@@ -1,0 +1,26 @@
+version: '3.8'
+services:
+  postgres:
+    image: postgres:13.5
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    ports:
+      - '5436:5432'
+
+  redis:
+    image: redis:6.2
+    command: redis-server --requirepass K3yjZLFW2QqPwfjufefG
+    ports:
+      - '6380:6379'
+    volumes:
+      - redis:/data
+    restart: always
+
+volumes:
+  postgres:
+  redis:
