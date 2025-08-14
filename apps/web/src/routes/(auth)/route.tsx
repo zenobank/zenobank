@@ -44,23 +44,6 @@ function ClerkAuthLayout() {
       </div>
       <div className='lg:p-8'>
         <div className='relative mx-auto flex w-full flex-col items-center justify-center gap-4'>
-          <LearnMore
-            defaultOpen
-            triggerProps={{
-              className: 'absolute -top-12 right-0 sm:right-20 size-6',
-            }}
-            contentProps={{ side: 'top', align: 'end', className: 'w-auto' }}
-          >
-            Welcome to the example Clerk auth page. <br />
-            Back to{' '}
-            <Link
-              to='/'
-              className='underline decoration-dashed underline-offset-2'
-            >
-              Dashboard
-            </Link>{' '}
-            ?
-          </LearnMore>
           <Outlet />
         </div>
       </div>
