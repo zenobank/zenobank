@@ -23,6 +23,7 @@ export default function Dashboard() {
     <>
       {/* ===== Top Heading ===== */}
       <Header>
+        <Search />
         <div className='ml-auto flex items-center space-x-4'>
           <ThemeSwitch />
           <UserButton />
