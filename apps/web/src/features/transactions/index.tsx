@@ -7,7 +7,7 @@ import { columns } from './components/users-columns'
 import { UsersDialogs } from './components/users-dialogs'
 import { TransactionsPrimaryButtons } from './components/users-primary-buttons'
 import { UsersTable } from './components/users-table'
-import UsersProvider from './context/users-context'
+import TransactionsProvider from './context/users-context'
 import { userListSchema } from './data/schema'
 import { users } from './data/users'
 
@@ -16,7 +16,7 @@ export default function Transactions() {
   const userList = userListSchema.parse(users)
 
   return (
-    <UsersProvider>
+    <TransactionsProvider>
       <Header fixed>
         <Search />
         <div className='ml-auto flex items-center space-x-4'>
@@ -41,6 +41,6 @@ export default function Transactions() {
       </Main>
 
       <UsersDialogs />
-    </UsersProvider>
+    </TransactionsProvider>
   )
 }
