@@ -6,6 +6,7 @@ import {
   IconTool,
   IconUser,
 } from '@tabler/icons-react'
+import { UserButton } from '@clerk/clerk-react'
 import { Separator } from '@/components/ui/separator'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
@@ -22,7 +23,7 @@ export default function Settings() {
         <Search />
         <div className='ml-auto flex items-center space-x-4'>
           <ThemeSwitch />
-          <ProfileDropdown />
+          <UserButton />
         </div>
       </Header>
 
