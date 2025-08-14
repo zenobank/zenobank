@@ -8,11 +8,12 @@ import {
 } from '@tanstack/react-query'
 import { RouterProvider, createRouter } from '@tanstack/react-router'
 import { ClerkProvider } from '@clerk/clerk-react'
+import { dark, shadcn } from '@clerk/themes'
 import { toast } from 'sonner'
 import { useAuthStore } from '@/stores/authStore'
 import { handleServerError } from '@/utils/handle-server-error'
 import { FontProvider } from './context/font-context'
-import { ThemeProvider } from './context/theme-context'
+import { ThemeProvider, useTheme } from './context/theme-context'
 import './index.css'
 // Generated Routes
 import { routeTree } from './routeTree.gen'
@@ -88,17 +89,21 @@ const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
 
 // Render the app
 const rootElement = document.getElementById('root')!
+
 if (!rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement)
   root.render(
     <StrictMode>
       <ClerkProvider
         publishableKey={PUBLISHABLE_KEY}
-        afterSignOutUrl='/clerk/sign-in'
-        signInUrl='/clerk/sign-in'
-        signUpUrl='/clerk/sign-up'
-        signInFallbackRedirectUrl='/clerk/user-management'
-        signUpFallbackRedirectUrl='/clerk/user-management'
+        afterSignOutUrl='/sign-in'
+        signInUrl='/sign-in'
+        signUpUrl='/sign-up'
+        signInFallbackRedirectUrl='/sign-in'
+        signUpFallbackRedirectUrl='/sign-up'
+        appearance={{
+          theme: shadcn,
+        }}
       >
         <QueryClientProvider client={queryClient}>
           <ThemeProvider defaultTheme='light' storageKey='vite-ui-theme'>
