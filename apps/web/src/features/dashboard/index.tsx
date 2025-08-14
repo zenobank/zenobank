@@ -1,3 +1,5 @@
+import { UserButton } from '@clerk/clerk-react'
+import { ClerkFullLogo } from '@/assets/clerk-full-logo'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -24,7 +26,7 @@ export default function Dashboard() {
         <div className='ml-auto flex items-center space-x-4'>
           <Search />
           <ThemeSwitch />
-          <ProfileDropdown />
+          <UserButton />
         </div>
       </Header>
 
