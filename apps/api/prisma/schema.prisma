@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
   output   = "../../../node_modules/.prisma/client"
@@ -14,72 +8,151 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum NetworkType {
+  EVM
+  SOLANA
+}
+
 model Wallet {
-  id          String        @id @default(uuid())
-  address     String        @unique
-  addressType String // EVM, BTC, SOL, etc.
-  // network     String // base-mainnet, base-testnet, etc.
-  label       String?
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  Transaction Transaction[]
+  id      String @id @default(uuid())
+  address String @unique
+
+  networkId NetworkId
+  network   Network   @relation(fields: [networkId], references: [id])
+
+  privateKey     String
+  label          String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  AddressBinding AddressBinding[]
 }
 
-enum WalletRole {
-  MASTER // pertenece a MasterAccount
-  DEPOSIT
-  GAS_TANK
-  USER
+model PaymentRequest {
+  id             String          @id @default(uuid())
+  orderCurrency  String // ISO 4217
+  orderAmount    BigInt
+  notifyUrl      String
+  orderId        String          @unique
+  expiredAt      DateTime
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  AddressBinding AddressBinding?
 }
 
-model MasterAccount {
-  id        String   @id @default(uuid())
-  label     String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+enum TokenStandard {
+  NATIVE
+  ERC20
+  BEP20
+  TRC20
+  SPL
 }
 
-model WalletWebhook {
-  webhookId String   @id
-  network   String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+enum NetworkId {
+  ETHEREUM_MAINNET
+  BASE_MAINNET
+  ARBITRUM_MAINNET
+  ETHEREUM_HOLESKY
 }
 
-model Transaction {
-  id                     String            @id @default(uuid())
-  txHash                 String            @unique
-  network                String
-  status                 TransactionStatus @default(PENDING)
-  type                   TransactionType
-  confirmations          Int               @default(0)
-  confirmationRetryCount Int               @default(0)
-  errorMessage           String?
-  createdAt              DateTime          @default(now())
-  updatedAt              DateTime          @updatedAt
+model Network {
+  id          NetworkId   @id
+  networkType NetworkType @unique
+  name        String      @unique
+  isTestnet   Boolean     @default(false)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
 
-  walletId String
-  wallet   Wallet @relation(fields: [walletId], references: [id])
+  TokenOnNetwork TokenOnNetwork[]
+  Wallet         Wallet[]
 }
 
-enum TransactionType {
-  GAS_TRANSFER
-  SWEEP_FUNDS
-  DEPOSIT
+model TokenCanonical {
+  id           String   @id
+  name         String
+  symbol       String
+  isStablecoin Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  variants TokenOnNetwork[]
+
+  @@unique([symbol, name])
 }
 
-enum TransactionStatus {
+model TokenOnNetwork {
+  id               String         @id
+  canonicalTokenId String
+  canonicalToken   TokenCanonical @relation(fields: [canonicalTokenId], references: [id])
+
+  standard     TokenStandard
+  address      String
+  decimals     Int
+  symbol       String
+  isDeprecated Boolean       @default(false)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  network   Network   @relation(fields: [networkId], references: [id])
+  networkId NetworkId
+
+  Deposit Deposit[]
+
+  @@unique([networkId, address])
+  @@index([canonicalTokenId])
+  @@index([networkId, symbol])
+}
+
+enum AddressBindingType {
+  TOPUP // address for recurring deposits
+  SINGLE_USE_PAYMENT
+}
+
+model AddressBinding {
+  id         String             @id @default(uuid())
+  type       AddressBindingType
+  merchantId String?
+  userId     String?
+
+  paymentRequestId String?         @unique
+  paymentRequest   PaymentRequest? @relation(fields: [paymentRequestId], references: [id])
+
+  walletId String?
+  wallet   Wallet? @relation(fields: [walletId], references: [id])
+  address  String
+
+  expiresAt DateTime?
+  active    Boolean   @default(true)
+
+  createdAt     DateTime  @default(now())
+  deactivatedAt DateTime?
+
+  deposits Deposit[]
+
+  @@index([type, userId])
+  @@index([type, merchantId])
+}
+
+enum DepositStatus {
   PENDING
   CONFIRMED
   FAILED
 }
 
-model Token {
-  id                  String @id
-  name                String
-  symbol              String
-  tokenAddress        String
-  network             String
-  decimals            Int
-  crossNetworkTokenId String // share between same token in different networks USDC in base, arbitrum, etc. will have the same id
+model Deposit {
+  id        String         @id @default(uuid())
+  bindingId String
+  binding   AddressBinding @relation(fields: [bindingId], references: [id])
+
+  tokenId String
+  token   TokenOnNetwork @relation(fields: [tokenId], references: [id])
+
+  txHash        String
+  amountAtomic  BigInt
+  confirmations Int           @default(0)
+  status        DepositStatus @default(PENDING)
+  firstSeenAt   DateTime      @default(now())
+  confirmedAt   DateTime?
+
+  @@unique([tokenId, txHash]) // idempotencia por activo en red
+  @@index([bindingId, status])
 }
