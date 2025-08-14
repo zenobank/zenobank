@@ -6,8 +6,6 @@ import {
   SidebarRail,
 } from '@/components/ui/sidebar'
 import { NavGroup } from '@/components/layout/nav-group'
-import { NavUser } from '@/components/layout/nav-user'
-import { TeamSwitcher } from '@/components/layout/team-switcher'
 import { useSidebarData } from './use-sidebar-data'
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -15,7 +13,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible='icon' variant='floating' {...props}>
       <SidebarHeader>
-        <TeamSwitcher teams={sidebarData.teams} />
+        <img
+          src={'/images/logo-black.png'}
+          alt='Clerk'
+          className='ml-2 w-1/2 pt-2'
+        />
       </SidebarHeader>
       <SidebarContent>
         {sidebarData.navGroups.map((props) => (
