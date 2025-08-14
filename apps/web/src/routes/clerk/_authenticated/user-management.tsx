@@ -14,13 +14,12 @@ import { Main } from '@/components/layout/main'
 import { LearnMore } from '@/components/learn-more'
 import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
-import { columns } from '@/features/users/components/users-columns'
-import { UsersDialogs } from '@/features/users/components/users-dialogs'
-import { UsersPrimaryButtons } from '@/features/users/components/users-primary-buttons'
-import { UsersTable } from '@/features/users/components/users-table'
-import UsersProvider from '@/features/users/context/users-context'
-import { userListSchema } from '@/features/users/data/schema'
-import { users } from '@/features/users/data/users'
+import { columns } from '@/features/transactions/components/users-columns'
+import { UsersDialogs } from '@/features/transactions/components/users-dialogs'
+import { UsersTable } from '@/features/transactions/components/users-table'
+import TransactionsProvider from '@/features/transactions/context/transactions-context'
+import { userListSchema } from '@/features/transactions/data/schema'
+import { users } from '@/features/transactions/data/users'
 
 export const Route = createFileRoute('/clerk/_authenticated/user-management')({
   component: UserManagement,
@@ -47,7 +46,7 @@ function UserManagement() {
   return (
     <>
       <SignedIn>
-        <UsersProvider>
+        <TransactionsProvider>
           <Header fixed>
             <Search />
             <div className='ml-auto flex items-center space-x-4'>
@@ -72,10 +71,10 @@ function UserManagement() {
                     <p>
                       This is the same as{' '}
                       <Link
-                        to='/users'
+                        to='/transactions'
                         className='text-blue-500 underline decoration-dashed underline-offset-2'
                       >
-                        '/users'
+                        '/transactions'
                       </Link>
                     </p>
 
@@ -87,7 +86,6 @@ function UserManagement() {
                   </LearnMore>
                 </div>
               </div>
-              <UsersPrimaryButtons />
             </div>
             <div className='-mx-4 flex-1 overflow-auto px-4 py-1 lg:flex-row lg:space-y-0 lg:space-x-12'>
               <UsersTable data={userList} columns={columns} />
@@ -95,7 +93,7 @@ function UserManagement() {
           </Main>
 
           <UsersDialogs />
-        </UsersProvider>
+        </TransactionsProvider>
       </SignedIn>
     </>
   )
@@ -138,10 +136,10 @@ function Unauthorized() {
               <p>
                 This is the same as{' '}
                 <Link
-                  to='/users'
+                  to='/transactions'
                   className='text-blue-500 underline decoration-dashed underline-offset-2'
                 >
-                  '/users'
+                  '/transactions'
                 </Link>
                 .{' '}
               </p>

@@ -28,16 +28,25 @@ model Wallet {
   paymentRequestId String?
 }
 
+enum PaymentRequestStatus {
+  PENDING
+  PARTIAL
+  PAID
+  EXPIRED
+  CANCELED
+}
+
 model PaymentRequest {
-  id            String   @id @default(uuid())
+  id            String               @id @default(uuid())
   orderCurrency String // ISO 4217
   orderAmount   BigInt
   notifyUrl     String
-  orderId       String   @unique
+  orderId       String               @unique
   expiredAt     DateTime
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
   wallets       Wallet[]
+  status        PaymentRequestStatus @default(PENDING)
 }
 
 enum TokenStandard {
