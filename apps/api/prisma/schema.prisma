@@ -17,26 +17,27 @@ model Wallet {
   id      String @id @default(uuid())
   address String @unique
 
-  networkId NetworkId
-  network   Network   @relation(fields: [networkId], references: [id])
+  addressType NetworkType
 
-  privateKey     String
-  label          String?
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
-  AddressBinding AddressBinding[]
+  privateKey       String
+  label            String?
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  Deposit          Deposit[]
+  PaymentRequest   PaymentRequest? @relation(fields: [paymentRequestId], references: [id])
+  paymentRequestId String?
 }
 
 model PaymentRequest {
-  id             String          @id @default(uuid())
-  orderCurrency  String // ISO 4217
-  orderAmount    BigInt
-  notifyUrl      String
-  orderId        String          @unique
-  expiredAt      DateTime
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
-  AddressBinding AddressBinding?
+  id            String   @id @default(uuid())
+  orderCurrency String // ISO 4217
+  orderAmount   BigInt
+  notifyUrl     String
+  orderId       String   @unique
+  expiredAt     DateTime
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  wallets       Wallet[]
 }
 
 enum TokenStandard {
@@ -63,7 +64,6 @@ model Network {
   updatedAt   DateTime    @updatedAt
 
   TokenOnNetwork TokenOnNetwork[]
-  Wallet         Wallet[]
 }
 
 model TokenCanonical {
@@ -107,31 +107,6 @@ enum AddressBindingType {
   SINGLE_USE_PAYMENT
 }
 
-model AddressBinding {
-  id         String             @id @default(uuid())
-  type       AddressBindingType
-  merchantId String?
-  userId     String?
-
-  paymentRequestId String?         @unique
-  paymentRequest   PaymentRequest? @relation(fields: [paymentRequestId], references: [id])
-
-  walletId String?
-  wallet   Wallet? @relation(fields: [walletId], references: [id])
-  address  String
-
-  expiresAt DateTime?
-  active    Boolean   @default(true)
-
-  createdAt     DateTime  @default(now())
-  deactivatedAt DateTime?
-
-  deposits Deposit[]
-
-  @@index([type, userId])
-  @@index([type, merchantId])
-}
-
 enum DepositStatus {
   PENDING
   CONFIRMED
@@ -139,9 +114,9 @@ enum DepositStatus {
 }
 
 model Deposit {
-  id        String         @id @default(uuid())
-  bindingId String
-  binding   AddressBinding @relation(fields: [bindingId], references: [id])
+  id       String @id @default(uuid())
+  walletId String
+  wallet   Wallet @relation(fields: [walletId], references: [id])
 
   tokenId String
   token   TokenOnNetwork @relation(fields: [tokenId], references: [id])
@@ -154,5 +129,4 @@ model Deposit {
   confirmedAt   DateTime?
 
   @@unique([tokenId, txHash]) // idempotencia por activo en red
-  @@index([bindingId, status])
 }

@@ -1,4 +1,4 @@
-import { useTransactions } from '../context/users-context'
+import { useTransactions } from '../context/transactions-context'
 import { UsersActionDialog } from './users-action-dialog'
 import { UsersDeleteDialog } from './users-delete-dialog'
 import { UsersInviteDialog } from './users-invite-dialog'

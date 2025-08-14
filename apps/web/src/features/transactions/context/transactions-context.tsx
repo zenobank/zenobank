@@ -32,11 +32,13 @@ export default function TransactionsProvider({ children }: Props) {
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const useTransactions = () => {
-  const usersContext = React.useContext(TransactionsContext)
+  const transactionsContext = React.useContext(TransactionsContext)
 
-  if (!usersContext) {
-    throw new Error('useUsers has to be used within <UsersContext>')
+  if (!transactionsContext) {
+    throw new Error(
+      'useTransactions has to be used within <TransactionsContext>'
+    )
   }
 
-  return usersContext
+  return transactionsContext
 }
