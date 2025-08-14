@@ -17,11 +17,6 @@ import { Route as errors500RouteImport } from './routes/(errors)/500'
 import { Route as errors404RouteImport } from './routes/(errors)/404'
 import { Route as errors403RouteImport } from './routes/(errors)/403'
 import { Route as errors401RouteImport } from './routes/(errors)/401'
-import { Route as auth2SignUpRouteImport } from './routes/(auth)2/sign-up'
-import { Route as auth2SignIn2RouteImport } from './routes/(auth)2/sign-in-2'
-import { Route as auth2SignInRouteImport } from './routes/(auth)2/sign-in'
-import { Route as auth2OtpRouteImport } from './routes/(auth)2/otp'
-import { Route as auth2ForgotPasswordRouteImport } from './routes/(auth)2/forgot-password'
 import { Route as authSignUpRouteImport } from './routes/(auth)/sign-up'
 import { Route as authSignInRouteImport } from './routes/(auth)/sign-in'
 import { Route as AuthenticatedSettingsRouteRouteImport } from './routes/_authenticated/settings/route'
@@ -70,31 +65,6 @@ const errors403Route = errors403RouteImport.update({
 const errors401Route = errors401RouteImport.update({
   id: '/(errors)/401',
   path: '/401',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const auth2SignUpRoute = auth2SignUpRouteImport.update({
-  id: '/(auth)2/sign-up',
-  path: '/2/sign-up',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const auth2SignIn2Route = auth2SignIn2RouteImport.update({
-  id: '/(auth)2/sign-in-2',
-  path: '/2/sign-in-2',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const auth2SignInRoute = auth2SignInRouteImport.update({
-  id: '/(auth)2/sign-in',
-  path: '/2/sign-in',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const auth2OtpRoute = auth2OtpRouteImport.update({
-  id: '/(auth)2/otp',
-  path: '/2/otp',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const auth2ForgotPasswordRoute = auth2ForgotPasswordRouteImport.update({
-  id: '/(auth)2/forgot-password',
-  path: '/2/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const authSignUpRoute = authSignUpRouteImport.update({
@@ -165,11 +135,6 @@ export interface FileRoutesByFullPath {
   '/settings': typeof AuthenticatedSettingsRouteRouteWithChildren
   '/sign-in': typeof authSignInRoute
   '/sign-up': typeof authSignUpRoute
-  '/2/forgot-password': typeof auth2ForgotPasswordRoute
-  '/2/otp': typeof auth2OtpRoute
-  '/2/sign-in': typeof auth2SignInRoute
-  '/2/sign-in-2': typeof auth2SignIn2Route
-  '/2/sign-up': typeof auth2SignUpRoute
   '/401': typeof errors401Route
   '/403': typeof errors403Route
   '/404': typeof errors404Route
@@ -188,11 +153,6 @@ export interface FileRoutesByTo {
   '/': typeof AuthenticatedIndexRoute
   '/sign-in': typeof authSignInRoute
   '/sign-up': typeof authSignUpRoute
-  '/2/forgot-password': typeof auth2ForgotPasswordRoute
-  '/2/otp': typeof auth2OtpRoute
-  '/2/sign-in': typeof auth2SignInRoute
-  '/2/sign-in-2': typeof auth2SignIn2Route
-  '/2/sign-up': typeof auth2SignUpRoute
   '/401': typeof errors401Route
   '/403': typeof errors403Route
   '/404': typeof errors404Route
@@ -214,11 +174,6 @@ export interface FileRoutesById {
   '/_authenticated/settings': typeof AuthenticatedSettingsRouteRouteWithChildren
   '/(auth)/sign-in': typeof authSignInRoute
   '/(auth)/sign-up': typeof authSignUpRoute
-  '/(auth)2/forgot-password': typeof auth2ForgotPasswordRoute
-  '/(auth)2/otp': typeof auth2OtpRoute
-  '/(auth)2/sign-in': typeof auth2SignInRoute
-  '/(auth)2/sign-in-2': typeof auth2SignIn2Route
-  '/(auth)2/sign-up': typeof auth2SignUpRoute
   '/(errors)/401': typeof errors401Route
   '/(errors)/403': typeof errors403Route
   '/(errors)/404': typeof errors404Route
@@ -241,11 +196,6 @@ export interface FileRouteTypes {
     | '/settings'
     | '/sign-in'
     | '/sign-up'
-    | '/2/forgot-password'
-    | '/2/otp'
-    | '/2/sign-in'
-    | '/2/sign-in-2'
-    | '/2/sign-up'
     | '/401'
     | '/403'
     | '/404'
@@ -264,11 +214,6 @@ export interface FileRouteTypes {
     | '/'
     | '/sign-in'
     | '/sign-up'
-    | '/2/forgot-password'
-    | '/2/otp'
-    | '/2/sign-in'
-    | '/2/sign-in-2'
-    | '/2/sign-up'
     | '/401'
     | '/403'
     | '/404'
@@ -289,11 +234,6 @@ export interface FileRouteTypes {
     | '/_authenticated/settings'
     | '/(auth)/sign-in'
     | '/(auth)/sign-up'
-    | '/(auth)2/forgot-password'
-    | '/(auth)2/otp'
-    | '/(auth)2/sign-in'
-    | '/(auth)2/sign-in-2'
-    | '/(auth)2/sign-up'
     | '/(errors)/401'
     | '/(errors)/403'
     | '/(errors)/404'
@@ -313,11 +253,6 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   authRouteRoute: typeof authRouteRouteWithChildren
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
-  auth2ForgotPasswordRoute: typeof auth2ForgotPasswordRoute
-  auth2OtpRoute: typeof auth2OtpRoute
-  auth2SignInRoute: typeof auth2SignInRoute
-  auth2SignIn2Route: typeof auth2SignIn2Route
-  auth2SignUpRoute: typeof auth2SignUpRoute
   errors401Route: typeof errors401Route
   errors403Route: typeof errors403Route
   errors404Route: typeof errors404Route
@@ -381,41 +316,6 @@ declare module '@tanstack/react-router' {
       path: '/401'
       fullPath: '/401'
       preLoaderRoute: typeof errors401RouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/(auth)2/sign-up': {
-      id: '/(auth)2/sign-up'
-      path: '/2/sign-up'
-      fullPath: '/2/sign-up'
-      preLoaderRoute: typeof auth2SignUpRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/(auth)2/sign-in-2': {
-      id: '/(auth)2/sign-in-2'
-      path: '/2/sign-in-2'
-      fullPath: '/2/sign-in-2'
-      preLoaderRoute: typeof auth2SignIn2RouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/(auth)2/sign-in': {
-      id: '/(auth)2/sign-in'
-      path: '/2/sign-in'
-      fullPath: '/2/sign-in'
-      preLoaderRoute: typeof auth2SignInRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/(auth)2/otp': {
-      id: '/(auth)2/otp'
-      path: '/2/otp'
-      fullPath: '/2/otp'
-      preLoaderRoute: typeof auth2OtpRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/(auth)2/forgot-password': {
-      id: '/(auth)2/forgot-password'
-      path: '/2/forgot-password'
-      fullPath: '/2/forgot-password'
-      preLoaderRoute: typeof auth2ForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/(auth)/sign-up': {
@@ -557,11 +457,6 @@ const AuthenticatedRouteRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   authRouteRoute: authRouteRouteWithChildren,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
-  auth2ForgotPasswordRoute: auth2ForgotPasswordRoute,
-  auth2OtpRoute: auth2OtpRoute,
-  auth2SignInRoute: auth2SignInRoute,
-  auth2SignIn2Route: auth2SignIn2Route,
-  auth2SignUpRoute: auth2SignUpRoute,
   errors401Route: errors401Route,
   errors403Route: errors403Route,
   errors404Route: errors404Route,
