@@ -19,7 +19,7 @@ import { type SidebarData } from '../types'
 export const sidebarData: SidebarData = {
   user: {
     name: 'satnaing',
-    email: 'satnaingdev@gmail.com',
+    email: 'satnaingdevd@gmail.com',
     avatar: '/avatars/shadcn.jpg',
   },
   teams: [
@@ -71,15 +71,15 @@ export const sidebarData: SidebarData = {
           items: [
             {
               title: 'Sign In',
-              url: '/clerk/sign-in',
+              url: '/sign-in',
             },
             {
               title: 'Sign Up',
-              url: '/clerk/sign-up',
+              url: '/sign-up',
             },
             {
-              title: 'User Management',
-              url: '/clerk/user-management',
+              title: 'Transactions',
+              url: '/transactions',
             },
           ],
         },
