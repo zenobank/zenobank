@@ -1,11 +1,11 @@
-import { Network, NETWORK_INFO } from 'src/lib/contants/network';
+import { NetworkId } from '@prisma/client';
 
-export function isNativeToken(tokenAddress: string, network: Network) {
+export function isNativeToken(tokenAddress: string, network: NetworkId) {
+  throw new Error('Not implemented');
   return (
-    tokenAddress.toLowerCase() ===
-    NETWORK_INFO[network].nativeCurrency.address.toLowerCase()
+    tokenAddress.toLowerCase() === '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
   );
 }
-export function nativeTokenAddress(network: Network): string {
-  return NETWORK_INFO[network].nativeCurrency.address;
+export function nativeTokenAddress(networkId: NetworkId): string {
+  return '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
 }

@@ -1,16 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { Network } from 'src/lib/contants/network';
 import { publicClients } from 'src/lib/contants/client';
 import { parsePercent } from 'src/lib/utils/percent';
 import { PublicClient, encodeFunctionData, erc20Abi } from 'viem';
 import { isNativeToken } from './tokens.utils';
+import { NetworkId } from '@prisma/client';
 
 @Injectable()
 export class TokenGasService {
   async estimateTokenTransferGasCost(
     transferArgs: { sender: string; destination: string },
     amountsToTransfer: { [key: string]: bigint },
-    network: Network,
+    network: NetworkId,
     extraGasMarginPerc = parsePercent('50%'),
   ): Promise<bigint> {
     const client = publicClients[network];
@@ -30,7 +30,7 @@ export class TokenGasService {
   private async estimateTokenTransferGasUnits(
     transferArgs: { sender: string; destination: string },
     amountsToTransfer: { [key: string]: bigint },
-    network: Network,
+    network: NetworkId,
     extraGasMarginPerc = parsePercent('50%'),
   ): Promise<bigint> {
     const client = publicClients[network];
