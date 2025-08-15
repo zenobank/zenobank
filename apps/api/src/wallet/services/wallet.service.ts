@@ -1,5 +1,5 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { NetworkType, Wallet } from '@prisma/client';
+import { NetworkId, NetworkType, Wallet } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
 import { WalletFactory } from 'src/wallet/wallet.factory';
 import { CreateWalletDto } from 'src/wallet/dto/create-wallet.dto';
@@ -10,7 +10,6 @@ import { PrismaService } from 'src/prisma/prisma.service';
 @Injectable()
 export class WalletService {
   private readonly logger = new Logger(WalletService.name);
-  private wallets: Map<string, Wallet> = new Map();
 
   constructor(
     private readonly walletFactory: WalletFactory,
@@ -34,9 +33,6 @@ export class WalletService {
         },
       });
 
-      await this.registerWalletInWebhooks(wallet);
-      this.wallets.set(wallet.id, wallet);
-
       this.logger.log(`Wallet created successfully: ${wallet.id}`);
       return wallet;
     } catch (error) {
@@ -45,12 +41,16 @@ export class WalletService {
     }
   }
 
-  async registerWalletInWebhooks(
-    wallet: Wallet,
-  ): Promise<WalletWebhookResponseDto[]> {
+  async registerWalletInWebhooks({
+    address,
+    networkId,
+  }: {
+    address: string;
+    networkId: NetworkId;
+  }): Promise<WalletWebhookResponseDto[]> {
     const response = await this.quickNodeService.addEvmWalletToWebhook({
       webhookId: `b693a672-3a58-436e-949b-837617613e32`,
-      wallet: wallet.address,
+      wallet: address,
     });
     return [
       {
