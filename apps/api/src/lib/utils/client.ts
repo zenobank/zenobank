@@ -6,13 +6,16 @@ import {
   WalletClient,
 } from 'viem';
 import { publicClients } from 'src/lib/contants/client';
-import { Network } from 'src/lib/contants/network';
+import { NetworkId } from '@prisma/client';
 
-export function client(network: Network): PublicClient {
-  return publicClients[network];
+export function client(networkId: NetworkId): PublicClient {
+  return publicClients[networkId];
 }
-export function walletClient(network: Network, account: Account): WalletClient {
-  const publicClient = client(network);
+export function walletClient(
+  networkId: NetworkId,
+  account: Account,
+): WalletClient {
+  const publicClient = client(networkId);
 
   return createWalletClient({
     account,

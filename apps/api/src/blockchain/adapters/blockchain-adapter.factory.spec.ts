@@ -1,5 +1,5 @@
 import { BlockchainAdapterFactory } from './blockchain-adapter.factory';
-import { Network } from 'src/lib/contants/network';
+import { NetworkId } from '@prisma/client';
 
 describe('BlockchainAdapterFactory', () => {
   let factory: BlockchainAdapterFactory;
@@ -9,14 +9,14 @@ describe('BlockchainAdapterFactory', () => {
   });
 
   it('should handle all defined networks in getAdapter()', () => {
-    const allNetworks = Object.values(Network);
-    const unhandled: Network[] = [];
+    const allNetworks = Object.values(NetworkId);
+    const unhandled: NetworkId[] = [];
 
     for (const network of allNetworks) {
       try {
-        factory.getAdapter(network as Network);
+        factory.getAdapter(network);
       } catch (e) {
-        unhandled.push(network as Network);
+        unhandled.push(network);
       }
     }
 
