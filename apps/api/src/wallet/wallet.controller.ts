@@ -16,15 +16,14 @@ export class WalletController {
 
   @Post('create-webhook/')
   async createWebhook() {
-    return this.walletService.registerWalletInWebhooks({
-      address: '0x1234567890123456789012345678901234567890',
+    const wallet = await this.walletService.createWallet({
       networkId: NetworkId.ARBITRUM_MAINNET,
-      privateKey: '0x1234567890123456789012345678901234567890',
       label: 'test',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      paymentRequestId: null,
-      id: '123',
+    });
+    console.log('wallet created', wallet.address);
+    return this.walletService.registerWalletInWebhooks({
+      address: wallet.address,
+      networkId: NetworkId.ARBITRUM_MAINNET,
     });
   }
 }

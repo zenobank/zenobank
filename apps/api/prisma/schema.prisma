@@ -70,7 +70,7 @@ enum NetworkId {
 
 model Network {
   id          NetworkId   @id
-  networkType NetworkType @unique
+  networkType NetworkType
   name        String      @unique
   isTestnet   Boolean     @default(false)
   createdAt   DateTime    @default(now())
