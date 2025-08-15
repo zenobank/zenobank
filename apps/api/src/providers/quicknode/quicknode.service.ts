@@ -69,10 +69,11 @@ export class QuickNodeService {
 
   async addEvmWalletToWebhook(args: {
     webhookId: string;
-    wallet: string;
+    wallets: string[];
   }): Promise<QuickNodeWebhookResponse> {
-    const { webhookId, wallet } = args;
+    const { webhookId, wallets } = args;
     const webhook = await this.getWebhookById(webhookId);
+    this.logger.log(`Webhook: ${JSON.stringify(webhook, null, 2)}`);
     const currentTrackedWallets = this.extractEvmWalletsFromFilterFunction(
       webhook.filter_function,
     );
@@ -82,7 +83,7 @@ export class QuickNodeService {
       templateId: 'evmWalletFilter',
       payload: {
         templateArgs: {
-          wallets: [...currentTrackedWallets, wallet],
+          wallets: [...currentTrackedWallets, ...wallets],
         },
         network: webhook.network,
         destination_attributes: {
