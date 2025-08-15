@@ -1,11 +1,12 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { Wallet } from '@prisma/client';
+import { NetworkType, Wallet } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
 import { WalletFactory } from 'src/wallet/wallet.factory';
 import { CreateWalletDto } from 'src/wallet/dto/create-wallet.dto';
 import { QuickNodeService } from 'src/providers/quicknode/quicknode.service';
 import { EVM_NETWORKS } from 'src/lib/contants/network';
 import { WalletWebhookResponseDto } from '../dto/response-wallet.dto';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class WalletService {
@@ -15,12 +16,24 @@ export class WalletService {
   constructor(
     private readonly walletFactory: WalletFactory,
     private readonly quickNodeService: QuickNodeService,
+    private readonly db: PrismaService,
   ) {}
 
   async createWallet(createWalletDto: CreateWalletDto): Promise<Wallet> {
     try {
-      const address = this.walletFactory.generate(createWalletDto.addressType);
-      const wallet: Wallet = this.buildWallet(createWalletDto, address);
+      const { address, privateKey } = this.walletFactory.generate(
+        createWalletDto.networkId,
+      );
+      const wallet: Wallet = await this.db.wallet.create({
+        data: {
+          address,
+          networkId: createWalletDto.networkId,
+          privateKey,
+          label: createWalletDto.label,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      });
 
       await this.registerWalletInWebhooks(wallet);
       this.wallets.set(wallet.id, wallet);
@@ -28,23 +41,12 @@ export class WalletService {
       this.logger.log(`Wallet created successfully: ${wallet.id}`);
       return wallet;
     } catch (error) {
-      this.logger.error(`Failed to create wallet: ${error.message}`);
+      this.logger.error(`Failed to create wallet: ${error}`);
       throw error;
     }
   }
-  private buildWallet(dto: CreateWalletDto, address: string): Wallet {
-    return {
-      id: uuidv4(),
-      address,
-      masterId: null,
-      addressType: dto.addressType,
-      label: dto.label,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-  }
 
-  private async registerWalletInWebhooks(
+  async registerWalletInWebhooks(
     wallet: Wallet,
   ): Promise<WalletWebhookResponseDto[]> {
     const responses = await Promise.all(
@@ -99,7 +101,7 @@ export class WalletService {
       this.wallets.delete(id);
       this.logger.log(`Wallet deleted successfully: ${id}`);
     } catch (error) {
-      this.logger.error(`Failed to delete wallet: ${error.message}`);
+      this.logger.error(`Failed to delete wallet: ${error}`);
       throw error;
     }
   }
@@ -147,7 +149,7 @@ export class WalletService {
       // Example: Send notification or store transaction
       await this.storeTransaction(wallet.id, transaction);
     } catch (error) {
-      this.logger.error(`Failed to process transaction: ${error.message}`);
+      this.logger.error(`Failed to process transaction: ${error}`);
     }
   }
 

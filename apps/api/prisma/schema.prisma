@@ -15,17 +15,21 @@ enum NetworkType {
 
 model Wallet {
   id      String @id @default(uuid())
-  address String @unique
+  address String
 
-  addressType NetworkType
+  networkId NetworkId
+  network   Network   @relation(fields: [networkId], references: [id])
 
-  privateKey       String
-  label            String?
-  createdAt        DateTime        @default(now())
-  updatedAt        DateTime        @updatedAt
-  Deposit          Deposit[]
-  PaymentRequest   PaymentRequest? @relation(fields: [paymentRequestId], references: [id])
+  privateKey String
+  label      String?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  deposits   Deposit[]
+
+  paymentRequest   PaymentRequest? @relation(fields: [paymentRequestId], references: [id])
   paymentRequestId String?
+
+  @@unique([networkId, address])
 }
 
 enum PaymentRequestStatus {
@@ -37,16 +41,16 @@ enum PaymentRequestStatus {
 }
 
 model PaymentRequest {
-  id            String               @id @default(uuid())
-  orderCurrency String // ISO 4217
-  orderAmount   BigInt
-  notifyUrl     String
-  orderId       String               @unique
-  expiredAt     DateTime
-  createdAt     DateTime             @default(now())
-  updatedAt     DateTime             @updatedAt
-  wallets       Wallet[]
-  status        PaymentRequestStatus @default(PENDING)
+  id             String               @id @default(uuid())
+  currency       String // ISO 4217
+  amount         String
+  notifyUrl      String
+  orderId        String               @unique
+  expiredAt      DateTime
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+  status         PaymentRequestStatus @default(PENDING)
+  depositWallets Wallet[]
 }
 
 enum TokenStandard {
@@ -73,6 +77,8 @@ model Network {
   updatedAt   DateTime    @updatedAt
 
   TokenOnNetwork TokenOnNetwork[]
+  Deposit        Deposit[]
+  Wallet         Wallet[]
 }
 
 model TokenCanonical {
@@ -129,6 +135,9 @@ model Deposit {
 
   tokenId String
   token   TokenOnNetwork @relation(fields: [tokenId], references: [id])
+
+  networkId NetworkId
+  network   Network   @relation(fields: [networkId], references: [id])
 
   txHash        String
   amountAtomic  BigInt

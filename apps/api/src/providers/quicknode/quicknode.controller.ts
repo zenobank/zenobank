@@ -8,7 +8,7 @@ import {
   Post,
   Req,
 } from '@nestjs/common';
-import { Request } from 'express';
+import type { Request } from 'express';
 import { QuickNodeService } from './quicknode.service';
 
 @Controller('providers/quicknode')

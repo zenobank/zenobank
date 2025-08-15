@@ -6,7 +6,6 @@ import {
 } from './transactions.constants';
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { TransactionStatus } from '@prisma/client';
 import {
   hasExceededMaxWaitTime,
   hasReachedMinBlockConfirmations,
@@ -31,16 +30,16 @@ export class TransactionsProcessor extends WorkerHost {
     const { txHash, network, walletAddress } = job.data;
 
     try {
-      const txInDb = await this.db.transaction.findUniqueOrThrow({
-        where: { txHash },
-      });
-      if (txInDb.status !== TransactionStatus.PENDING) {
-        this.logger.warn(
-          `Transaction ${txHash} is not pending, skipping...`,
-          job.data,
-        );
-        return;
-      }
+      // const txInDb = await this.db.transaction.findUniqueOrThrow({
+      //   where: { txHash },
+      // });
+      // if (txInDb.status !== TransactionStatus.PENDING) {
+      //   this.logger.warn(
+      //     `Transaction ${txHash} is not pending, skipping...`,
+      //     job.data,
+      //   );
+      //   return;
+      // }
 
       const confirmationPolicy = NETWORK_CONFIRMATION_POLICIES[network];
 
@@ -56,50 +55,50 @@ export class TransactionsProcessor extends WorkerHost {
         currentBlockConfirmations: txStatus.confirmations,
         minBlockConfirmations: confirmationPolicy.minBlockConfirmations,
       });
-      await this.db.transaction.update({
-        where: { txHash },
-        data: {
-          confirmations: txStatus.confirmations,
-          confirmationRetryCount: txInDb.confirmationRetryCount + 1,
-        },
-      });
+      // await this.db.transaction.update({
+      //   where: { txHash },
+      //   data: {
+      //     confirmations: txStatus.confirmations,
+      //     confirmationRetryCount: txInDb.confirmationRetryCount + 1,
+      //   },
+      // });
 
       if (isConfirmed) {
-        await this.db.transaction.update({
-          where: { txHash },
-          data: {
-            status: TransactionStatus.CONFIRMED,
-          },
-        });
+        // await this.db.transaction.update({
+        //   where: { txHash },
+        //   data: {
+        //     status: TransactionStatus.CONFIRMED,
+        //   },
+        // });
         return;
       }
 
-      const isExpired = hasExceededMaxWaitTime({
-        createdAt: txInDb.createdAt,
-        maxWaitTimeMs: confirmationPolicy.maxWaitTime,
-      });
-
+      // const isExpired = hasExceededMaxWaitTime({
+      //   createdAt: txInDb.createdAt,
+      //   maxWaitTimeMs: confirmationPolicy.maxWaitTime,
+      // });
+      const isExpired = false;
       if (isExpired) {
-        await this.db.transaction.update({
-          where: { txHash },
-          data: {
-            status: TransactionStatus.FAILED,
-            errorMessage: 'Max wait time exceeded',
-          },
-        });
+        // await this.db.transaction.update({
+        //   where: { txHash },
+        //   data: {
+        //     status: TransactionStatus.FAILED,
+        //     errorMessage: 'Max wait time exceeded',
+        //   },
+        // });
         return;
       }
 
       return this.requeueJobWithDelay(job, confirmationPolicy.retryDelay);
     } catch (error) {
       this.logger.error(error);
-      await this.db.transaction.update({
-        where: { txHash },
-        data: {
-          status: TransactionStatus.FAILED,
-          errorMessage: error.message,
-        },
-      });
+      // await this.db.transaction.update({
+      //   where: { txHash },
+      //   data: {
+      //     status: TransactionStatus.FAILED,
+      //     errorMessage: error instanceof Error ? error.message : String(error),
+      //   },
+      // });
       throw error;
     }
   }

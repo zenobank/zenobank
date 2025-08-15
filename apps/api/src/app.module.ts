@@ -10,6 +10,8 @@ import { PrismaModule } from './prisma/prisma.module';
 import { BullModule } from '@nestjs/bullmq';
 import { TransactionsModule } from './transactions/transactions.module';
 import { BlockchainModule } from './blockchain/blockchain.module';
+import { PaymentsController } from './payments/payments.controller';
+import { PaymentsModule } from './payments/payments.module';
 
 @Module({
   imports: [
@@ -33,8 +35,9 @@ import { BlockchainModule } from './blockchain/blockchain.module';
     }),
     TransactionsModule,
     BlockchainModule,
+    PaymentsModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, PaymentsController],
   providers: [AppService],
 })
 export class AppModule {}
