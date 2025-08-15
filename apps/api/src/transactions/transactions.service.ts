@@ -7,6 +7,7 @@ import { privateKeyToAccount } from 'viem/accounts';
 import { client, walletClient } from 'src/lib/utils/client';
 import { erc20Abi } from 'viem';
 import { Env, getEnv } from 'src/lib/utils/env';
+import { NetworkId } from '@prisma/client';
 
 @Injectable()
 export class TransactionsService {
@@ -46,7 +47,7 @@ export class TransactionsService {
     const balances = await this.tokensService.getTokenBalances(
       network,
       sourceWalletAddress,
-      tokens.map((token) => token.tokenAddress),
+      tokens.map((token) => token.address),
     );
 
     const sourceWalletNativeBalance =

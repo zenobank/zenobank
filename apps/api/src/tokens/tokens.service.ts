@@ -22,33 +22,33 @@ export class TokensService {
   }
 
   async getTokenBalance(
-    network: Network,
+    networkId: NetworkId,
     { owner, token }: { owner: string; token: string },
   ): Promise<bigint> {
-    const balances = await this.getTokenBalances(network, owner, [token]);
+    const balances = await this.getTokenBalances(networkId, owner, [token]);
     return balances[token.toLowerCase()] ?? 0n;
   }
   async getNativeTokenBalance(
-    network: Network,
+    networkId: NetworkId,
     owner: string,
   ): Promise<bigint> {
-    return await this.getTokenBalance(network, {
+    return await this.getTokenBalance(networkId, {
       owner,
-      token: nativeTokenAddress(network),
+      token: nativeTokenAddress(networkId),
     });
   }
 
   async getTokenBalances(
-    network: Network,
+    networkId: NetworkId,
     owner: string,
     tokens: string[],
   ): Promise<{ [key: string]: bigint }> {
     const MAX_RETRIES = 5;
     const RETRY_DELAY = ms('1.5s');
-    const client = publicClients[network];
+    const client = publicClients[networkId];
     try {
       const tokenNativeIndex = tokens.findIndex((address) =>
-        isNativeToken(address, network),
+        isNativeToken(address, networkId),
       );
 
       let res = (await requestWithRepeatDelay(
@@ -56,7 +56,7 @@ export class TokensService {
           // @ts-ignore
           client.multicall({
             contracts: tokens
-              .filter((address) => !isNativeToken(address, network))
+              .filter((address) => !isNativeToken(address, networkId))
 
               .map((token) => ({
                 abi: erc20Abi,

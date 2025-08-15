@@ -1,5 +1,3 @@
-import { Network } from 'src/lib/contants/network';
-
 // export interface Token {
 //   id: string;
 
