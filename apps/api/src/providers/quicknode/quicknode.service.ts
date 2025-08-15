@@ -62,8 +62,8 @@ export class QuickNodeService {
       this.logger.log(`Webhook created: ${response.data.id}`);
       return response.data;
     } catch (error) {
-      this.logger.error(error.response?.data?.message || error.message);
-      throw new Error(`QuickNode webhook error: ${error.message}`);
+      this.logger.error(error instanceof Error ? error.message : String(error));
+      throw new Error(`QuickNode webhook error: ${error}`);
     }
   }
 
@@ -112,9 +112,9 @@ export class QuickNodeService {
       return response.data;
     } catch (error) {
       this.logger.error(
-        `Failed to update template webhook: ${error.response?.data?.message || error.message}`,
+        `Failed to update template webhook: ${error instanceof Error ? error.message : String(error)}`,
       );
-      throw new Error(`QuickNode update template error: ${error.message}`);
+      throw new Error(`QuickNode update template error: ${error}`);
     }
   }
   async createWebhookFromTemplate(
@@ -135,9 +135,9 @@ export class QuickNodeService {
       return response.data;
     } catch (error) {
       this.logger.error(
-        `Failed to create template webhook: ${error.response?.data?.message || error.message}`,
+        `Failed to create template webhook: ${error instanceof Error ? error.message : String(error)}`,
       );
-      throw new Error(`QuickNode template error: ${error.message}`);
+      throw new Error(`QuickNode template error: ${error}`);
     }
   }
 
@@ -147,8 +147,8 @@ export class QuickNodeService {
       await this.httpClient.delete(`/webhooks/rest/v1/webhooks/${id}`);
       this.logger.log(`Webhook deleted: ${id}`);
     } catch (error) {
-      this.logger.error(error.message);
-      throw new Error(`QuickNode delete error: ${error.message}`);
+      this.logger.error(error);
+      throw new Error(`QuickNode delete error: ${error}`);
     }
   }
 
@@ -159,8 +159,8 @@ export class QuickNodeService {
       );
       return response.data;
     } catch (error) {
-      this.logger.error(error.message);
-      throw new Error(`QuickNode status error: ${error.message}`);
+      this.logger.error(error);
+      throw new Error(`QuickNode status error: ${error}`);
     }
   }
   async getWebhookById(id: string): Promise<QuickNodeWebhookResponse> {
@@ -170,8 +170,8 @@ export class QuickNodeService {
       );
       return response.data;
     } catch (error) {
-      this.logger.error(error.message);
-      throw new Error(`QuickNode get webhook error: ${error.message}`);
+      this.logger.error(error);
+      throw new Error(`QuickNode get webhook error: ${error}`);
     }
   }
 

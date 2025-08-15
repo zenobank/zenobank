@@ -12,6 +12,7 @@ export class BlockchainAdapterFactory {
       case Network.ETHEREUM_MAINNET:
       case Network.BASE_MAINNET:
       case Network.ARBITRUM_MAINNET:
+      case Network.ETHEREUM_HOLESKY:
         return new EvmAdapter(network);
       default:
         throw new Error(`No adapter found for network: ${network}`);
