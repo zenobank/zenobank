@@ -1,12 +1,12 @@
-import { Network } from 'src/lib/contants/network';
+import { NetworkId } from '@prisma/client';
 
 export interface TransactionConfirmationJobData {
   txHash: string;
-  network: Network;
+  network: NetworkId;
   walletAddress: string;
 }
 
 export interface SweepWalletFundsJobData {
   sourceWalletAddress: string;
-  network: Network;
+  network: NetworkId;
 }

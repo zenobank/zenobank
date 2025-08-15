@@ -1,5 +1,4 @@
 import { AddressType } from 'src/lib/contants/address-type.enum';
-import { Network, NETWORK_INFO } from 'src/lib/contants/network';
 
 export interface NetworkInfo {
   addressType: AddressType;

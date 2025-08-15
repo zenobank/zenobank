@@ -1,14 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Network, NETWORK_INFO } from 'src/lib/contants/network';
 import { SweepWalletFundsJobData } from './transactions.interface';
 import { TokensService } from 'src/tokens/tokens.service';
 import { TokenGasService } from 'src/tokens/tokens-gas.service';
 import { isNativeToken, nativeTokenAddress } from 'src/tokens/tokens.utils';
-import {
-  generatePrivateKey,
-  privateKeyToAccount,
-  privateKeyToAddress,
-} from 'viem/accounts';
+import { privateKeyToAccount } from 'viem/accounts';
 import { client, walletClient } from 'src/lib/utils/client';
 import { erc20Abi } from 'viem';
 import { Env, getEnv } from 'src/lib/utils/env';
@@ -154,7 +149,7 @@ export class TransactionsService {
       if (isNativeToken(tokenAddress, network)) continue;
 
       this.logger.log(
-        `Transferring ${amount} ${tokens.find((token) => token.tokenAddress === tokenAddress)?.symbol} tokens from ${sourceWalletAddress} to master account ${masterAccount.address}...`,
+        `Transferring ${amount} ${tokens.find((token) => token.address === tokenAddress)?.symbol} tokens from ${sourceWalletAddress} to master account ${masterAccount.address}...`,
       );
 
       const tokenTransferTx = await sourceWalletWalletClient.writeContract({

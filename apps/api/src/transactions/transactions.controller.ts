@@ -1,8 +1,8 @@
 import { Controller, Get } from '@nestjs/common';
 import { TransactionsService } from './transactions.service';
 import { zeroAddress } from 'viem';
-import { Network } from 'src/lib/contants/network';
 import { privateKeyToAccount } from 'viem/accounts';
+import { NetworkId } from '@prisma/client';
 
 @Controller('transactions')
 export class TransactionsController {
@@ -15,7 +15,7 @@ export class TransactionsController {
 
     await this.transactionsService.enqueueSweepWalletFundsJob({
       sourceWalletAddress: depositAccount.address,
-      network: Network.ETHEREUM_HOLESKY,
+      network: NetworkId.ETHEREUM_HOLESKY,
     });
   }
 }

@@ -4,7 +4,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { WalletFactory } from 'src/wallet/wallet.factory';
 import { CreateWalletDto } from 'src/wallet/dto/create-wallet.dto';
 import { QuickNodeService } from 'src/providers/quicknode/quicknode.service';
-import { EVM_NETWORKS } from 'src/lib/contants/network';
 import { WalletWebhookResponseDto } from '../dto/response-wallet.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 
@@ -49,61 +48,16 @@ export class WalletService {
   async registerWalletInWebhooks(
     wallet: Wallet,
   ): Promise<WalletWebhookResponseDto[]> {
-    const responses = await Promise.all(
-      EVM_NETWORKS.map((network) =>
-        this.quickNodeService.addEvmWalletToWebhook({
-          webhookId: `b693a672-3a58-436e-949b-837617613e32`,
-          wallet: wallet.address,
-        }),
-      ),
-    );
-
-    return responses.map((res) => ({
-      webhookId: res.id,
-      network: res.network,
-    }));
-  }
-
-  async getAllWallets(): Promise<Wallet[]> {
-    return Array.from(this.wallets.values());
-  }
-
-  async getWalletById(id: string): Promise<Wallet> {
-    const wallet = this.wallets.get(id);
-    if (!wallet) {
-      throw new NotFoundException(`Wallet with ID ${id} not found`);
-    }
-    return wallet;
-  }
-
-  async getWalletByAddress(address: string, network: string): Promise<Wallet> {
-    const wallet = Array.from(this.wallets.values()).find(
-      (w) =>
-        w.address.toLowerCase() === address.toLowerCase() &&
-        w.addressType === network,
-    );
-
-    if (!wallet) {
-      throw new NotFoundException(
-        `Wallet with address ${address} not found on ${network}`,
-      );
-    }
-    return wallet;
-  }
-
-  async deleteWallet(id: string): Promise<void> {
-    const wallet = this.wallets.get(id);
-    if (!wallet) {
-      throw new NotFoundException(`Wallet with ID ${id} not found`);
-    }
-
-    try {
-      this.wallets.delete(id);
-      this.logger.log(`Wallet deleted successfully: ${id}`);
-    } catch (error) {
-      this.logger.error(`Failed to delete wallet: ${error}`);
-      throw error;
-    }
+    const response = await this.quickNodeService.addEvmWalletToWebhook({
+      webhookId: `b693a672-3a58-436e-949b-837617613e32`,
+      wallet: wallet.address,
+    });
+    return [
+      {
+        webhookId: response.id,
+        network: response.network,
+      },
+    ];
   }
 
   async processWebhookEvent(eventData: any): Promise<void> {
@@ -121,44 +75,8 @@ export class WalletService {
     }
 
     // Process each transaction
-    for (const tx of transactions) {
-      await this.processTransaction(address, network, tx);
-    }
-  }
-
-  private async processTransaction(
-    address: string,
-    network: string,
-    transaction: any,
-  ): Promise<void> {
-    try {
-      const wallet = await this.getWalletByAddress(address, network);
-
-      this.logger.log(`Processing transaction for wallet ${wallet.id}:`, {
-        txHash: transaction.hash,
-        from: transaction.from,
-        to: transaction.to,
-        value: transaction.value,
-        tokenName: transaction.tokenName,
-        tokenSymbol: transaction.tokenSymbol,
-      });
-
-      // Here you can implement your business logic for handling transactions
-      // For example: store in database, send notifications, update balances, etc.
-
-      // Example: Send notification or store transaction
-      await this.storeTransaction(wallet.id, transaction);
-    } catch (error) {
-      this.logger.error(`Failed to process transaction: ${error}`);
-    }
-  }
-
-  private async storeTransaction(
-    walletId: string,
-    transaction: any,
-  ): Promise<void> {
-    // Implementation for storing transaction in database
-    // This is a placeholder - you would implement your own storage logic
-    this.logger.log(`Storing transaction for wallet ${walletId}:`, transaction);
+    // for (const tx of transactions) {
+    //   await this.processTransaction(address, network, tx);
+    // }
   }
 }

@@ -1,22 +1,21 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Network, NETWORK_INFO } from 'src/lib/contants/network';
 import { publicClients } from 'src/lib/contants/client';
 import ms from 'src/lib/utils/ms';
 import { requestWithRepeatDelay } from 'src/lib/utils/request-with-repeat-delay';
 import { erc20Abi } from 'viem';
 import { isNativeToken, nativeTokenAddress } from './tokens.utils';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Token } from '@prisma/client';
+import { NetworkId, TokenOnNetwork } from '@prisma/client';
 
 @Injectable()
 export class TokensService {
   private readonly logger = new Logger(TokensService.name);
   constructor(private db: PrismaService) {}
 
-  async getTokens(network: Network): Promise<Token[]> {
-    const tokens = await this.db.token.findMany({
+  async getTokens(networkId: NetworkId): Promise<TokenOnNetwork[]> {
+    const tokens = await this.db.tokenOnNetwork.findMany({
       where: {
-        network,
+        networkId,
       },
     });
     return tokens;
