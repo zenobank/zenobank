@@ -12,6 +12,8 @@ import { TransactionsModule } from './transactions/transactions.module';
 import { BlockchainModule } from './blockchain/blockchain.module';
 import { PaymentsController } from './payments/payments.controller';
 import { PaymentsModule } from './payments/payments.module';
+import { AlchemyController } from './providers/alchemy/alchemy.controller';
+import { AlchemyModule } from './providers/alchemy/alchemy.module';
 
 @Module({
   imports: [
@@ -36,8 +38,9 @@ import { PaymentsModule } from './payments/payments.module';
     TransactionsModule,
     BlockchainModule,
     PaymentsModule,
+    AlchemyModule,
   ],
-  controllers: [AppController, PaymentsController],
+  controllers: [AppController, PaymentsController, AlchemyController],
   providers: [AppService],
 })
 export class AppModule {}

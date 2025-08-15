@@ -42,15 +42,15 @@ export class WalletService {
   }
 
   async registerWalletInWebhooks({
-    address,
+    addresses,
     networkId,
   }: {
-    address: string;
+    addresses: string[];
     networkId: NetworkId;
   }): Promise<WalletWebhookResponseDto[]> {
     const response = await this.quickNodeService.addEvmWalletToWebhook({
       webhookId: `b693a672-3a58-436e-949b-837617613e32`,
-      wallet: address,
+      wallets: addresses,
     });
     return [
       {

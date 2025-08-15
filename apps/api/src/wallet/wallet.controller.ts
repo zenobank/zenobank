@@ -1,10 +1,23 @@
 import { Controller, Get, Post } from '@nestjs/common';
 import { WalletService } from './services/wallet.service';
 import { NetworkId } from '@prisma/client';
+import { WalletFactory } from './wallet.factory';
+import { client } from 'src/lib/utils/client';
+import {
+  createClient,
+  createPublicClient,
+  http,
+  parseAbiItem,
+  webSocket,
+} from 'viem';
+import { arbitrum } from 'viem/chains';
 
 @Controller('wallet')
 export class WalletController {
-  constructor(private readonly walletService: WalletService) {}
+  constructor(
+    private readonly walletService: WalletService,
+    private readonly walletFactory: WalletFactory,
+  ) {}
 
   @Get()
   async getWallets() {
@@ -14,16 +27,51 @@ export class WalletController {
     });
   }
 
+  @Get('test')
+  async test() {
+    const viemClient = createPublicClient({
+      chain: arbitrum,
+      transport: http('https://arb1.arbitrum.io/rpc'), // ej. wss://...
+    });
+
+    const abc = viemClient.watchEvent({
+      address: '0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9',
+      poll: true,
+      event: parseAbiItem(
+        'event Transfer(address indexed from, address indexed to, uint256 value)',
+      ),
+      pollingInterval: 1000,
+      onLogs: (logs) => {
+        console.log(logs);
+      },
+    });
+    console.log(abc);
+    return abc;
+  }
+
   @Post('create-webhook/')
   async createWebhook() {
-    const wallet = await this.walletService.createWallet({
-      networkId: NetworkId.ARBITRUM_MAINNET,
-      label: 'test',
-    });
-    console.log('wallet created', wallet.address);
-    return this.walletService.registerWalletInWebhooks({
-      address: wallet.address,
-      networkId: NetworkId.ARBITRUM_MAINNET,
-    });
+    const total = 100;
+    const batchSize = 10;
+
+    // Crear batch de wallets
+    const walletsBatch = [];
+    for (let j = 0; j < batchSize && j < total; j++) {
+      const wallet = this.walletFactory.generate(NetworkId.ARBITRUM_MAINNET);
+      walletsBatch.push(wallet);
+      console.log(walletsBatch);
+    }
+
+    // Registrar batch en paralelo
+    await Promise.all(
+      walletsBatch.map((wallet) =>
+        this.walletService.registerWalletInWebhooks({
+          addresses: Array.from(walletsBatch.map((w) => w.address)),
+          networkId: NetworkId.ARBITRUM_MAINNET,
+        }),
+      ),
+    );
+
+    return { message: `${total} wallets creadas y registradas` };
   }
 }
