@@ -32,7 +32,8 @@ import {
 } from '@/components/ui/popover'
 import { Separator } from '@/components/ui/separator'
 import { ConfirmDialog } from '@/components/confirm-dialog'
-import PaymentDetails from './components/PaymentDetails'
+import PaymentDetails from './components/DetailsScreen'
+import TimerBadge from './components/TimerBadge'
 
 export type PaymentData = {
   id: string
@@ -107,7 +108,6 @@ enum PopoverId {
 export default function Payments() {
   const { id } = Route.useParams()
   const paymentData = Route.useLoaderData()
-
   const [screen, setScreen] = useState<PaymentScreen>(PaymentScreen.SELECTION)
   const [activePopover, setActivePopover] = useState<PopoverId | null>(null)
 
@@ -176,10 +176,7 @@ export default function Payments() {
                 )}
                 <CardTitle className='text-lg'>Send Payment</CardTitle>
               </div>
-              <Badge variant='outline'>
-                <Clock className='' />
-                60:00
-              </Badge>
+              <TimerBadge />
             </div>
           </CardHeader>
 
