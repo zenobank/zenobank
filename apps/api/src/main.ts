@@ -22,6 +22,10 @@ async function bootstrap() {
   SwaggerModule.setup('docs', app, document);
   // quicknode webhook validation
   app.use('/api/v1/providers/quicknode/webhook', express.raw({ type: '*/*' }));
+  app.use((req, res, next) => {
+    res.removeHeader('X-Powered-By');
+    next();
+  });
   await app.listen(3001);
 }
 bootstrap();
