@@ -161,7 +161,7 @@ function RouteComponent() {
                 )}
                 <CardTitle className='text-lg'>Send Payment</CardTitle>
               </div>
-              <Badge variant='secondary'>
+              <Badge variant='outline'>
                 <Clock className='' />
                 60:00
               </Badge>
@@ -174,7 +174,7 @@ function RouteComponent() {
               <div>
                 <div className='flex items-center justify-center gap-3 text-3xl font-bold'>
                   {selectedToken ? (
-                    <>
+                    <span className='relative flex items-center gap-2'>
                       {tokenAmount?.toFixed(6)}{' '}
                       {tokens.find((t) => t.value === selectedToken)?.symbol}
                       <Button
@@ -185,11 +185,11 @@ function RouteComponent() {
                             `${tokenAmount?.toFixed(6)} ${tokens.find((t) => t.value === selectedToken)?.symbol}`
                           )
                         }
-                        className='h-8 w-8 p-2'
+                        className='absolute top-1 -right-9 h-8 w-8'
                       >
                         <Copy className='h-4 w-4' />
                       </Button>
-                    </>
+                    </span>
                   ) : (
                     <>Select currency</>
                   )}
@@ -399,21 +399,19 @@ function RouteComponent() {
                     <Label className='text-muted-foreground'>
                       Send funds to
                     </Label>
-                    <div className='flex items-center justify-between text-sm'>
-                      <div>
-                        <span className='font-medium'>
-                          {walletAddress.slice(0, 6)}...
-                          {walletAddress.slice(-6)}
-                        </span>
-                        <Button
-                          variant='ghost'
-                          size='sm'
-                          className='h-6 px-2 text-xs'
-                          onClick={() => copy(walletAddress)}
-                        >
-                          <Copy className='h-3 w-3' />
-                        </Button>
-                      </div>
+                    <div className='relative flex items-center justify-between text-sm'>
+                      <span className='font-medium'>
+                        {walletAddress.slice(0, 6)}...
+                        {walletAddress.slice(-6)}
+                      </span>
+                      <Button
+                        variant='ghost'
+                        size='sm'
+                        className='absolute -top-0.5 -right-9 h-6 text-xs'
+                        onClick={() => copy(walletAddress)}
+                      >
+                        <Copy className='h-3 w-3' />
+                      </Button>
                     </div>
                   </div>
 
