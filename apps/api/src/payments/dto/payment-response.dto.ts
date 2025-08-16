@@ -3,19 +3,31 @@ import { ApiProperty } from '@nestjs/swagger';
 import { PaymentRequest, PaymentRequestStatus } from '@prisma/client';
 
 export class PaymentResponseDto {
-  @ApiProperty()
+  @ApiProperty({
+    example: '123e4567-e89b-12d3-a456-426614174000',
+  })
   id: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    example: '100',
+  })
   amount: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    example: 'USD',
+  })
   currency: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    enum: PaymentRequestStatus,
+    enumName: 'PaymentRequestStatus',
+    example: PaymentRequestStatus.PENDING,
+  })
   status: PaymentRequestStatus;
 
-  @ApiProperty()
+  @ApiProperty({
+    example: new Date().toISOString(),
+  })
   createdAt: Date;
 
   constructor(partial: Partial<PaymentResponseDto>) {

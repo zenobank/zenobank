@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
   IsNotEmpty,
   IsNumber,
@@ -10,10 +11,16 @@ export class CreatePaymentDto {
   @IsNotEmpty()
   @IsNumber()
   @IsPositive()
+  @ApiProperty({
+    example: '100',
+  })
   amount: string;
 
   @IsNotEmpty()
   @IsString()
   @Length(3, 3)
+  @ApiProperty({
+    example: 'USD',
+  })
   currency: string;
 }
