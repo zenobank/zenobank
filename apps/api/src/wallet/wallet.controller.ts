@@ -11,6 +11,7 @@ import {
   webSocket,
 } from 'viem';
 import { arbitrum } from 'viem/chains';
+import { validationMetadatasToSchemas } from 'class-validator-jsonschema';
 
 @Controller('wallet')
 export class WalletController {
@@ -18,6 +19,13 @@ export class WalletController {
     private readonly walletService: WalletService,
     private readonly walletFactory: WalletFactory,
   ) {}
+
+  @Get('validator-schema')
+  async getValidatorSchema(): Promise<any> {
+    const schemas = validationMetadatasToSchemas();
+    console.log(schemas);
+    return schemas;
+  }
 
   @Get()
   async getWallets() {
