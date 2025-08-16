@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { randomUUID } from 'crypto';
@@ -20,6 +20,16 @@ export class PaymentsService {
         expiredAt: new Date(Date.now() + 1000 * 60 * 60 * 24),
       },
     });
+    return PaymentResponseDto.fromPrisma(payment);
+  }
+
+  async getPayment(id: string): Promise<PaymentResponseDto> {
+    const payment = await this.db.paymentRequest.findUnique({
+      where: { id },
+    });
+    if (!payment) {
+      throw new NotFoundException();
+    }
     return PaymentResponseDto.fromPrisma(payment);
   }
 }
