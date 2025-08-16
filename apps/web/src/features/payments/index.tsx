@@ -32,6 +32,7 @@ import {
 } from '@/components/ui/popover'
 import { Separator } from '@/components/ui/separator'
 import { ConfirmDialog } from '@/components/confirm-dialog'
+import PaymentDetails from './components/PaymentDetails'
 
 export type PaymentData = {
   id: string
@@ -150,6 +151,15 @@ export default function Payments() {
     setShowCancelDialog(false)
     setScreen(PaymentScreen.SELECTION)
   }
+  const [disabled, buttonText] = useMemo(() => {
+    if (!selectedTokenData) {
+      return [true, 'Select cryptocurrency']
+    }
+    if (!selectedNetworkData) {
+      return [true, 'Select network']
+    }
+    return [false, 'Next']
+  }, [selectedTokenData, selectedNetworkData])
 
   return (
     <div className='bg-secondary flex min-h-screen items-center justify-center px-4 py-8'>
@@ -203,11 +213,9 @@ export default function Payments() {
                 {/* Token Selector */}
                 <div className='space-y-2'>
                   <Popover
-                    open={activePopover === 'token'}
+                    open={activePopover === PopoverId.TOKEN}
                     onOpenChange={(open) => {
-                      if (!open) {
-                        setActivePopover(null)
-                      }
+                      setActivePopover(open ? PopoverId.TOKEN : null)
                     }}
                   >
                     <PopoverTrigger asChild>
@@ -297,18 +305,16 @@ export default function Payments() {
                 {/* Network Selector */}
                 <div className='space-y-2'>
                   <Popover
-                    open={activePopover === 'network'}
+                    open={activePopover === PopoverId.NETWORK}
                     onOpenChange={(open) => {
-                      if (!open) {
-                        setActivePopover(null)
-                      }
+                      setActivePopover(open ? PopoverId.NETWORK : null)
                     }}
                   >
                     <PopoverTrigger asChild>
                       <Button
                         variant='outline'
                         role='combobox'
-                        aria-expanded={activePopover === 'network'}
+                        aria-expanded={activePopover === PopoverId.NETWORK}
                         className='mx-auto h-12 w-full max-w-md justify-between'
                         disabled={!selectedTokenData}
                       >
@@ -321,10 +327,8 @@ export default function Payments() {
                               )?.label
                             }
                           </div>
-                        ) : selectedTokenData ? (
-                          'Select network...'
                         ) : (
-                          'Select cryptocurrency first'
+                          'Select network...'
                         )}
                         <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
                       </Button>
@@ -376,46 +380,20 @@ export default function Payments() {
 
                 <Button
                   onClick={() => {
-                    if (selectedTokenData && selectedNetworkData) {
-                      setScreen(PaymentScreen.DETAILS)
-                    }
+                    setScreen(PaymentScreen.DETAILS)
                   }}
-                  disabled={!selectedTokenData || !selectedNetworkData}
+                  disabled={disabled}
                   className={`mx-auto w-full ${
-                    selectedTokenData && selectedNetworkData
-                      ? 'cursor-pointer'
-                      : 'cursor-not-allowed'
+                    disabled ? 'cursor-not-allowed' : 'cursor-pointer'
                   }`}
                 >
-                  Next
+                  {buttonText}
                 </Button>
               </>
             )}
 
             {screen === PaymentScreen.DETAILS && (
-              <>
-                <div className='space-y-4'>
-                  <div className='mx-auto flex w-full flex-col items-center justify-center'>
-                    <Label className='text-muted-foreground'>
-                      Send funds to
-                    </Label>
-                    <div className='relative flex items-center justify-between text-sm'>
-                      <span className='font-medium'>
-                        {walletAddress.slice(0, 6)}...
-                        {walletAddress.slice(-6)}
-                      </span>
-                      <CopyButton text={walletAddress} />
-                    </div>
-                  </div>
-
-                  <QRCodeCanvas
-                    className='mx-auto rounded-md p-0.5'
-                    value='https://reactjs.org/'
-                    bgColor='#000000'
-                    fgColor='#ffffff'
-                  />
-                </div>
-              </>
+              <PaymentDetails walletAddress={walletAddress} />
             )}
           </CardContent>
 
