@@ -1,6 +1,18 @@
 import { useState, useEffect, useMemo } from 'react'
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { ChevronsUpDown, Check, QrCode, Copy, Clock, Info } from 'lucide-react'
+import copy from 'copy-to-clipboard'
+import {
+  ChevronsUpDown,
+  Check,
+  Copy,
+  Clock,
+  Info,
+  MoveLeft,
+  ChevronLeft,
+  ArrowLeft,
+  ArrowLeftCircle,
+} from 'lucide-react'
+import { QRCodeCanvas } from 'qrcode.react'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -19,6 +31,7 @@ import {
   CommandGroup,
   CommandItem,
 } from '@/components/ui/command'
+import { Label } from '@/components/ui/label'
 import {
   Popover,
   PopoverContent,
@@ -106,8 +119,7 @@ function RouteComponent() {
   const [openChain, setOpenChain] = useState(false)
   const [selectedToken, setSelectedToken] = useState('')
   const [selectedChain, setSelectedChain] = useState('')
-  const [counter, setCounter] = useState(60 * 60) // Start at 60 minutes
-  const [currentStep, setCurrentStep] = useState(1) // 1: Select, 2: QR
+  const [currentStep, setCurrentStep] = useState(1)
 
   // Calculate token amount and USD conversion
   const tokenAmount = useMemo(() => {
@@ -117,33 +129,8 @@ function RouteComponent() {
     return paymentData.amount / token.usdPrice
   }, [selectedToken, paymentData.amount])
 
-  const usdAmount = useMemo(() => {
-    if (!selectedToken) return paymentData.amount
-    const token = tokens.find((t) => t.value === selectedToken)
-    if (!token) return paymentData.amount
-    return tokenAmount! * token.usdPrice
-  }, [selectedToken, tokenAmount, paymentData.amount])
-
   // Generate mock wallet address and QR code
   const walletAddress = '0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b6'
-  const qrCodeData = `ethereum:${walletAddress}?amount=${tokenAmount || paymentData.amount}&token=${selectedToken || 'USD'}`
-
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text)
-  }
-
-  // Counter effect - countdown from 60 minutes
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCounter((prev) => Math.max(0, prev - 1))
-    }, 1000)
-    return () => clearInterval(interval)
-  }, [])
-
-  // Auto-open token selector on mount
-  useEffect(() => {
-    setOpenToken(true)
-  }, [])
 
   // Auto-open network selector when token is selected
   useEffect(() => {
@@ -153,51 +140,30 @@ function RouteComponent() {
   }, [selectedToken, selectedChain])
 
   // Auto-advance to next step when both are selected
-  useEffect(() => {
-    if (selectedToken && selectedChain) {
-      setCurrentStep(2)
-    }
-  }, [selectedToken, selectedChain])
-
-  // Format counter as MM:SS
-  const formatCounter = (seconds: number) => {
-    const minutes = Math.floor(seconds / 60)
-    const remainingSeconds = seconds % 60
-    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`
-  }
-
-  const handleBack = () => {
-    setCurrentStep(1)
-  }
+  // useEffect(() => {
+  //   if (selectedToken && selectedChain) {
+  //     setCurrentStep(2)
+  //   }
+  // }, [selectedChain])
 
   return (
-    <div className='bg-background min-h-screen px-4 py-8'>
-      <div className='mx-auto max-w-md'>
-        {/* Store Header */}
-        <div className='mb-6 text-center'>
-          <h1 className='text-2xl font-bold'>{paymentData.storeName}</h1>
-          <p>Complete your payment</p>
-        </div>
-
+    <div className='bg-secondary flex min-h-screen items-center justify-center px-4 py-8'>
+      <div className='mx-auto max-w-md flex-1'>
         <Card className=''>
           <CardHeader className='pb-4'>
             <div className='flex items-center justify-between'>
-              <div className='flex items-center gap-3'>
+              <div className='flex items-center'>
                 {currentStep === 2 && (
-                  <Button
-                    variant='ghost'
-                    size='sm'
-                    onClick={handleBack}
-                    className='p-2'
-                  >
-                    ←
-                  </Button>
+                  <ArrowLeft
+                    onClick={() => setCurrentStep(1)}
+                    className='text-muted-foreground mr-1 cursor-pointer'
+                  />
                 )}
-                <CardTitle className='text-lg'>Amazon</CardTitle>
+                <CardTitle className='text-lg'>Send Payment</CardTitle>
               </div>
               <Badge variant='secondary'>
                 <Clock className='' />
-                {formatCounter(counter)}
+                60:00
               </Badge>
             </div>
           </CardHeader>
@@ -205,47 +171,40 @@ function RouteComponent() {
           <CardContent className='space-y-6'>
             {/* Amount Display - Always visible */}
             <div className='py-4 text-center'>
-              {selectedToken ? (
-                <div>
-                  <div className='flex items-center justify-center gap-3 text-3xl font-bold'>
-                    {tokenAmount?.toFixed(6)}{' '}
-                    {tokens.find((t) => t.value === selectedToken)?.symbol}
-                    <Button
-                      variant='ghost'
-                      size='sm'
-                      onClick={() =>
-                        copyToClipboard(
-                          `${tokenAmount?.toFixed(6)} ${tokens.find((t) => t.value === selectedToken)?.symbol}`
-                        )
-                      }
-                      className='h-8 w-8 p-2'
-                    >
-                      <Copy className='h-4 w-4' />
-                    </Button>
-                  </div>
-                  <div className='mt-1 text-sm'>
-                    ≈ ${usdAmount.toFixed(2)} USD
-                  </div>
+              <div>
+                <div className='flex items-center justify-center gap-3 text-3xl font-bold'>
+                  {selectedToken ? (
+                    <>
+                      {tokenAmount?.toFixed(6)}{' '}
+                      {tokens.find((t) => t.value === selectedToken)?.symbol}
+                      <Button
+                        variant='ghost'
+                        size='sm'
+                        onClick={() =>
+                          copy(
+                            `${tokenAmount?.toFixed(6)} ${tokens.find((t) => t.value === selectedToken)?.symbol}`
+                          )
+                        }
+                        className='h-8 w-8 p-2'
+                      >
+                        <Copy className='h-4 w-4' />
+                      </Button>
+                    </>
+                  ) : (
+                    <>Select currency</>
+                  )}
                 </div>
-              ) : (
-                <div>
-                  <div className='flex items-center justify-center gap-3 text-3xl font-bold'>
-                    Select currency
-                    <Button
-                      variant='ghost'
-                      size='sm'
-                      onClick={() =>
-                        copyToClipboard(`${paymentData.amount} USD`)
-                      }
-                      className='h-8 w-8 p-2'
-                    >
-                      <Copy className='h-4 w-4' />
-                    </Button>
-                  </div>
-                  <div className='mt-1 text-sm'>${paymentData.amount} USD</div>
+                <div className='mt-1 text-sm'>
+                  <Badge variant='secondary'>
+                    Network:{' '}
+                    {networks.find((c) => c.value === selectedChain)?.label
+                      ? networks.find((c) => c.value === selectedChain)?.label
+                      : '-'}
+                  </Badge>
                 </div>
-              )}
+              </div>
             </div>
+            <Separator />
 
             {/* Step 1: Token and Network Selection */}
             {currentStep === 1 && (
@@ -414,63 +373,43 @@ function RouteComponent() {
                     </PopoverContent>
                   </Popover>
                 </div>
+
+                <Button
+                  onClick={() => {
+                    if (selectedToken && selectedChain) {
+                      setCurrentStep(2)
+                    }
+                  }}
+                  disabled={!selectedToken || !selectedChain}
+                  className={`mx-auto w-full ${
+                    selectedToken && selectedChain
+                      ? 'cursor-pointer'
+                      : 'cursor-not-allowed'
+                  }`}
+                >
+                  Next
+                </Button>
               </>
             )}
 
-            {/* Step 2: QR Code and Payment Details */}
             {currentStep === 2 && (
               <>
-                <Separator />
                 <div className='space-y-4'>
-                  {/* QR Code - First */}
-                  <div className='text-center'>
-                    <img
-                      src='/images/qr.png'
-                      alt='QR Code'
-                      className='mx-auto h-32 w-32'
-                    />
-                  </div>
-
-                  {/* Wallet Address - Second */}
-                  <div className='space-y-3'>
+                  <div className='mx-auto flex w-full flex-col items-center justify-center'>
+                    <Label className='text-muted-foreground'>
+                      Send funds to
+                    </Label>
                     <div className='flex items-center justify-between text-sm'>
-                      <span>Wallet Address:</span>
-                      <Button
-                        variant='ghost'
-                        size='sm'
-                        className='h-6 px-2 text-xs'
-                        onClick={() => copyToClipboard(walletAddress)}
-                      >
-                        <Copy className='h-3 w-3' />
-                      </Button>
-                    </div>
-
-                    <div className='font-mono text-sm break-all'>
-                      {walletAddress}
-                    </div>
-                  </div>
-
-                  {/* Amount - Third */}
-                  <div className='space-y-3'>
-                    <div className='flex items-center justify-between text-sm'>
-                      <span>Amount:</span>
-                      <div className='flex items-center gap-2'>
+                      <div>
                         <span className='font-medium'>
-                          {tokenAmount?.toFixed(6)}{' '}
-                          {
-                            tokens.find((t) => t.value === selectedToken)
-                              ?.symbol
-                          }
+                          {walletAddress.slice(0, 6)}...
+                          {walletAddress.slice(-6)}
                         </span>
                         <Button
                           variant='ghost'
                           size='sm'
                           className='h-6 px-2 text-xs'
-                          onClick={() =>
-                            copyToClipboard(
-                              `${tokenAmount?.toFixed(6)} ${tokens.find((t) => t.value === selectedToken)?.symbol}`
-                            )
-                          }
+                          onClick={() => copy(walletAddress)}
                         >
                           <Copy className='h-3 w-3' />
                         </Button>
@@ -478,15 +417,12 @@ function RouteComponent() {
                     </div>
                   </div>
 
-                  {/* Network - Fourth */}
-                  <div className='space-y-3'>
-                    <div className='flex items-center justify-between text-sm'>
-                      <span>Network:</span>
-                      <span className='font-medium'>
-                        {networks.find((n) => n.value === selectedChain)?.label}
-                      </span>
-                    </div>
-                  </div>
+                  <QRCodeCanvas
+                    className='mx-auto rounded-md p-0.5'
+                    value='https://reactjs.org/'
+                    bgColor='#000000'
+                    fgColor='#ffffff'
+                  />
                 </div>
               </>
             )}
@@ -497,16 +433,21 @@ function RouteComponent() {
           </CardFooter>
         </Card>
 
-        {/* Footer */}
-        <div className='mt-6 text-center'>
-          <p className='text-xs'>
-            Powered by{' '}
-            <a href='https://zenobank.io' target='_blank'>
-              <span className='underline'>Zenobank</span>
-            </a>
-          </p>
-        </div>
+        <Footer />
       </div>
+    </div>
+  )
+}
+
+const Footer = () => {
+  return (
+    <div className='mt-6 text-center'>
+      <p className='text-xs'>
+        Powered by{' '}
+        <a href='https://zenobank.io' target='_blank'>
+          <span className='underline'>Zenobank</span>
+        </a>
+      </p>
     </div>
   )
 }

@@ -1,6 +1,6 @@
 // dto/payment-response.dto.ts
 import { ApiProperty } from '@nestjs/swagger';
-import { PaymentRequest } from '@prisma/client';
+import { PaymentRequest, PaymentRequestStatus } from '@prisma/client';
 
 export class PaymentResponseDto {
   @ApiProperty()
@@ -13,7 +13,7 @@ export class PaymentResponseDto {
   currency: string;
 
   @ApiProperty()
-  status: string;
+  status: PaymentRequestStatus;
 
   @ApiProperty()
   createdAt: Date;

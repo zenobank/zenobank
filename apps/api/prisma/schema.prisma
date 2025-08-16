@@ -34,16 +34,16 @@ model Wallet {
 
 enum PaymentRequestStatus {
   PENDING
-  PARTIAL
-  PAID
+  COMPLETED
   EXPIRED
-  CANCELED
+  CANCELLED
 }
 
 model PaymentRequest {
   id             String               @id @default(uuid())
   currency       String // ISO 4217
   amount         String
+  amountFilled   String               @default("0")
   notifyUrl      String
   orderId        String               @unique
   expiredAt      DateTime
