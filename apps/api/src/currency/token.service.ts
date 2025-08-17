@@ -60,7 +60,6 @@ export class TokenService {
 
       let res = (await requestWithRepeatDelay(
         () =>
-          // @ts-ignore
           client.multicall({
             contracts: tokens
               .filter((address) => !isNativeToken(address, networkId))
@@ -90,10 +89,15 @@ export class TokenService {
       }
 
       return res.reduce(
-        (all, { result: balance }, i) => ({
-          ...all,
-          [tokens[i].toLowerCase()]: balance || 0n,
-        }),
+        (all, { result: balance }, i) => {
+          if (i < tokens.length) {
+            return {
+              ...all,
+              [tokens?.[i]?.toLowerCase() ?? '']: balance ?? 0n,
+            };
+          }
+          return all;
+        },
         {} as { [key: string]: bigint },
       );
     } catch (error: any) {

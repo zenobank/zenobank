@@ -10,8 +10,8 @@ import { PrismaModule } from './prisma/prisma.module';
 import { BullModule } from '@nestjs/bullmq';
 import { TransactionsModule } from './transactions/transactions.module';
 import { BlockchainModule } from './blockchain/blockchain.module';
-import { PaymentsController } from './payments/payments.controller';
-import { PaymentsModule } from './payments/payments.module';
+import { PaymentController } from './payment/payment.controller';
+import { PaymentsModule } from './payment/payment.module';
 import { AlchemyController } from './providers/alchemy/alchemy.controller';
 import { AlchemyModule } from './providers/alchemy/alchemy.module';
 import { NetworksModule } from './networks/networks.module';
@@ -42,7 +42,7 @@ import { NetworksModule } from './networks/networks.module';
     AlchemyModule,
     NetworksModule,
   ],
-  controllers: [AppController, PaymentsController, AlchemyController],
+  controllers: [AppController, PaymentController, AlchemyController],
   providers: [AppService],
 })
 export class AppModule {}

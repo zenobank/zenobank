@@ -4,7 +4,6 @@ import { http } from 'viem';
 import { NetworkId } from '@prisma/client';
 
 export const publicClients: Record<NetworkId, PublicClient> = {
-  // @ts-expect-error TS2590. Viem lib error
   [NetworkId.ETHEREUM_MAINNET]: createPublicClient({
     chain: mainnet,
     transport: http(),

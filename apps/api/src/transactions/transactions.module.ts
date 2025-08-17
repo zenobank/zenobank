@@ -7,7 +7,7 @@ import {
 } from './transactions.constants';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { TransactionsProcessor } from './transactions-confirmation.worker';
-import { CurrencyModule } from 'src/currencies/currency.module';
+import { CurrencyModule } from 'src/currency/currency.module';
 import { BlockchainModule } from 'src/blockchain/blockchain.module';
 import { TransactionsController } from './transactions.controller';
 

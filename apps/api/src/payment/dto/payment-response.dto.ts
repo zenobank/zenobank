@@ -1,8 +1,12 @@
 // dto/payment-response.dto.ts
 import { ApiProperty } from '@nestjs/swagger';
-import { Payment, PaymentStatus } from '@prisma/client';
+import { NetworkId, Payment, PaymentStatus } from '@prisma/client';
 import { Env, getEnv } from 'src/lib/utils/env';
 import { getPaymentUrl } from '../lib/utils';
+
+type PaymentWithAddress = Payment & {
+  depositWalletAddress: string | null;
+};
 
 export class PaymentResponseDto {
   @ApiProperty({
@@ -35,14 +39,30 @@ export class PaymentResponseDto {
   @ApiProperty()
   paymentUrl: string;
 
+  @ApiProperty({ nullable: true })
+  paymentAddress: string | null;
+
+  @ApiProperty({ nullable: true })
+  paymentCurrencyId: string | null;
+
+  @ApiProperty({
+    nullable: true,
+    enum: NetworkId,
+    enumName: 'NetworkId',
+  })
+  paymentNetworkId: NetworkId | null;
+
   constructor(partial: Partial<PaymentResponseDto>) {
     Object.assign(this, partial);
   }
 
-  static fromPrisma(payment: Payment): PaymentResponseDto {
+  static fromPrisma(payment: PaymentWithAddress): PaymentResponseDto {
     return new PaymentResponseDto({
       id: payment.id,
       paymentUrl: getPaymentUrl(payment.id),
+      paymentAddress: payment.depositWalletAddress,
+      paymentCurrencyId: payment.tokenId,
+      paymentNetworkId: payment.networkId,
       amount: payment.amount.toString(),
       currency: payment.currency,
       status: payment.status,
