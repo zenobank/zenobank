@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Network, NetworkId, TokenOnNetwork } from '@prisma/client';
 import { IsEnum, IsString } from 'class-validator';
 
-export class UpdatePaymentSelectionDto {
+export class UpdateDepositSelectionDto {
   @IsString()
   @ApiProperty({
     example: 'USDC_BASE',

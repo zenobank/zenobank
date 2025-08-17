@@ -9,6 +9,25 @@ type PaymentWithAddress = Payment & {
   depositWalletAddress: string | null;
 };
 
+export class DepositDetailsDto {
+  @ApiProperty({
+    example: '0x1234567890123456789012345678901234567890',
+  })
+  address: string;
+
+  @ApiProperty({
+    example: 'USDC_ARBITRUM',
+  })
+  currencyId: string;
+
+  @ApiProperty({
+    example: NetworkId.ARBITRUM_MAINNET,
+    enum: NetworkId,
+    enumName: 'NetworkId',
+  })
+  networkId: NetworkId;
+}
+
 export class PaymentResponseDto {
   @ApiProperty({
     example: '123e4567-e89b-12d3-a456-426614174000',
@@ -42,21 +61,11 @@ export class PaymentResponseDto {
   })
   expiredAt: Date;
 
+  @ApiProperty({ type: DepositDetailsDto, nullable: true })
+  depositDetails: DepositDetailsDto | null;
+
   @ApiProperty()
   paymentUrl: string;
-
-  @ApiProperty({ nullable: true })
-  paymentAddress: string | null;
-
-  @ApiProperty({ nullable: true })
-  paymentCurrencyId: string | null;
-
-  @ApiProperty({
-    nullable: true,
-    enum: NetworkId,
-    enumName: 'NetworkId',
-  })
-  paymentNetworkId: NetworkId | null;
 
   constructor(partial: Partial<PaymentResponseDto>) {
     Object.assign(this, partial);
@@ -66,9 +75,14 @@ export class PaymentResponseDto {
     return new PaymentResponseDto({
       id: payment.id,
       paymentUrl: getPaymentUrl(payment.id),
-      paymentAddress: payment.depositWalletAddress,
-      paymentCurrencyId: payment.tokenId,
-      paymentNetworkId: payment.networkId,
+      depositDetails:
+        payment.depositWalletAddress && payment.tokenId && payment.networkId
+          ? {
+              address: payment.depositWalletAddress,
+              currencyId: payment.tokenId,
+              networkId: payment.networkId,
+            }
+          : null,
       amount: payment.amount.toString(),
       currency: payment.currency,
       status: payment.status,

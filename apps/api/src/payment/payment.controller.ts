@@ -10,7 +10,7 @@ import {
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { PaymentService } from './payment.service';
 import { PaymentResponseDto } from './dto/payment-response.dto';
-import { UpdatePaymentSelectionDto } from './dto/update-payment-selection.dto';
+import { UpdateDepositSelectionDto } from './dto/update-payment-selection.dto';
 
 @Controller('payments')
 export class PaymentController {
@@ -32,11 +32,11 @@ export class PaymentController {
     return payment;
   }
 
-  @Patch(':id/selection')
-  async updatePaymentSelection(
+  @Patch(':id/deposit')
+  async updatePaymentDepositSelection(
     @Param('id') id: string,
-    @Body() dto: UpdatePaymentSelectionDto,
+    @Body() dto: UpdateDepositSelectionDto,
   ): Promise<PaymentResponseDto> {
-    return this.paymentsService.updatePaymentSelection(id, dto);
+    return this.paymentsService.updatePaymentDepositSelection(id, dto);
   }
 }
