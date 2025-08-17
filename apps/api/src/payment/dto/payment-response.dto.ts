@@ -3,6 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { NetworkId, Payment, PaymentStatus } from '@prisma/client';
 import { Env, getEnv } from 'src/lib/utils/env';
 import { getPaymentUrl } from '../lib/utils';
+import ms from 'src/lib/utils/ms';
 
 type PaymentWithAddress = Payment & {
   depositWalletAddress: string | null;
@@ -36,6 +37,11 @@ export class PaymentResponseDto {
   })
   createdAt: Date;
 
+  @ApiProperty({
+    example: new Date(Date.now() + ms('1h')).toISOString(),
+  })
+  expiredAt: Date;
+
   @ApiProperty()
   paymentUrl: string;
 
@@ -67,6 +73,7 @@ export class PaymentResponseDto {
       currency: payment.currency,
       status: payment.status,
       createdAt: payment.createdAt,
+      expiredAt: payment.expiredAt,
     });
   }
 }
