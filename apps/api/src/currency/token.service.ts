@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { publicClients } from 'src/lib/contants/client';
 import ms from 'src/lib/utils/ms';
 import { requestWithRepeatDelay } from 'src/lib/utils/request-with-repeat-delay';
@@ -16,6 +16,11 @@ export class TokenService {
     const token = await this.db.tokenOnNetwork.findUnique({
       where: { id },
     });
+    return token;
+  }
+  async getTokenOrThrow(id: string): Promise<TokenOnNetwork> {
+    const token = await this.getToken(id);
+    if (!token) throw new NotFoundException('Token not found');
     return token;
   }
 

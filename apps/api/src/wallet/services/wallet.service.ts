@@ -17,6 +17,15 @@ export class WalletService {
     private readonly db: PrismaService,
   ) {}
 
+  async createDepositWallet(createWalletDto: CreateWalletDto): Promise<Wallet> {
+    const wallet = await this.createWallet(createWalletDto);
+    // await this.registerWalletInWebhooks({
+    //   addresses: [wallet.address],
+    //   networkId: wallet.networkId,
+    // });
+    return wallet;
+  }
+
   async createWallet(createWalletDto: CreateWalletDto): Promise<Wallet> {
     try {
       const { address, privateKey } = this.walletFactory.generate(
