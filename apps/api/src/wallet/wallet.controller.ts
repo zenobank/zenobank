@@ -63,7 +63,7 @@ export class WalletController {
     const batchSize = 10;
 
     // Crear batch de wallets
-    const walletsBatch = [];
+    const walletsBatch: { address: string; privateKey: string }[] = [];
     for (let j = 0; j < batchSize && j < total; j++) {
       const wallet = this.walletFactory.generate(NetworkId.ARBITRUM_MAINNET);
       walletsBatch.push(wallet);

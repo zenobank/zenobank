@@ -81,7 +81,7 @@ export class TokenGasService {
     return (
       gasEstimation +
       (gasEstimation *
-        BigInt(Math.floor(transferArgs.extraGasMarginPerc * 100))) /
+        BigInt(Math.floor(transferArgs?.extraGasMarginPerc ?? 0 * 100))) /
         100n
     );
   }
@@ -109,7 +109,7 @@ export class TokenGasService {
     return (
       gasEstimation +
       (gasEstimation *
-        BigInt(Math.floor(transferArgs.extraGasMarginPerc * 100))) /
+        BigInt(Math.floor(transferArgs?.extraGasMarginPerc ?? 0 * 100))) /
         100n
     );
   }

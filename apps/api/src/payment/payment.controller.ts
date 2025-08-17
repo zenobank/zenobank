@@ -8,13 +8,13 @@ import {
   Post,
 } from '@nestjs/common';
 import { CreatePaymentDto } from './dto/create-payment.dto';
-import { PaymentsService } from './payments.service';
+import { PaymentService } from './payment.service';
 import { PaymentResponseDto } from './dto/payment-response.dto';
 import { UpdatePaymentSelectionDto } from './dto/update-payment-selection.dto';
 
 @Controller('payments')
-export class PaymentsController {
-  constructor(private readonly paymentsService: PaymentsService) {}
+export class PaymentController {
+  constructor(private readonly paymentsService: PaymentService) {}
 
   @Post('')
   async createPayment(
