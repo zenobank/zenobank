@@ -3,14 +3,21 @@ import { publicClients } from 'src/lib/contants/client';
 import ms from 'src/lib/utils/ms';
 import { requestWithRepeatDelay } from 'src/lib/utils/request-with-repeat-delay';
 import { erc20Abi } from 'viem';
-import { isNativeToken, nativeTokenAddress } from './tokens.utils';
+import { isNativeToken, nativeTokenAddress } from './lib/utils';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { NetworkId, TokenOnNetwork } from '@prisma/client';
 
 @Injectable()
-export class TokensService {
-  private readonly logger = new Logger(TokensService.name);
+export class TokenService {
+  private readonly logger = new Logger(TokenService.name);
   constructor(private db: PrismaService) {}
+
+  async getToken(id: string): Promise<TokenOnNetwork | null> {
+    const token = await this.db.tokenOnNetwork.findUnique({
+      where: { id },
+    });
+    return token;
+  }
 
   async getTokens(networkId: NetworkId): Promise<TokenOnNetwork[]> {
     const tokens = await this.db.tokenOnNetwork.findMany({

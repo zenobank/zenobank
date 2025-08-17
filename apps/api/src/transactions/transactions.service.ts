@@ -1,8 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { SweepWalletFundsJobData } from './transactions.interface';
-import { TokensService } from 'src/tokens/tokens.service';
-import { TokenGasService } from 'src/tokens/tokens-gas.service';
-import { isNativeToken, nativeTokenAddress } from 'src/tokens/tokens.utils';
+import { TokenService } from 'src/currencies/token.service';
+import { TokenGasService } from 'src/currencies/tokens-gas.service';
+import { isNativeToken, nativeTokenAddress } from 'src/currencies/lib/utils';
 import { privateKeyToAccount } from 'viem/accounts';
 import { client, walletClient } from 'src/lib/utils/client';
 import { erc20Abi } from 'viem';
@@ -13,7 +13,7 @@ import { NetworkId } from '@prisma/client';
 export class TransactionsService {
   private readonly logger = new Logger(TransactionsService.name);
   constructor(
-    private tokensService: TokensService,
+    private tokensService: TokenService,
     private tokenGasService: TokenGasService,
   ) {}
 

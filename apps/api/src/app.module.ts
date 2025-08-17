@@ -14,6 +14,7 @@ import { PaymentsController } from './payments/payments.controller';
 import { PaymentsModule } from './payments/payments.module';
 import { AlchemyController } from './providers/alchemy/alchemy.controller';
 import { AlchemyModule } from './providers/alchemy/alchemy.module';
+import { NetworksModule } from './networks/networks.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { AlchemyModule } from './providers/alchemy/alchemy.module';
     BlockchainModule,
     PaymentsModule,
     AlchemyModule,
+    NetworksModule,
   ],
   controllers: [AppController, PaymentsController, AlchemyController],
   providers: [AppService],

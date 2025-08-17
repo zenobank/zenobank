@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
-import { TokensService } from './tokens.service';
+import { TokenService } from './token.service';
 import { TokenGasService } from './tokens-gas.service';
 import { PrismaModule } from 'src/prisma/prisma.module';
 
 @Module({
-  providers: [TokensService, TokenGasService],
-  exports: [TokensService, TokenGasService],
+  providers: [TokenService, TokenGasService],
+  exports: [TokenService, TokenGasService],
   imports: [PrismaModule],
 })
-export class TokensModule {}
+export class CurrencyModule {}

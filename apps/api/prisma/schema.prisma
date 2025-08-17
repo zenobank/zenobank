@@ -22,35 +22,48 @@ model Wallet {
 
   privateKey String
   label      String?
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-  deposits   Deposit[]
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
-  paymentRequest   PaymentRequest? @relation(fields: [paymentRequestId], references: [id])
-  paymentRequestId String?
+  depositForPayment Payment? @relation(name: "DepositWallet")
 
   @@unique([networkId, address])
 }
 
-enum PaymentRequestStatus {
+enum PaymentStatus {
   PENDING
   COMPLETED
   EXPIRED
   CANCELLED
 }
 
-model PaymentRequest {
-  id             String               @id @default(uuid())
-  currency       String // ISO 4217
-  amount         String
-  amountFilled   String               @default("0")
-  notifyUrl      String
-  orderId        String               @unique
-  expiredAt      DateTime
-  createdAt      DateTime             @default(now())
-  updatedAt      DateTime             @updatedAt
-  status         PaymentRequestStatus @default(PENDING)
-  depositWallets Wallet[]
+model Payment {
+  id String @id @default(uuid())
+
+  title       String?
+  description String?
+
+  currency     String
+  amount       String
+  amountFilled String        @default("0")
+  notifyUrl    String
+  orderId      String        @unique
+  expiredAt    DateTime
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  status       PaymentStatus @default(PENDING)
+
+  tokenId String?
+  token   TokenOnNetwork? @relation(fields: [tokenId], references: [id])
+
+  networkId NetworkId?
+  network   Network?   @relation(fields: [networkId], references: [id])
+
+  transactionId String?      @unique
+  transaction   Transaction? @relation(name: "PaymentTx", fields: [transactionId], references: [id])
+
+  depositWalletId String? @unique
+  depositWallet   Wallet? @relation(name: "DepositWallet", fields: [depositWalletId], references: [id])
 }
 
 enum TokenStandard {
@@ -76,9 +89,10 @@ model Network {
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
 
-  TokenOnNetwork TokenOnNetwork[]
-  Deposit        Deposit[]
-  Wallet         Wallet[]
+  tokens       TokenOnNetwork[]
+  transactions Transaction[]
+  wallets      Wallet[]
+  Payment      Payment[]
 }
 
 model TokenCanonical {
@@ -110,7 +124,8 @@ model TokenOnNetwork {
   network   Network   @relation(fields: [networkId], references: [id])
   networkId NetworkId
 
-  Deposit Deposit[]
+  transactions Transaction[]
+  payments     Payment[]
 
   @@unique([networkId, address])
   @@index([canonicalTokenId])
@@ -118,20 +133,27 @@ model TokenOnNetwork {
 }
 
 enum AddressBindingType {
-  TOPUP // address for recurring deposits
+  TOPUP
   SINGLE_USE_PAYMENT
 }
 
-enum DepositStatus {
+enum TransactionStatus {
   PENDING
   CONFIRMED
   FAILED
 }
 
-model Deposit {
-  id       String @id @default(uuid())
-  walletId String
-  wallet   Wallet @relation(fields: [walletId], references: [id])
+model Transaction {
+  id   String @id @default(uuid())
+  hash String
+
+  fromAddress String
+  toAddress   String
+
+  title       String
+  description String?
+  amount      String
+  amountFiat  String
 
   tokenId String
   token   TokenOnNetwork @relation(fields: [tokenId], references: [id])
@@ -139,12 +161,15 @@ model Deposit {
   networkId NetworkId
   network   Network   @relation(fields: [networkId], references: [id])
 
-  txHash        String
-  amountAtomic  BigInt
-  confirmations Int           @default(0)
-  status        DepositStatus @default(PENDING)
-  firstSeenAt   DateTime      @default(now())
+  confirmations Int               @default(0)
+  status        TransactionStatus @default(PENDING)
+  firstSeenAt   DateTime          @default(now())
   confirmedAt   DateTime?
 
-  @@unique([tokenId, txHash]) // idempotencia por activo en red
+  payment Payment? @relation(name: "PaymentTx")
+
+  @@unique([networkId, hash])
+  @@index([tokenId])
+  @@index([fromAddress])
+  @@index([toAddress])
 }
