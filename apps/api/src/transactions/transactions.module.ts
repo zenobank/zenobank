@@ -7,13 +7,13 @@ import {
 } from './transactions.constants';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { TransactionsProcessor } from './transactions-confirmation.worker';
-import { TokensModule } from 'src/tokens/tokens.module';
+import { CurrencyModule } from 'src/currencies/currency.module';
 import { BlockchainModule } from 'src/blockchain/blockchain.module';
 import { TransactionsController } from './transactions.controller';
 
 @Module({
   imports: [
-    TokensModule,
+    CurrencyModule,
     BlockchainModule,
     BullModule.registerQueue({
       name: TX_CONFIRMATION_QUEUE_NAME,

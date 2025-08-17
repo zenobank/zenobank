@@ -33,6 +33,8 @@ import {
 import { Separator } from '@/components/ui/separator'
 import { ConfirmDialog } from '@/components/confirm-dialog'
 import PaymentDetails from './components/DetailsScreen'
+import ExpiredScreen from './components/ExpiredScreen'
+import SuccessScreen from './components/SuccessScreen'
 import TimerBadge from './components/TimerBadge'
 
 export type PaymentData = {
@@ -91,6 +93,7 @@ const networks = [
 enum PaymentScreen {
   SELECTION = 'selection',
   DETAILS = 'details',
+  SUCCESS = 'success',
   EXPIRED = 'expired',
   CONFIRMED = 'confirmed',
 }
@@ -136,6 +139,10 @@ export default function Payments() {
   // Generate mock wallet address and QR code
   const walletAddress = '0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b6'
 
+  // Mock transaction hash for success screen
+  const mockTransactionHash =
+    '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
+
   // Auto-open network selector when token is selected
   useEffect(() => {
     if (paymentSelection.selectedToken && !paymentSelection.selectedNetwork) {
@@ -150,6 +157,24 @@ export default function Payments() {
   const handleCancelConfirm = () => {
     setShowCancelDialog(false)
     setScreen(PaymentScreen.SELECTION)
+  }
+
+  const handleRetry = () => {
+    setScreen(PaymentScreen.SELECTION)
+    setPaymentSelection({
+      selectedToken: null,
+      selectedNetwork: null,
+    })
+    setActivePopover(null)
+  }
+
+  const handleBackToSelection = () => {
+    setScreen(PaymentScreen.SELECTION)
+    setPaymentSelection({
+      selectedToken: null,
+      selectedNetwork: null,
+    })
+    setActivePopover(null)
   }
   const [disabled, buttonText] = useMemo(() => {
     if (!selectedTokenData) {
@@ -390,7 +415,50 @@ export default function Payments() {
             )}
 
             {screen === PaymentScreen.DETAILS && (
-              <PaymentDetails walletAddress={walletAddress} />
+              <div className='space-y-4'>
+                <PaymentDetails walletAddress={walletAddress} />
+
+                {/* Demo buttons for testing different screens */}
+                <div className='flex gap-2 pt-4'>
+                  <Button
+                    variant='outline'
+                    size='sm'
+                    onClick={() => setScreen(PaymentScreen.SUCCESS)}
+                    className='flex-1'
+                  >
+                    Demo Success
+                  </Button>
+                  <Button
+                    variant='outline'
+                    size='sm'
+                    onClick={() => setScreen(PaymentScreen.EXPIRED)}
+                    className='flex-1'
+                  >
+                    Demo Expired
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {screen === PaymentScreen.SUCCESS && (
+              <SuccessScreen
+                walletAddress={walletAddress}
+                tokenAmount={tokenAmount?.toFixed(6) || '0'}
+                tokenSymbol={selectedTokenData?.symbol || ''}
+                networkName={selectedNetworkData?.label || ''}
+                transactionHash={mockTransactionHash}
+                onBackToSelection={handleBackToSelection}
+              />
+            )}
+
+            {screen === PaymentScreen.EXPIRED && (
+              <ExpiredScreen
+                tokenAmount={tokenAmount?.toFixed(6) || '0'}
+                tokenSymbol={selectedTokenData?.symbol || ''}
+                networkName={selectedNetworkData?.label || ''}
+                onRetry={handleRetry}
+                onBack={handleBackToSelection}
+              />
             )}
           </CardContent>
 

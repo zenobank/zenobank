@@ -1,7 +1,16 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  NotFoundException,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { PaymentsService } from './payments.service';
 import { PaymentResponseDto } from './dto/payment-response.dto';
+import { UpdatePaymentSelectionDto } from './dto/update-payment-selection.dto';
 
 @Controller('payments')
 export class PaymentsController {
@@ -15,7 +24,19 @@ export class PaymentsController {
   }
 
   @Get(':id')
-  async getPayment(@Param('id') id: string) {
-    return this.paymentsService.getPayment(id);
+  async getPayment(@Param('id') id: string): Promise<PaymentResponseDto> {
+    const payment = await this.paymentsService.getPayment(id);
+    if (!payment) {
+      throw new NotFoundException();
+    }
+    return payment;
+  }
+
+  @Patch(':id/selection')
+  async updatePaymentSelection(
+    @Param('id') id: string,
+    @Body() dto: UpdatePaymentSelectionDto,
+  ): Promise<PaymentResponseDto> {
+    return this.paymentsService.updatePaymentSelection(id, dto);
   }
 }
