@@ -85,6 +85,7 @@ model Network {
   id          NetworkId   @id
   networkType NetworkType
   name        String      @unique
+  displayName String
   isTestnet   Boolean     @default(false)
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt

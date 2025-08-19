@@ -8,6 +8,7 @@
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "tunel": "lt -s dkfjadskfjaercl --port 3001",
+    "p:seed": "pnpm tsx prisma/seed.ts",
     "p:generate": "pnpx prisma generate",
     "p:push": "pnpx prisma db push",
     "p:fix": "rm -rf node_modules/.prisma && rm -rf node_modules/@prisma/client && rm -rf ../../node_modules/.prisma && rm -rf ../../node_modules/@prisma/client && pnpm dlx prisma generate",

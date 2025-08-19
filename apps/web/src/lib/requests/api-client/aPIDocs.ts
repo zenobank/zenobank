@@ -35,6 +35,7 @@ import type {
   CreatePaymentDto,
   CreateTestDto,
   PaymentResponseDto,
+  TokenResponseDto,
   UpdateDepositSelectionDto,
   WalletControllerGetValidatorSchemaV1200,
   WalletControllerTestV1200
@@ -847,6 +848,86 @@ export function useTransactionsControllerTestV1<TData = Awaited<ReturnType<typeo
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getTransactionsControllerTestV1QueryOptions(options)
+
+  const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+export const assetControllerGetSupportedTokensV1 = (
+     options?: AxiosRequestConfig
+ ): Promise<AxiosResponse<TokenResponseDto[]>> => {
+    
+    
+    return axios.default.get(
+      `/api/v1/assets/tokens`,options
+    );
+  }
+
+
+export const getAssetControllerGetSupportedTokensV1QueryKey = () => {
+    return [`/api/v1/assets/tokens`] as const;
+    }
+
+    
+export const getAssetControllerGetSupportedTokensV1QueryOptions = <TData = Awaited<ReturnType<typeof assetControllerGetSupportedTokensV1>>, TError = AxiosError<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof assetControllerGetSupportedTokensV1>>, TError, TData>>, axios?: AxiosRequestConfig}
+) => {
+
+const {query: queryOptions, axios: axiosOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getAssetControllerGetSupportedTokensV1QueryKey();
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof assetControllerGetSupportedTokensV1>>> = ({ signal }) => assetControllerGetSupportedTokensV1({ signal, ...axiosOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof assetControllerGetSupportedTokensV1>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type AssetControllerGetSupportedTokensV1QueryResult = NonNullable<Awaited<ReturnType<typeof assetControllerGetSupportedTokensV1>>>
+export type AssetControllerGetSupportedTokensV1QueryError = AxiosError<unknown>
+
+
+export function useAssetControllerGetSupportedTokensV1<TData = Awaited<ReturnType<typeof assetControllerGetSupportedTokensV1>>, TError = AxiosError<unknown>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof assetControllerGetSupportedTokensV1>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof assetControllerGetSupportedTokensV1>>,
+          TError,
+          Awaited<ReturnType<typeof assetControllerGetSupportedTokensV1>>
+        > , 'initialData'
+      >, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAssetControllerGetSupportedTokensV1<TData = Awaited<ReturnType<typeof assetControllerGetSupportedTokensV1>>, TError = AxiosError<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof assetControllerGetSupportedTokensV1>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof assetControllerGetSupportedTokensV1>>,
+          TError,
+          Awaited<ReturnType<typeof assetControllerGetSupportedTokensV1>>
+        > , 'initialData'
+      >, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAssetControllerGetSupportedTokensV1<TData = Awaited<ReturnType<typeof assetControllerGetSupportedTokensV1>>, TError = AxiosError<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof assetControllerGetSupportedTokensV1>>, TError, TData>>, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useAssetControllerGetSupportedTokensV1<TData = Awaited<ReturnType<typeof assetControllerGetSupportedTokensV1>>, TError = AxiosError<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof assetControllerGetSupportedTokensV1>>, TError, TData>>, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getAssetControllerGetSupportedTokensV1QueryOptions(options)
 
   const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
