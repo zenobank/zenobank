@@ -5,6 +5,7 @@ export default defineConfig({
   api: {
     input: 'http://localhost:3001/docs-json',
     output: {
+      baseUrl: 'http://localhost:3001',
       target: 'src/lib/requests/api-client', // carpeta de salida
       schemas: 'src/lib/requests/api-client/model', // opcional pero recomendable
       client: 'react-query',

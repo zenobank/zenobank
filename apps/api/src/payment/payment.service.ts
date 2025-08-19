@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { randomUUID } from 'crypto';
@@ -75,11 +79,14 @@ export class PaymentService {
     if (!currentDepositDetails)
       throw new NotFoundException('Payment not found');
 
-    const sameChain = currentDepositDetails.networkId === newNetwork.id;
-
     let depositWalletId = currentDepositDetails.depositWalletId ?? null;
+    if (depositWalletId) {
+      throw new BadRequestException(
+        'Can not change deposit details, please create a new payment',
+      );
+    }
 
-    if (!depositWalletId || !sameChain) {
+    if (currentDepositDetails.networkId !== newNetwork.id) {
       const wallet = await this.walletService.createDepositWallet({
         networkId: newNetwork.id,
         label: `deposit-${paymentId}`,

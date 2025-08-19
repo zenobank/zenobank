@@ -48,7 +48,7 @@ export const appControllerGetHelloV1 = (
     
     
     return axios.default.get(
-      `/api/v1`,{
+      `http://localhost:3001/api/v1`,{
         responseType: 'text',
     ...options,}
     );
@@ -56,7 +56,7 @@ export const appControllerGetHelloV1 = (
 
 
 export const getAppControllerGetHelloV1QueryKey = () => {
-    return [`/api/v1`] as const;
+    return [`http://localhost:3001/api/v1`] as const;
     }
 
     
@@ -130,7 +130,7 @@ export const paymentControllerCreatePaymentV1 = (
     
     
     return axios.default.post(
-      `/api/v1/payments`,
+      `http://localhost:3001/api/v1/payments`,
       createPaymentDto,options
     );
   }
@@ -186,13 +186,13 @@ export const paymentControllerGetPaymentV1 = (
     
     
     return axios.default.get(
-      `/api/v1/payments/${id}`,options
+      `http://localhost:3001/api/v1/payments/${id}`,options
     );
   }
 
 
 export const getPaymentControllerGetPaymentV1QueryKey = (id?: string,) => {
-    return [`/api/v1/payments/${id}`] as const;
+    return [`http://localhost:3001/api/v1/payments/${id}`] as const;
     }
 
     
@@ -267,7 +267,7 @@ export const paymentControllerUpdatePaymentDepositSelectionV1 = (
     
     
     return axios.default.patch(
-      `/api/v1/payments/${id}/deposit`,
+      `http://localhost:3001/api/v1/payments/${id}/deposit`,
       updateDepositSelectionDto,options
     );
   }
@@ -323,7 +323,7 @@ export const alchemyControllerHandleWebhookV1 = (
     
     
     return axios.default.post(
-      `/api/v1/providers/alchemy/webhook`,undefined,options
+      `http://localhost:3001/api/v1/providers/alchemy/webhook`,undefined,options
     );
   }
 
@@ -378,7 +378,7 @@ export const testControllerCreateV1 = (
     
     
     return axios.default.post(
-      `/api/v1/test`,
+      `http://localhost:3001/api/v1/test`,
       createTestDto,{
         responseType: 'text',
     ...options,}
@@ -436,7 +436,7 @@ export const quicknodeControllerHandleWebhookV1 = (
     
     
     return axios.default.post(
-      `/api/v1/providers/quicknode/webhook`,undefined,options
+      `http://localhost:3001/api/v1/providers/quicknode/webhook`,undefined,options
     );
   }
 
@@ -491,13 +491,13 @@ export const walletControllerGetValidatorSchemaV1 = (
     
     
     return axios.default.get(
-      `/api/v1/wallet/validator-schema`,options
+      `http://localhost:3001/api/v1/wallet/validator-schema`,options
     );
   }
 
 
 export const getWalletControllerGetValidatorSchemaV1QueryKey = () => {
-    return [`/api/v1/wallet/validator-schema`] as const;
+    return [`http://localhost:3001/api/v1/wallet/validator-schema`] as const;
     }
 
     
@@ -571,13 +571,13 @@ export const walletControllerGetWalletsV1 = (
     
     
     return axios.default.get(
-      `/api/v1/wallet`,options
+      `http://localhost:3001/api/v1/wallet`,options
     );
   }
 
 
 export const getWalletControllerGetWalletsV1QueryKey = () => {
-    return [`/api/v1/wallet`] as const;
+    return [`http://localhost:3001/api/v1/wallet`] as const;
     }
 
     
@@ -651,13 +651,13 @@ export const walletControllerTestV1 = (
     
     
     return axios.default.get(
-      `/api/v1/wallet/test`,options
+      `http://localhost:3001/api/v1/wallet/test`,options
     );
   }
 
 
 export const getWalletControllerTestV1QueryKey = () => {
-    return [`/api/v1/wallet/test`] as const;
+    return [`http://localhost:3001/api/v1/wallet/test`] as const;
     }
 
     
@@ -731,7 +731,7 @@ export const walletControllerCreateWebhookV1 = (
     
     
     return axios.default.post(
-      `/api/v1/wallet/create-webhook`,undefined,options
+      `http://localhost:3001/api/v1/wallet/create-webhook`,undefined,options
     );
   }
 
@@ -786,13 +786,13 @@ export const transactionsControllerTestV1 = (
     
     
     return axios.default.get(
-      `/api/v1/transactions/abc`,options
+      `http://localhost:3001/api/v1/transactions/abc`,options
     );
   }
 
 
 export const getTransactionsControllerTestV1QueryKey = () => {
-    return [`/api/v1/transactions/abc`] as const;
+    return [`http://localhost:3001/api/v1/transactions/abc`] as const;
     }
 
     
@@ -866,13 +866,13 @@ export const assetControllerGetSupportedTokensV1 = (
     
     
     return axios.default.get(
-      `/api/v1/assets/tokens`,options
+      `http://localhost:3001/api/v1/assets/tokens`,options
     );
   }
 
 
 export const getAssetControllerGetSupportedTokensV1QueryKey = () => {
-    return [`/api/v1/assets/tokens`] as const;
+    return [`http://localhost:3001/api/v1/assets/tokens`] as const;
     }
 
     
@@ -946,13 +946,13 @@ export const networksControllerGetNetworksV1 = (
     
     
     return axios.default.get(
-      `/api/v1/networks`,options
+      `http://localhost:3001/api/v1/networks`,options
     );
   }
 
 
 export const getNetworksControllerGetNetworksV1QueryKey = () => {
-    return [`/api/v1/networks`] as const;
+    return [`http://localhost:3001/api/v1/networks`] as const;
     }
 
     
