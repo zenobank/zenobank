@@ -5,33 +5,34 @@ import { requestWithRepeatDelay } from 'src/lib/utils/request-with-repeat-delay'
 import { erc20Abi } from 'viem';
 import { isNativeToken, nativeTokenAddress } from '../lib/utils';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { NetworkId, TokenOnNetwork } from '@prisma/client';
+import { NetworkId, Token } from '@prisma/client';
+import { plainToInstance } from 'class-transformer';
+import { TokenResponseDto } from '../dto/token-response.dto';
 
 @Injectable()
 export class TokenService {
   private readonly logger = new Logger(TokenService.name);
   constructor(private db: PrismaService) {}
 
-  async getSupportedTokens(): Promise<any> {
-    // tengo que añadir el seed
-    const canonicalTokens = await this.db.tokenCanonical.findMany({});
-    return canonicalTokens;
+  async getSupportedTokens(): Promise<TokenResponseDto[]> {
+    const tokens = await this.db.token.findMany({});
+    return plainToInstance(TokenResponseDto, tokens);
   }
 
-  async getToken(id: string): Promise<TokenOnNetwork | null> {
-    const token = await this.db.tokenOnNetwork.findUnique({
+  async getToken(id: string): Promise<Token | null> {
+    const token = await this.db.token.findUnique({
       where: { id },
     });
     return token;
   }
-  async getTokenOrThrow(id: string): Promise<TokenOnNetwork> {
+  async getTokenOrThrow(id: string): Promise<Token> {
     const token = await this.getToken(id);
     if (!token) throw new NotFoundException('Token not found');
     return token;
   }
 
-  async getTokens(networkId: NetworkId): Promise<TokenOnNetwork[]> {
-    const tokens = await this.db.tokenOnNetwork.findMany({
+  async getNetworkTokens(networkId: NetworkId): Promise<Token[]> {
+    const tokens = await this.db.token.findMany({
       where: {
         networkId,
       },

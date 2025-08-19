@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Network, NetworkId, TokenOnNetwork } from '@prisma/client';
+import { Network, NetworkId, Token } from '@prisma/client';
 import { IsEnum, IsString } from 'class-validator';
 
 export class UpdateDepositSelectionDto {
@@ -7,7 +7,7 @@ export class UpdateDepositSelectionDto {
   @ApiProperty({
     example: 'USDC_BASE',
   })
-  tokenId: TokenOnNetwork['id'];
+  tokenId: Token['id'];
 
   @IsEnum(NetworkId)
   @ApiProperty({
