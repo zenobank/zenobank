@@ -1,22 +1,11 @@
 import { createFileRoute } from '@tanstack/react-router'
 import Payments from '@/features/payments'
-
-export type PaymentData = {
-  id: string
-  storeName: string
-  amount: number
-  currency: string
-}
+import { paymentControllerGetPaymentV1 } from '../../api-orval/aPIDocs'
+import { PaymentResponseDto } from '../../api-orval/model'
 
 export const Route = createFileRoute('/payments/$id')({
-  loader: async ({ params }) => {
-    // Simulate payment data - in real app this would come from your API
-    const data: PaymentData = {
-      id: params.id,
-      storeName: 'PayAmazon',
-      amount: 3,
-      currency: 'USD',
-    }
+  loader: async ({ params }): Promise<PaymentResponseDto> => {
+    const { data } = await paymentControllerGetPaymentV1(params.id)
     return data
   },
   component: Payments,
