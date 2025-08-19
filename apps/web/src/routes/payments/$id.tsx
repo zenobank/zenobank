@@ -1,12 +1,24 @@
 import { createFileRoute } from '@tanstack/react-router'
+import {
+  assetControllerGetSupportedTokensV1,
+  networksControllerGetNetworksV1,
+  paymentControllerGetPaymentV1,
+} from '@/lib/requests/api-client/aPIDocs'
 import Payments from '@/features/payments'
-import { paymentControllerGetPaymentV1 } from '../../api-orval/aPIDocs'
-import { PaymentResponseDto } from '../../api-orval/model'
 
 export const Route = createFileRoute('/payments/$id')({
-  loader: async ({ params }): Promise<PaymentResponseDto> => {
-    const { data } = await paymentControllerGetPaymentV1(params.id)
-    return data
+  loader: async ({ params }) => {
+    const [
+      { data: paymentData },
+      { data: networks },
+      { data: supportedTokens },
+    ] = await Promise.all([
+      paymentControllerGetPaymentV1(params.id),
+      networksControllerGetNetworksV1(),
+      assetControllerGetSupportedTokensV1(),
+    ])
+
+    return { paymentData, networks, supportedTokens }
   },
   component: Payments,
 })
