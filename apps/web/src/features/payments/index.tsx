@@ -1,4 +1,5 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
+import { isAfter } from 'date-fns'
 import { Route } from '@/routes/payments/$id'
 import { ChevronsUpDown, Check } from 'lucide-react'
 import { toast } from 'sonner'
@@ -6,7 +7,11 @@ import {
   useAssetControllerGetSupportedTokensV1,
   usePaymentControllerUpdatePaymentDepositSelectionV1,
 } from '@/lib/requests/api-client/aPIDocs'
-import { NetworkId } from '@/lib/requests/api-client/model'
+import {
+  NetworkId,
+  PaymentResponseDto,
+  PaymentStatus,
+} from '@/lib/requests/api-client/model'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -32,29 +37,20 @@ import {
   Popover,
 } from '@/components/ui/popover'
 import { Separator } from '@/components/ui/separator'
-import { ConfirmDialog } from '@/components/confirm-dialog'
 import PaymentDetails from './components/DetailsScreen'
 import ExpiredScreen from './components/ExpiredScreen'
 import SuccessScreen from './components/SuccessScreen'
 import TimerBadge from './components/TimerBadge'
 
-export type PaymentData = {
-  id: string
-  storeName: string
-  amount: number
-  currency: string
-}
-
 enum PaymentScreen {
   SELECTION = 'selection',
   DETAILS = 'details',
-  SUCCESS = 'success',
   EXPIRED = 'expired',
-  CONFIRMED = 'confirmed',
+  SUCCESS = 'success',
 }
 
-interface PaymentSelection {
-  selectedToken: string | null
+interface PaymentSelection<TokenId> {
+  selectedToken: TokenId | null
   selectedNetwork: NetworkId | null
 }
 
@@ -64,22 +60,41 @@ enum PopoverId {
 }
 
 export default function Payments() {
-  const [isLoading, setIsLoading] = useState(false)
   const { paymentData, networks, supportedTokens } = Route.useLoaderData()
   const { mutate: updatePaymentDepositSelection } =
     usePaymentControllerUpdatePaymentDepositSelectionV1()
 
-  const [screen, setScreen] = useState<PaymentScreen>(
-    paymentData?.depositDetails == null
-      ? PaymentScreen.SELECTION
-      : PaymentScreen.DETAILS
-  )
+  const [isLoading, setIsLoading] = useState(false)
   const [activePopover, setActivePopover] = useState<PopoverId | null>(null)
 
-  const [paymentSelection, setPaymentSelection] = useState<PaymentSelection>({
+  const [screen, setScreen] = useState<PaymentScreen>(() =>
+    deriveScreen(paymentData)
+  )
+  const [paymentSelection, setPaymentSelection] = useState<
+    PaymentSelection<TokenId>
+  >({
     selectedToken: paymentData?.depositDetails?.currencyId || null,
     selectedNetwork: paymentData?.depositDetails?.networkId || null,
   })
+
+  const isPaymentExpired = useMemo(() => {
+    return isAfter(new Date(), new Date(paymentData.expiredAt))
+  }, [paymentData?.expiredAt])
+
+  const deriveScreen = useCallback(
+    (p: PaymentResponseDto): PaymentScreen => {
+      if (!p.depositDetails) return PaymentScreen.SELECTION
+      if (p.status === PaymentStatus.SUCCESS) return PaymentScreen.SUCCESS
+      if (p.status === PaymentStatus.CANCELLED) return PaymentScreen.EXPIRED
+      if (p.status === PaymentStatus.EXPIRED || isPaymentExpired) {
+        return PaymentScreen.EXPIRED
+      }
+      return PaymentScreen.DETAILS
+    },
+    [isPaymentExpired]
+  )
+
+  type TokenId = (typeof supportedTokens)[number]['id']
 
   // Group tokens by canonicalTokenId and get unique tokens
   const uniqueTokens = useMemo(() => {
@@ -166,7 +181,7 @@ export default function Payments() {
     return [false, 'Next']
   }, [selectedTokenData, selectedNetworkData, isLoading])
 
-  const handleNext = async () => {
+  const handleDepositSelectionSubmit = async () => {
     if (disabled) return
     const { selectedToken, selectedNetwork } = paymentSelection
 
@@ -199,11 +214,11 @@ export default function Payments() {
               <div className='flex items-center'>
                 <CardTitle className='text-lg'>Send Payment</CardTitle>
               </div>
-              <TimerBadge />
+              <Badge variant='secondary'>{paymentData.expiredAt}</Badge>
             </div>
           </CardHeader>
 
-          <CardContent className='space-y-6'>
+          <CardContent className='space-y-3'>
             <div className='py-4 text-center'>
               <div>
                 <div className='flex items-center justify-center gap-3 text-3xl font-bold'>
@@ -230,7 +245,7 @@ export default function Payments() {
             </div>
             <Separator />
 
-            {screen === PaymentScreen.SELECTION && (
+            {screen === PaymentScreen.SELECTION && !isPaymentExpired && (
               <>
                 {/* Token Selector */}
                 <div className='space-y-2'>
@@ -408,7 +423,7 @@ export default function Payments() {
 
                 <Button
                   onClick={() => {
-                    handleNext()
+                    handleDepositSelectionSubmit()
                   }}
                   disabled={disabled}
                   className={`mx-auto w-full ${
@@ -421,7 +436,8 @@ export default function Payments() {
             )}
 
             {screen === PaymentScreen.DETAILS &&
-              paymentData.depositDetails?.address && (
+              paymentData.depositDetails?.address &&
+              !isPaymentExpired && (
                 <PaymentDetails
                   walletAddress={paymentData.depositDetails?.address}
                 />

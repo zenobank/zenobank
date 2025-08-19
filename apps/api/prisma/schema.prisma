@@ -32,7 +32,7 @@ model Wallet {
 
 enum PaymentStatus {
   PENDING
-  COMPLETED
+  SUCCESS
   EXPIRED
   CANCELLED
 }
