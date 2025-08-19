@@ -64,7 +64,6 @@ enum PopoverId {
 }
 
 export default function Payments() {
-  const { id } = Route.useParams()
   const [isLoading, setIsLoading] = useState(false)
   const { paymentData, networks, supportedTokens } = Route.useLoaderData()
   const { mutate: updatePaymentDepositSelection } =
@@ -78,55 +77,81 @@ export default function Payments() {
   const [activePopover, setActivePopover] = useState<PopoverId | null>(null)
 
   const [paymentSelection, setPaymentSelection] = useState<PaymentSelection>({
-    selectedToken: null,
-    selectedNetwork: null,
+    selectedToken: paymentData?.depositDetails?.currencyId || null,
+    selectedNetwork: paymentData?.depositDetails?.networkId || null,
   })
-  const [showCancelDialog, setShowCancelDialog] = useState(false)
+
+  // Group tokens by canonicalTokenId and get unique tokens
+  const uniqueTokens = useMemo(() => {
+    const tokenMap = new Map()
+    supportedTokens?.forEach((token) => {
+      if (!tokenMap.has(token.canonicalTokenId)) {
+        tokenMap.set(token.canonicalTokenId, token)
+      }
+    })
+    return Array.from(tokenMap.values())
+  }, [supportedTokens])
+
+  // Get available networks for selected token
+  const availableNetworks = useMemo(() => {
+    if (!paymentSelection.selectedToken) return []
+
+    const selectedTokenData = supportedTokens.find(
+      (t) => t.id === paymentSelection.selectedToken
+    )
+    if (!selectedTokenData) return []
+
+    // Find all tokens with the same canonicalTokenId
+    const tokensWithSameCanonical = supportedTokens.filter(
+      (t) => t.canonicalTokenId === selectedTokenData.canonicalTokenId
+    )
+
+    // Get networks for these tokens
+    const networkIds = tokensWithSameCanonical.map((t) => t.networkId)
+    return networks.filter((network) =>
+      networkIds.some(
+        (networkId) => networkId.toString() === network.id.toString()
+      )
+    )
+  }, [paymentSelection.selectedToken, supportedTokens, networks])
 
   // Calculate token amount and USD conversion
   const selectedTokenData = useMemo(() => {
     if (!paymentSelection.selectedToken) return null
     return supportedTokens.find((t) => t.id === paymentSelection.selectedToken)
-  }, [paymentSelection.selectedToken])
+  }, [paymentSelection.selectedToken, supportedTokens])
 
   const selectedNetworkData = useMemo(() => {
     if (!paymentSelection.selectedNetwork) return null
     return networks.find(
       (n) => n.id.toString() === paymentSelection.selectedNetwork
     )
-  }, [paymentSelection.selectedNetwork])
+  }, [paymentSelection.selectedNetwork, networks])
 
-  // Generate mock wallet address and QR code
-  const walletAddress = '0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b6'
-
-  // Mock transaction hash for success screen
-  const mockTransactionHash =
-    '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
-
-  // Auto-open network selector when token is selected
+  // Auto-select network if only one is available
   useEffect(() => {
-    if (paymentSelection.selectedToken && !paymentSelection.selectedNetwork) {
+    if (paymentSelection.selectedToken && availableNetworks.length === 1) {
+      setPaymentSelection((prev) => ({
+        ...prev,
+        selectedNetwork: availableNetworks[0].id.toString() as NetworkId,
+      }))
+    }
+  }, [paymentSelection.selectedToken, availableNetworks])
+
+  // Auto-open network selector when token is selected (only if multiple networks available)
+  useEffect(() => {
+    if (
+      paymentSelection.selectedToken &&
+      !paymentSelection.selectedNetwork &&
+      availableNetworks.length > 1
+    ) {
       setActivePopover(PopoverId.NETWORK)
     }
-  }, [paymentSelection.selectedToken, paymentSelection.selectedNetwork])
-
-  const handleBackClick = () => {
-    setShowCancelDialog(true)
-  }
-
-  const handleCancelConfirm = () => {
-    setShowCancelDialog(false)
-    setScreen(PaymentScreen.SELECTION)
-  }
-
-  const handleRetry = () => {
-    setScreen(PaymentScreen.SELECTION)
-    setPaymentSelection({
-      selectedToken: null,
-      selectedNetwork: null,
-    })
-    setActivePopover(null)
-  }
+  }, [
+    paymentSelection.selectedToken,
+    paymentSelection.selectedNetwork,
+    availableNetworks,
+  ])
 
   const [disabled, buttonText] = useMemo(() => {
     if (isLoading) {
@@ -139,7 +164,7 @@ export default function Payments() {
       return [true, 'Select network']
     }
     return [false, 'Next']
-  }, [selectedTokenData, selectedNetworkData])
+  }, [selectedTokenData, selectedNetworkData, isLoading])
 
   const handleNext = async () => {
     if (disabled) return
@@ -157,6 +182,7 @@ export default function Payments() {
       })
       setScreen(PaymentScreen.DETAILS)
     } catch (error) {
+      console.log('error', error)
       toast.error('Failed to update payment deposit selection')
       console.error(error)
     } finally {
@@ -252,7 +278,7 @@ export default function Payments() {
                         <CommandList>
                           <CommandEmpty>No cryptocurrency found.</CommandEmpty>
                           <CommandGroup>
-                            {supportedTokens?.map((token) => (
+                            {uniqueTokens?.map((token) => (
                               <CommandItem
                                 key={token.id}
                                 value={token.id}
@@ -261,6 +287,7 @@ export default function Payments() {
                                     setPaymentSelection({
                                       ...paymentSelection,
                                       selectedToken: currentValue,
+                                      selectedNetwork: null, // Reset network when token changes
                                     })
                                   }
                                   setActivePopover(null)
@@ -298,11 +325,13 @@ export default function Payments() {
                   </Popover>
                 </div>
 
-                {/* Network Selector */}
+                {/* Network Selector - Always visible but disabled when only one network */}
                 <div className='space-y-2'>
                   <Popover
                     open={activePopover === PopoverId.NETWORK}
                     onOpenChange={(open) => {
+                      // Only allow opening if multiple networks available
+                      if (open && availableNetworks.length <= 1) return
                       setActivePopover(open ? PopoverId.NETWORK : null)
                     }}
                   >
@@ -312,66 +341,68 @@ export default function Payments() {
                         role='combobox'
                         aria-expanded={activePopover === PopoverId.NETWORK}
                         className='mx-auto h-12 w-full max-w-md justify-between'
-                        disabled={!selectedTokenData}
+                        disabled={
+                          !selectedTokenData || availableNetworks.length <= 1
+                        }
                       >
                         {selectedNetworkData ? (
                           <div className='flex items-center gap-3'>
-                            {
-                              networks.find(
-                                (network) =>
-                                  network.id === selectedNetworkData.id
-                              )?.displayName
-                            }
+                            {selectedNetworkData.displayName}
                           </div>
                         ) : (
                           'Select network...'
                         )}
-                        <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+                        {availableNetworks.length > 1 && (
+                          <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+                        )}
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className='w-96 p-0'>
-                      <Command>
-                        <CommandInput
-                          placeholder='Search network...'
-                          className='h-9'
-                        />
-                        <CommandList>
-                          <CommandEmpty>No network found.</CommandEmpty>
-                          <CommandGroup>
-                            {networks.map((network) => (
-                              <CommandItem
-                                key={network.id.toString()}
-                                value={network.id.toString()}
-                                onSelect={(currentValue) => {
-                                  if (
-                                    currentValue !==
-                                    selectedNetworkData?.id.toString()
-                                  ) {
-                                    setPaymentSelection({
-                                      ...paymentSelection,
-                                      selectedNetwork: currentValue,
-                                    })
-                                  }
-                                  setActivePopover(null)
-                                }}
-                              >
-                                <div className='flex items-center gap-3'>
-                                  {network.displayName}
-                                  <Check
-                                    className={cn(
-                                      'ml-auto h-4 w-4',
-                                      selectedNetworkData?.id === network.id
-                                        ? 'opacity-100'
-                                        : 'opacity-0'
-                                    )}
-                                  />
-                                </div>
-                              </CommandItem>
-                            ))}
-                          </CommandGroup>
-                        </CommandList>
-                      </Command>
-                    </PopoverContent>
+                    {availableNetworks.length > 1 && (
+                      <PopoverContent className='w-96 p-0'>
+                        <Command>
+                          <CommandInput
+                            placeholder='Search network...'
+                            className='h-9'
+                          />
+                          <CommandList>
+                            <CommandEmpty>No network found.</CommandEmpty>
+                            <CommandGroup>
+                              {availableNetworks.map((network) => (
+                                <CommandItem
+                                  key={network.id.toString()}
+                                  value={network.id.toString()}
+                                  onSelect={(currentValue) => {
+                                    if (
+                                      currentValue !==
+                                      selectedNetworkData?.id.toString()
+                                    ) {
+                                      setPaymentSelection({
+                                        ...paymentSelection,
+                                        selectedNetwork:
+                                          currentValue as NetworkId,
+                                      })
+                                    }
+                                    setActivePopover(null)
+                                  }}
+                                >
+                                  <div className='flex items-center gap-3'>
+                                    {network.displayName}
+                                    <Check
+                                      className={cn(
+                                        'ml-auto h-4 w-4',
+                                        selectedNetworkData?.id === network.id
+                                          ? 'opacity-100'
+                                          : 'opacity-0'
+                                      )}
+                                    />
+                                  </div>
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    )}
                   </Popover>
                 </div>
 
@@ -389,52 +420,16 @@ export default function Payments() {
               </>
             )}
 
-            {screen === PaymentScreen.DETAILS && (
-              <div className='space-y-4'>
-                <PaymentDetails walletAddress={walletAddress} />
+            {screen === PaymentScreen.DETAILS &&
+              paymentData.depositDetails?.address && (
+                <PaymentDetails
+                  walletAddress={paymentData.depositDetails?.address}
+                />
+              )}
 
-                {/* Demo buttons for testing different screens */}
-                <div className='flex gap-2 pt-4'>
-                  <Button
-                    variant='outline'
-                    size='sm'
-                    onClick={() => setScreen(PaymentScreen.SUCCESS)}
-                    className='flex-1'
-                  >
-                    Demo Success
-                  </Button>
-                  <Button
-                    variant='outline'
-                    size='sm'
-                    onClick={() => setScreen(PaymentScreen.EXPIRED)}
-                    className='flex-1'
-                  >
-                    Demo Expired
-                  </Button>
-                </div>
-              </div>
-            )}
+            {screen === PaymentScreen.SUCCESS && <SuccessScreen />}
 
-            {screen === PaymentScreen.SUCCESS && (
-              <SuccessScreen
-                walletAddress={walletAddress}
-                tokenAmount={paymentData.amount}
-                tokenSymbol={selectedTokenData?.symbol || ''}
-                networkName={selectedNetworkData?.displayName || ''}
-                transactionHash={mockTransactionHash}
-                onBackToSelection={() => {}}
-              />
-            )}
-
-            {screen === PaymentScreen.EXPIRED && (
-              <ExpiredScreen
-                tokenAmount={paymentData.amount}
-                tokenSymbol={selectedTokenData?.symbol || ''}
-                networkName={selectedNetworkData?.displayName || ''}
-                onRetry={handleRetry}
-                onBack={() => {}}
-              />
-            )}
+            {screen === PaymentScreen.EXPIRED && <ExpiredScreen />}
           </CardContent>
 
           <CardFooter className='pt-4'>
@@ -443,25 +438,6 @@ export default function Payments() {
         </Card>
 
         <Footer />
-
-        {/* Cancel Confirmation Dialog */}
-        <ConfirmDialog
-          open={showCancelDialog}
-          onOpenChange={setShowCancelDialog}
-          handleConfirm={handleCancelConfirm}
-          title='Are you sure?'
-          desc={
-            <div className='space-y-4'>
-              <p className='mb-2'>
-                This transaction will be cancelled. If you already sent the
-                payment please wait.
-              </p>
-            </div>
-          }
-          confirmText='Yes, I am sure'
-          cancelBtnText='Cancel'
-          destructive
-        />
       </div>
     </div>
   )
