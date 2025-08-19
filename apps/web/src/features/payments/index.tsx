@@ -1,6 +1,12 @@
 import { useState, useEffect, useMemo } from 'react'
 import { Route } from '@/routes/payments/$id'
 import { ChevronsUpDown, Check } from 'lucide-react'
+import { toast } from 'sonner'
+import {
+  useAssetControllerGetSupportedTokensV1,
+  usePaymentControllerUpdatePaymentDepositSelectionV1,
+} from '@/lib/requests/api-client/aPIDocs'
+import { NetworkId } from '@/lib/requests/api-client/model'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -49,7 +55,7 @@ enum PaymentScreen {
 
 interface PaymentSelection {
   selectedToken: string | null
-  selectedNetwork: string | null
+  selectedNetwork: NetworkId | null
 }
 
 enum PopoverId {
@@ -59,7 +65,10 @@ enum PopoverId {
 
 export default function Payments() {
   const { id } = Route.useParams()
+  const [isLoading, setIsLoading] = useState(false)
   const { paymentData, networks, supportedTokens } = Route.useLoaderData()
+  const { mutate: updatePaymentDepositSelection } =
+    usePaymentControllerUpdatePaymentDepositSelectionV1()
 
   const [screen, setScreen] = useState<PaymentScreen>(
     paymentData?.depositDetails == null
@@ -120,6 +129,9 @@ export default function Payments() {
   }
 
   const [disabled, buttonText] = useMemo(() => {
+    if (isLoading) {
+      return [true, 'Loading...']
+    }
     if (!selectedTokenData) {
       return [true, 'Select cryptocurrency']
     }
@@ -128,6 +140,29 @@ export default function Payments() {
     }
     return [false, 'Next']
   }, [selectedTokenData, selectedNetworkData])
+
+  const handleNext = async () => {
+    if (disabled) return
+    const { selectedToken, selectedNetwork } = paymentSelection
+
+    if (!selectedToken || !selectedNetwork) return
+    setIsLoading(true)
+    try {
+      await updatePaymentDepositSelection({
+        id: paymentData.id,
+        data: {
+          tokenId: selectedToken,
+          networkId: selectedNetwork,
+        },
+      })
+      setScreen(PaymentScreen.DETAILS)
+    } catch (error) {
+      toast.error('Failed to update payment deposit selection')
+      console.error(error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   return (
     <div className='bg-secondary flex min-h-screen items-center justify-center px-4 py-8'>
@@ -342,7 +377,7 @@ export default function Payments() {
 
                 <Button
                   onClick={() => {
-                    setScreen(PaymentScreen.DETAILS)
+                    handleNext()
                   }}
                   disabled={disabled}
                   className={`mx-auto w-full ${
