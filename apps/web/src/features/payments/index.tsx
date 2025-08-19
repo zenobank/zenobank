@@ -1,12 +1,10 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import { isAfter } from 'date-fns'
 import { Route } from '@/routes/payments/$id'
-import { ChevronsUpDown, Check } from 'lucide-react'
+import { ChevronsUpDown, Check, TimerIcon } from 'lucide-react'
+import Countdown from 'react-countdown'
 import { toast } from 'sonner'
-import {
-  useAssetControllerGetSupportedTokensV1,
-  usePaymentControllerUpdatePaymentDepositSelectionV1,
-} from '@/lib/requests/api-client/aPIDocs'
+import { usePaymentControllerUpdatePaymentDepositSelectionV1 } from '@/lib/requests/api-client/aPIDocs'
 import {
   NetworkId,
   PaymentResponseDto,
@@ -40,7 +38,6 @@ import { Separator } from '@/components/ui/separator'
 import PaymentDetails from './components/DetailsScreen'
 import ExpiredScreen from './components/ExpiredScreen'
 import SuccessScreen from './components/SuccessScreen'
-import TimerBadge from './components/TimerBadge'
 
 enum PaymentScreen {
   SELECTION = 'selection',
@@ -64,6 +61,22 @@ export default function Payments() {
   const { mutate: updatePaymentDepositSelection } =
     usePaymentControllerUpdatePaymentDepositSelectionV1()
 
+  const deriveScreen = useCallback(
+    (p: PaymentResponseDto): PaymentScreen => {
+      if (!p.depositDetails) return PaymentScreen.SELECTION
+      if (p.status === PaymentStatus.SUCCESS) return PaymentScreen.SUCCESS
+      if (p.status === PaymentStatus.CANCELLED) return PaymentScreen.EXPIRED
+      if (
+        p.status === PaymentStatus.EXPIRED ||
+        isAfter(new Date(), new Date(paymentData.expiredAt))
+      ) {
+        return PaymentScreen.EXPIRED
+      }
+      return PaymentScreen.DETAILS
+    },
+    [paymentData.expiredAt]
+  )
+
   const [isLoading, setIsLoading] = useState(false)
   const [activePopover, setActivePopover] = useState<PopoverId | null>(null)
 
@@ -76,23 +89,6 @@ export default function Payments() {
     selectedToken: paymentData?.depositDetails?.currencyId || null,
     selectedNetwork: paymentData?.depositDetails?.networkId || null,
   })
-
-  const isPaymentExpired = useMemo(() => {
-    return isAfter(new Date(), new Date(paymentData.expiredAt))
-  }, [paymentData?.expiredAt])
-
-  const deriveScreen = useCallback(
-    (p: PaymentResponseDto): PaymentScreen => {
-      if (!p.depositDetails) return PaymentScreen.SELECTION
-      if (p.status === PaymentStatus.SUCCESS) return PaymentScreen.SUCCESS
-      if (p.status === PaymentStatus.CANCELLED) return PaymentScreen.EXPIRED
-      if (p.status === PaymentStatus.EXPIRED || isPaymentExpired) {
-        return PaymentScreen.EXPIRED
-      }
-      return PaymentScreen.DETAILS
-    },
-    [isPaymentExpired]
-  )
 
   type TokenId = (typeof supportedTokens)[number]['id']
 
@@ -107,7 +103,6 @@ export default function Payments() {
     return Array.from(tokenMap.values())
   }, [supportedTokens])
 
-  // Get available networks for selected token
   const availableNetworks = useMemo(() => {
     if (!paymentSelection.selectedToken) return []
 
@@ -116,12 +111,10 @@ export default function Payments() {
     )
     if (!selectedTokenData) return []
 
-    // Find all tokens with the same canonicalTokenId
     const tokensWithSameCanonical = supportedTokens.filter(
       (t) => t.canonicalTokenId === selectedTokenData.canonicalTokenId
     )
 
-    // Get networks for these tokens
     const networkIds = tokensWithSameCanonical.map((t) => t.networkId)
     return networks.filter((network) =>
       networkIds.some(
@@ -214,7 +207,24 @@ export default function Payments() {
               <div className='flex items-center'>
                 <CardTitle className='text-lg'>Send Payment</CardTitle>
               </div>
-              <Badge variant='secondary'>{paymentData.expiredAt}</Badge>
+              <Badge variant='secondary'>
+                <TimerIcon />
+                <Countdown
+                  date={new Date(paymentData.expiredAt)}
+                  daysInHours
+                  overtime={false}
+                  onComplete={() => {
+                    setScreen(PaymentScreen.EXPIRED)
+                  }}
+                  renderer={({ hours, minutes, seconds }) => (
+                    <span>
+                      {hours !== 0 && String(hours).padStart(2, '0') + ':'}
+                      {String(minutes).padStart(2, '0')}:
+                      {String(seconds).padStart(2, '0')}
+                    </span>
+                  )}
+                />
+              </Badge>
             </div>
           </CardHeader>
 
@@ -245,7 +255,7 @@ export default function Payments() {
             </div>
             <Separator />
 
-            {screen === PaymentScreen.SELECTION && !isPaymentExpired && (
+            {screen === PaymentScreen.SELECTION && (
               <>
                 {/* Token Selector */}
                 <div className='space-y-2'>
@@ -436,8 +446,7 @@ export default function Payments() {
             )}
 
             {screen === PaymentScreen.DETAILS &&
-              paymentData.depositDetails?.address &&
-              !isPaymentExpired && (
+              paymentData.depositDetails?.address && (
                 <PaymentDetails
                   walletAddress={paymentData.depositDetails?.address}
                 />
