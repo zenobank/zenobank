@@ -54,7 +54,7 @@ model Payment {
   status       PaymentStatus @default(PENDING)
 
   tokenId String?
-  token   TokenOnNetwork? @relation(fields: [tokenId], references: [id])
+  token   Token?  @relation(fields: [tokenId], references: [id])
 
   networkId NetworkId?
   network   Network?   @relation(fields: [networkId], references: [id])
@@ -89,28 +89,15 @@ model Network {
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
 
-  tokens       TokenOnNetwork[]
+  tokens       Token[]
   transactions Transaction[]
   wallets      Wallet[]
   Payment      Payment[]
 }
 
-model TokenCanonical {
-  id        String   @id
-  name      String
-  symbol    String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  variants TokenOnNetwork[]
-
-  @@unique([symbol, name])
-}
-
-model TokenOnNetwork {
-  id               String         @id
+model Token {
+  id               String @id
   canonicalTokenId String
-  canonicalToken   TokenCanonical @relation(fields: [canonicalTokenId], references: [id])
 
   standard     TokenStandard
   address      String
@@ -155,7 +142,7 @@ model Transaction {
   amountFiat  String
 
   tokenId String
-  token   TokenOnNetwork @relation(fields: [tokenId], references: [id])
+  token   Token  @relation(fields: [tokenId], references: [id])
 
   networkId NetworkId
   network   Network   @relation(fields: [networkId], references: [id])

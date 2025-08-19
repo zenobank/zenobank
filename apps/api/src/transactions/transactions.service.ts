@@ -41,7 +41,7 @@ export class TransactionsService {
     );
     const gasStationWalletClient = walletClient(network, gasTankerAccount);
 
-    const tokens = await this.tokensService.getTokens(network);
+    const tokens = await this.tokensService.getNetworkTokens(network);
     this.logger.log(`Found ${tokens.length} tokens to check on ${network}`);
 
     const balances = await this.tokensService.getTokenBalances(

@@ -36,84 +36,8 @@ async function seedNetworks() {
   });
 }
 
-async function seedTokenCanonicals() {
-  await prisma.tokenCanonical.createMany({
-    data: [
-      {
-        id: 'USDC',
-        name: 'USDC',
-        symbol: 'USDC',
-      },
-      {
-        id: 'USDT',
-        name: 'USDT',
-        symbol: 'USDT',
-      },
-      {
-        id: 'BTC',
-        name: 'Bitcoin',
-        symbol: 'BTC',
-      },
-      {
-        id: 'ETH',
-        name: 'Ethereum',
-        symbol: 'ETH',
-      },
-      {
-        id: 'SOL',
-        name: 'Solana',
-        symbol: 'SOL',
-      },
-      {
-        id: 'XRP',
-        name: 'Ripple',
-        symbol: 'XRP',
-      },
-      {
-        id: 'DOGE',
-        name: 'Dogecoin',
-        symbol: 'DOGE',
-      },
-      {
-        id: 'LTC',
-        name: 'Litecoin',
-        symbol: 'LTC',
-      },
-      {
-        id: 'BCH',
-        name: 'Bitcoin Cash',
-        symbol: 'BCH',
-      },
-      {
-        id: 'XLM',
-        name: 'Stellar',
-        symbol: 'XLM',
-      },
-      {
-        id: 'ADA',
-        name: 'Cardano',
-        symbol: 'ADA',
-      },
-      {
-        id: 'DOT',
-        name: 'Polkadot',
-        symbol: 'DOT',
-      },
-      {
-        id: 'LINK',
-        name: 'Chainlink',
-        symbol: 'LINK',
-      },
-      {
-        id: 'UNI',
-        name: 'Uniswap',
-        symbol: 'UNI',
-      },
-    ],
-  });
-}
 async function seedTokensOnNetworks() {
-  await prisma.tokenOnNetwork.createMany({
+  await prisma.token.createMany({
     data: [
       {
         id: 'USDC_ETHEREUM_MAINNET',
