@@ -9,17 +9,17 @@ export class NetworkResponseDto {
   @ApiProperty({
     example: 'ETHEREUM_MAINNET',
   })
-  id: Network['id'];
+  id: string;
 
   @Expose()
   @IsString()
   @ApiProperty({ example: 'Ethereum Mainnet' })
-  name: Network['name'];
+  name: string;
 
   @Expose()
   @IsString()
   @ApiProperty({ example: 'Ethereum' })
-  displayName: Network['displayName'];
+  displayName: string;
 
   @Expose()
   @IsEnum(NetworkType)
@@ -27,10 +27,10 @@ export class NetworkResponseDto {
     example: NetworkType.EVM,
     enum: NetworkType,
   })
-  networkType: Network['networkType'];
+  networkType: NetworkType;
 
   @Expose()
   @IsBoolean()
   @ApiProperty({ example: false })
-  isTestnet: Network['isTestnet'];
+  isTestnet: boolean;
 }

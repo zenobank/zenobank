@@ -39,52 +39,6 @@ export type PaymentData = {
   currency: string
 }
 
-const tokens = [
-  {
-    value: 'btc',
-    label: 'Bitcoin',
-    symbol: 'BTC',
-    imageUrl: '/images/tokens/btc.png',
-    usdPrice: 45000, // Example price
-  },
-  {
-    value: 'eth',
-    label: 'Ethereum',
-    symbol: 'ETH',
-    imageUrl: '/images/tokens/eth.png',
-    usdPrice: 2800,
-  },
-  {
-    value: 'usdt',
-    label: 'Tether',
-    symbol: 'USDT',
-    imageUrl: '/images/tokens/usdt.png',
-    usdPrice: 1,
-  },
-  {
-    value: 'usdc',
-    label: 'USD Coin',
-    symbol: 'USDC',
-    imageUrl: '/images/tokens/usdc.png',
-    usdPrice: 1,
-  },
-  {
-    value: 'sol',
-    label: 'Solana',
-    symbol: 'SOL',
-    imageUrl: '/images/tokens/sol.png',
-    usdPrice: 95,
-  },
-] as const
-
-const networks = [
-  { value: 'ethereum', label: 'Ethereum' },
-  { value: 'polygon', label: 'Polygon' },
-  { value: 'binance', label: 'BSC' },
-  { value: 'arbitrum', label: 'Arbitrum' },
-  { value: 'optimism', label: 'Optimism' },
-] as const
-
 enum PaymentScreen {
   SELECTION = 'selection',
   DETAILS = 'details',
@@ -105,7 +59,8 @@ enum PopoverId {
 
 export default function Payments() {
   const { id } = Route.useParams()
-  const paymentData = Route.useLoaderData()
+  const { paymentData, networks, supportedTokens } = Route.useLoaderData()
+
   const [screen, setScreen] = useState<PaymentScreen>(
     paymentData?.depositDetails == null
       ? PaymentScreen.SELECTION
@@ -122,18 +77,15 @@ export default function Payments() {
   // Calculate token amount and USD conversion
   const selectedTokenData = useMemo(() => {
     if (!paymentSelection.selectedToken) return null
-    return tokens.find((t) => t.value === paymentSelection.selectedToken)
+    return supportedTokens.find((t) => t.id === paymentSelection.selectedToken)
   }, [paymentSelection.selectedToken])
 
   const selectedNetworkData = useMemo(() => {
     if (!paymentSelection.selectedNetwork) return null
-    return networks.find((n) => n.value === paymentSelection.selectedNetwork)
+    return networks.find(
+      (n) => n.id.toString() === paymentSelection.selectedNetwork
+    )
   }, [paymentSelection.selectedNetwork])
-
-  const tokenAmount = useMemo(() => {
-    if (!selectedTokenData) return null
-    return Number(paymentData.amount) / selectedTokenData.usdPrice
-  }, [selectedTokenData, paymentData.amount])
 
   // Generate mock wallet address and QR code
   const walletAddress = '0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b6'
@@ -196,9 +148,9 @@ export default function Payments() {
                 <div className='flex items-center justify-center gap-3 text-3xl font-bold'>
                   {selectedTokenData ? (
                     <span className='relative flex items-center gap-2'>
-                      {tokenAmount?.toFixed(6)} {selectedTokenData.symbol}
+                      {paymentData.amount} {selectedTokenData.symbol}
                       <CopyButton
-                        text={`${tokenAmount?.toFixed(6)} ${selectedTokenData.symbol}`}
+                        text={`${paymentData.amount} ${selectedTokenData.symbol}`}
                       />
                     </span>
                   ) : (
@@ -208,7 +160,9 @@ export default function Payments() {
                 <div className='mt-1 text-sm'>
                   <Badge variant='secondary'>
                     Network:{' '}
-                    {selectedNetworkData ? selectedNetworkData.label : '-'}
+                    {selectedNetworkData
+                      ? selectedNetworkData.displayName
+                      : '-'}
                   </Badge>
                 </div>
               </div>
@@ -235,8 +189,8 @@ export default function Payments() {
                         {selectedTokenData ? (
                           <div className='flex items-center gap-3'>
                             <img
-                              src={selectedTokenData.imageUrl}
-                              alt={selectedTokenData.label}
+                              src={`/images/tokens/${selectedTokenData.canonicalTokenId.toLowerCase()}.png`}
+                              alt={selectedTokenData.symbol}
                               className='h-6 w-6 rounded-full'
                             />
                             <div className='text-left'>
@@ -244,7 +198,7 @@ export default function Payments() {
                                 {selectedTokenData.symbol}
                               </div>
                               <div className='text-xs'>
-                                {selectedTokenData.label}
+                                {selectedTokenData.symbol}
                               </div>
                             </div>
                           </div>
@@ -263,14 +217,12 @@ export default function Payments() {
                         <CommandList>
                           <CommandEmpty>No cryptocurrency found.</CommandEmpty>
                           <CommandGroup>
-                            {tokens.map((token) => (
+                            {supportedTokens?.map((token) => (
                               <CommandItem
-                                key={token.value}
-                                value={token.value}
+                                key={token.id}
+                                value={token.id}
                                 onSelect={(currentValue) => {
-                                  if (
-                                    currentValue !== selectedTokenData?.value
-                                  ) {
+                                  if (currentValue !== selectedTokenData?.id) {
                                     setPaymentSelection({
                                       ...paymentSelection,
                                       selectedToken: currentValue,
@@ -281,20 +233,22 @@ export default function Payments() {
                               >
                                 <div className='flex w-full items-center gap-3'>
                                   <img
-                                    src={token.imageUrl}
-                                    alt={token.label}
+                                    src={`/images/tokens/${token.canonicalTokenId.toLowerCase()}.png`}
+                                    alt={token.symbol}
                                     className='h-6 w-6 rounded-full'
                                   />
                                   <div className='flex-1'>
                                     <div className='text-sm font-bold'>
                                       {token.symbol}
                                     </div>
-                                    <div className='text-xs'>{token.label}</div>
+                                    <div className='text-xs'>
+                                      {token.symbol}
+                                    </div>
                                   </div>
                                   <Check
                                     className={cn(
                                       'ml-auto h-4 w-4',
-                                      selectedTokenData?.value === token.value
+                                      selectedTokenData?.id === token.id
                                         ? 'opacity-100'
                                         : 'opacity-0'
                                     )}
@@ -330,8 +284,8 @@ export default function Payments() {
                             {
                               networks.find(
                                 (network) =>
-                                  network.value === selectedNetworkData.value
-                              )?.label
+                                  network.id === selectedNetworkData.id
+                              )?.displayName
                             }
                           </div>
                         ) : (
@@ -349,13 +303,14 @@ export default function Payments() {
                         <CommandList>
                           <CommandEmpty>No network found.</CommandEmpty>
                           <CommandGroup>
-                            {networks.map((chain) => (
+                            {networks.map((network) => (
                               <CommandItem
-                                key={chain.value}
-                                value={chain.value}
+                                key={network.id.toString()}
+                                value={network.id.toString()}
                                 onSelect={(currentValue) => {
                                   if (
-                                    currentValue !== selectedNetworkData?.value
+                                    currentValue !==
+                                    selectedNetworkData?.id.toString()
                                   ) {
                                     setPaymentSelection({
                                       ...paymentSelection,
@@ -366,11 +321,11 @@ export default function Payments() {
                                 }}
                               >
                                 <div className='flex items-center gap-3'>
-                                  {chain.label}
+                                  {network.displayName}
                                   <Check
                                     className={cn(
                                       'ml-auto h-4 w-4',
-                                      selectedNetworkData?.value === chain.value
+                                      selectedNetworkData?.id === network.id
                                         ? 'opacity-100'
                                         : 'opacity-0'
                                     )}
@@ -428,9 +383,9 @@ export default function Payments() {
             {screen === PaymentScreen.SUCCESS && (
               <SuccessScreen
                 walletAddress={walletAddress}
-                tokenAmount={tokenAmount?.toFixed(6) || '0'}
+                tokenAmount={paymentData.amount}
                 tokenSymbol={selectedTokenData?.symbol || ''}
-                networkName={selectedNetworkData?.label || ''}
+                networkName={selectedNetworkData?.displayName || ''}
                 transactionHash={mockTransactionHash}
                 onBackToSelection={() => {}}
               />
@@ -438,9 +393,9 @@ export default function Payments() {
 
             {screen === PaymentScreen.EXPIRED && (
               <ExpiredScreen
-                tokenAmount={tokenAmount?.toFixed(6) || '0'}
+                tokenAmount={paymentData.amount}
                 tokenSymbol={selectedTokenData?.symbol || ''}
-                networkName={selectedNetworkData?.label || ''}
+                networkName={selectedNetworkData?.displayName || ''}
                 onRetry={handleRetry}
                 onBack={() => {}}
               />

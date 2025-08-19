@@ -34,6 +34,7 @@ import type {
 import type {
   CreatePaymentDto,
   CreateTestDto,
+  NetworkResponseDto,
   PaymentResponseDto,
   TokenResponseDto,
   UpdateDepositSelectionDto,
@@ -928,6 +929,86 @@ export function useAssetControllerGetSupportedTokensV1<TData = Awaited<ReturnTyp
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getAssetControllerGetSupportedTokensV1QueryOptions(options)
+
+  const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+export const networksControllerGetNetworksV1 = (
+     options?: AxiosRequestConfig
+ ): Promise<AxiosResponse<NetworkResponseDto[]>> => {
+    
+    
+    return axios.default.get(
+      `/api/v1/networks`,options
+    );
+  }
+
+
+export const getNetworksControllerGetNetworksV1QueryKey = () => {
+    return [`/api/v1/networks`] as const;
+    }
+
+    
+export const getNetworksControllerGetNetworksV1QueryOptions = <TData = Awaited<ReturnType<typeof networksControllerGetNetworksV1>>, TError = AxiosError<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof networksControllerGetNetworksV1>>, TError, TData>>, axios?: AxiosRequestConfig}
+) => {
+
+const {query: queryOptions, axios: axiosOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getNetworksControllerGetNetworksV1QueryKey();
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof networksControllerGetNetworksV1>>> = ({ signal }) => networksControllerGetNetworksV1({ signal, ...axiosOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof networksControllerGetNetworksV1>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type NetworksControllerGetNetworksV1QueryResult = NonNullable<Awaited<ReturnType<typeof networksControllerGetNetworksV1>>>
+export type NetworksControllerGetNetworksV1QueryError = AxiosError<unknown>
+
+
+export function useNetworksControllerGetNetworksV1<TData = Awaited<ReturnType<typeof networksControllerGetNetworksV1>>, TError = AxiosError<unknown>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof networksControllerGetNetworksV1>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof networksControllerGetNetworksV1>>,
+          TError,
+          Awaited<ReturnType<typeof networksControllerGetNetworksV1>>
+        > , 'initialData'
+      >, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useNetworksControllerGetNetworksV1<TData = Awaited<ReturnType<typeof networksControllerGetNetworksV1>>, TError = AxiosError<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof networksControllerGetNetworksV1>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof networksControllerGetNetworksV1>>,
+          TError,
+          Awaited<ReturnType<typeof networksControllerGetNetworksV1>>
+        > , 'initialData'
+      >, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useNetworksControllerGetNetworksV1<TData = Awaited<ReturnType<typeof networksControllerGetNetworksV1>>, TError = AxiosError<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof networksControllerGetNetworksV1>>, TError, TData>>, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useNetworksControllerGetNetworksV1<TData = Awaited<ReturnType<typeof networksControllerGetNetworksV1>>, TError = AxiosError<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof networksControllerGetNetworksV1>>, TError, TData>>, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getNetworksControllerGetNetworksV1QueryOptions(options)
 
   const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
