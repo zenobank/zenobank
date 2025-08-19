@@ -4,7 +4,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { randomUUID } from 'crypto';
 import { PaymentResponseDto } from './dto/payment-response.dto';
 import { UpdateDepositSelectionDto } from './dto/update-payment-selection.dto';
-import { TokenService } from 'src/currency/token.service';
+import { TokenService } from 'src/assets/token/token.service';
 import { NetworksService } from 'src/networks/networks.service';
 import { WalletService } from 'src/wallet/services/wallet.service';
 

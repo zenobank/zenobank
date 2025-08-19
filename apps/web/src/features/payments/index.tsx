@@ -1,11 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
-import { createFileRoute } from '@tanstack/react-router'
 import { Route } from '@/routes/payments/$id'
-import copy from 'copy-to-clipboard'
-import { ChevronsUpDown, Check, Copy, Clock, ArrowLeft } from 'lucide-react'
-import { QRCodeCanvas } from 'qrcode.react'
+import { ChevronsUpDown, Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { useTheme } from '@/context/theme-context'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -24,7 +20,6 @@ import {
   CommandItem,
 } from '@/components/ui/command'
 import { CopyButton } from '@/components/ui/copy-button'
-import { Label } from '@/components/ui/label'
 import {
   PopoverContent,
   PopoverTrigger,
@@ -111,7 +106,11 @@ enum PopoverId {
 export default function Payments() {
   const { id } = Route.useParams()
   const paymentData = Route.useLoaderData()
-  const [screen, setScreen] = useState<PaymentScreen>(PaymentScreen.SELECTION)
+  const [screen, setScreen] = useState<PaymentScreen>(
+    paymentData?.depositDetails == null
+      ? PaymentScreen.SELECTION
+      : PaymentScreen.DETAILS
+  )
   const [activePopover, setActivePopover] = useState<PopoverId | null>(null)
 
   const [paymentSelection, setPaymentSelection] = useState<PaymentSelection>({
@@ -133,7 +132,7 @@ export default function Payments() {
 
   const tokenAmount = useMemo(() => {
     if (!selectedTokenData) return null
-    return paymentData.amount / selectedTokenData.usdPrice
+    return Number(paymentData.amount) / selectedTokenData.usdPrice
   }, [selectedTokenData, paymentData.amount])
 
   // Generate mock wallet address and QR code
@@ -168,14 +167,6 @@ export default function Payments() {
     setActivePopover(null)
   }
 
-  const handleBackToSelection = () => {
-    setScreen(PaymentScreen.SELECTION)
-    setPaymentSelection({
-      selectedToken: null,
-      selectedNetwork: null,
-    })
-    setActivePopover(null)
-  }
   const [disabled, buttonText] = useMemo(() => {
     if (!selectedTokenData) {
       return [true, 'Select cryptocurrency']
@@ -193,12 +184,6 @@ export default function Payments() {
           <CardHeader className='pb-4'>
             <div className='flex items-center justify-between'>
               <div className='flex items-center'>
-                {screen === PaymentScreen.DETAILS && (
-                  <ArrowLeft
-                    onClick={handleBackClick}
-                    className='text-muted-foreground mr-1 cursor-pointer'
-                  />
-                )}
                 <CardTitle className='text-lg'>Send Payment</CardTitle>
               </div>
               <TimerBadge />
@@ -447,7 +432,7 @@ export default function Payments() {
                 tokenSymbol={selectedTokenData?.symbol || ''}
                 networkName={selectedNetworkData?.label || ''}
                 transactionHash={mockTransactionHash}
-                onBackToSelection={handleBackToSelection}
+                onBackToSelection={() => {}}
               />
             )}
 
@@ -457,7 +442,7 @@ export default function Payments() {
                 tokenSymbol={selectedTokenData?.symbol || ''}
                 networkName={selectedNetworkData?.label || ''}
                 onRetry={handleRetry}
-                onBack={handleBackToSelection}
+                onBack={() => {}}
               />
             )}
           </CardContent>

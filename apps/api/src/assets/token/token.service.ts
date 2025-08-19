@@ -3,7 +3,7 @@ import { publicClients } from 'src/lib/contants/client';
 import ms from 'src/lib/utils/ms';
 import { requestWithRepeatDelay } from 'src/lib/utils/request-with-repeat-delay';
 import { erc20Abi } from 'viem';
-import { isNativeToken, nativeTokenAddress } from './lib/utils';
+import { isNativeToken, nativeTokenAddress } from '../lib/utils';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { NetworkId, TokenOnNetwork } from '@prisma/client';
 
@@ -11,6 +11,12 @@ import { NetworkId, TokenOnNetwork } from '@prisma/client';
 export class TokenService {
   private readonly logger = new Logger(TokenService.name);
   constructor(private db: PrismaService) {}
+
+  async getSupportedTokens(): Promise<any> {
+    // tengo que añadir el seed
+    const canonicalTokens = await this.db.tokenCanonical.findMany({});
+    return canonicalTokens;
+  }
 
   async getToken(id: string): Promise<TokenOnNetwork | null> {
     const token = await this.db.tokenOnNetwork.findUnique({

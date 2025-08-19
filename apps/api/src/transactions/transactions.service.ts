@@ -1,8 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { SweepWalletFundsJobData } from './transactions.interface';
-import { TokenService } from 'src/currency/token.service';
-import { TokenGasService } from 'src/currency/tokens-gas.service';
-import { isNativeToken, nativeTokenAddress } from 'src/currency/lib/utils';
+import { TokenService } from 'src/assets/token/token.service';
+import { TokenGasService } from 'src/assets/token/tokens-gas.service';
+import { isNativeToken, nativeTokenAddress } from 'src/assets/lib/utils';
 import { privateKeyToAccount } from 'viem/accounts';
 import { client, walletClient } from 'src/lib/utils/client';
 import { erc20Abi } from 'viem';
