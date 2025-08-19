@@ -9,9 +9,5 @@
 export interface CreatePaymentDto {
   /** @minimum 1 */
   amount: string;
-  /**
-   * @minLength 3
-   * @maxLength 3
-   */
   currency: string;
 }

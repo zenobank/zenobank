@@ -14,22 +14,26 @@ async function seedNetworks() {
         id: NetworkId.ETHEREUM_MAINNET,
         networkType: NetworkType.EVM,
         name: 'Ethereum Mainnet',
+        displayName: 'Ethereum',
       },
       {
         id: NetworkId.BASE_MAINNET,
         networkType: NetworkType.EVM,
         name: 'Base Mainnet',
+        displayName: 'Base',
       },
       {
         id: NetworkId.ARBITRUM_MAINNET,
         networkType: NetworkType.EVM,
         name: 'Arbitrum Mainnet',
+        displayName: 'Arbitrum',
       },
       {
         id: NetworkId.ETHEREUM_HOLESKY,
         networkType: NetworkType.EVM,
         name: 'Ethereum Holesky',
         isTestnet: true,
+        displayName: 'Ethereum Holesky',
       },
     ],
     skipDuplicates: true,
@@ -84,6 +88,7 @@ async function seedTokensOnNetworks() {
 }
 
 async function main() {
+  await seedNetworks();
   await seedTokensOnNetworks();
 }
 
