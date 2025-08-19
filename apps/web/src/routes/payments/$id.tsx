@@ -17,6 +17,7 @@ export const Route = createFileRoute('/payments/$id')({
       networksControllerGetNetworksV1(),
       assetControllerGetSupportedTokensV1(),
     ])
+    console.log('supported tokens', supportedTokens)
 
     return { paymentData, networks, supportedTokens }
   },

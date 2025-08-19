@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Network, NetworkType } from '@prisma/client';
+import { Network, NetworkId, NetworkType } from '@prisma/client';
 import { Expose } from 'class-transformer';
 import { IsBoolean, IsEnum, IsString } from 'class-validator';
 
@@ -9,7 +9,7 @@ export class NetworkResponseDto {
   @ApiProperty({
     example: 'ETHEREUM_MAINNET',
   })
-  id: string;
+  id: NetworkId;
 
   @Expose()
   @IsString()
