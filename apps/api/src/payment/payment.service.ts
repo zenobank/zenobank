@@ -11,6 +11,7 @@ import { UpdateDepositSelectionDto } from './dto/update-payment-selection.dto';
 import { TokenService } from 'src/assets/token/token.service';
 import { NetworksService } from 'src/networks/networks.service';
 import { WalletService } from 'src/wallet/services/wallet.service';
+import ms from 'src/lib/utils/ms';
 
 @Injectable()
 export class PaymentService {
@@ -30,7 +31,7 @@ export class PaymentService {
         currency,
         notifyUrl: 'https://example.com/notify',
         orderId: randomUUID(),
-        expiredAt: new Date(Date.now() + 1000 * 60 * 60 * 24),
+        expiredAt: new Date(Date.now() + ms('1h')),
       },
     });
     return PaymentResponseDto.fromPrisma({
