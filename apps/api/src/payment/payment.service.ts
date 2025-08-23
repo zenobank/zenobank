@@ -88,12 +88,14 @@ export class PaymentService {
     }
 
     if (currentDepositDetails.networkId !== newNetwork.id) {
-      const wallet = await this.walletService.createDepositWallet({
+      const wallet = await this.walletService.createWallet({
         networkId: newNetwork.id,
         label: `deposit-${paymentId}`,
       });
       depositWalletId = wallet.id;
     }
+
+    // AQUÍ ES DONDE TENGO QUE REGISTRAR LA WALLET EN LA WEBHOOKS
 
     const updated = await this.db.payment.update({
       where: { id: paymentId },

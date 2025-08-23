@@ -27,6 +27,9 @@ model Wallet {
 
   depositForPayment Payment? @relation(name: "DepositWallet")
 
+  activityWebhook   ActivityWebhook? @relation(fields: [activityWebhookId], references: [id])
+  activityWebhookId String?
+
   @@unique([networkId, address])
 }
 
@@ -90,10 +93,11 @@ model Network {
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
 
-  tokens       Token[]
-  transactions Transaction[]
-  wallets      Wallet[]
-  Payment      Payment[]
+  tokens           Token[]
+  transactions     Transaction[]
+  wallets          Wallet[]
+  Payment          Payment[]
+  activityWebhooks ActivityWebhook[]
 }
 
 model Token {
@@ -159,4 +163,26 @@ model Transaction {
   @@index([tokenId])
   @@index([fromAddress])
   @@index([toAddress])
+}
+
+enum WebhookProvider {
+  ALCHEMY
+}
+
+model ActivityWebhook {
+  id        String @id @default(uuid())
+  webhookId String @unique
+
+  providerId WebhookProvider
+
+  networkId NetworkId
+  network   Network   @relation(fields: [networkId], references: [id])
+
+  currentSize Int @default(0)
+  maxSize     Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  wallets Wallet[]
 }

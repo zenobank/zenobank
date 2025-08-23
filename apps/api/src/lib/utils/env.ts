@@ -28,6 +28,10 @@ export class Env {
     'GAS_TANKER_TESTING_PRIVATE_KEY';
   @IsString()
   GAS_TANKER_TESTING_PRIVATE_KEY: string;
+
+  static readonly ALCHEMY_AUTH_TOKEN = 'ALCHEMY_AUTH_TOKEN';
+  @IsString()
+  ALCHEMY_AUTH_TOKEN: string;
 }
 
 export function validateEnvConfig(config: Record<string, unknown>) {
