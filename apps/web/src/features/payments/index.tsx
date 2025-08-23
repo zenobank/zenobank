@@ -1,5 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react'
-import { isAfter } from 'date-fns'
+import { useState, useEffect, useMemo } from 'react'
 import { Route } from '@/routes/payments/$id'
 import { ChevronsUpDown, Check, TimerIcon } from 'lucide-react'
 import Countdown from 'react-countdown'
@@ -10,6 +9,7 @@ import {
   PaymentResponseDto,
   PaymentStatus,
 } from '@/lib/requests/api-client/model'
+import { CheckoutState } from '@/lib/types/payment-checkout/payment-state'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -38,13 +38,7 @@ import { Separator } from '@/components/ui/separator'
 import PaymentDetails from './components/DetailsScreen'
 import ExpiredScreen from './components/ExpiredScreen'
 import SuccessScreen from './components/SuccessScreen'
-
-enum PaymentScreen {
-  SELECTION = 'selection',
-  DETAILS = 'details',
-  EXPIRED = 'expired',
-  SUCCESS = 'success',
-}
+import { getPaymentCheckoutState } from './hooks/usePaymentState'
 
 interface PaymentSelection<TokenId> {
   selectedToken: TokenId | null
@@ -57,32 +51,24 @@ enum PopoverId {
 }
 
 export default function Payments() {
-  const { paymentData, networks, supportedTokens } = Route.useLoaderData()
-  const { mutate: updatePaymentDepositSelection } =
-    usePaymentControllerUpdatePaymentDepositSelectionV1()
+  const {
+    paymentData: initialPaymentData,
+    networks,
+    supportedTokens,
+  } = Route.useLoaderData()
+  const [paymentData, setPaymentData] =
+    useState<PaymentResponseDto>(initialPaymentData)
 
-  const deriveScreen = useCallback(
-    (p: PaymentResponseDto): PaymentScreen => {
-      if (!p.depositDetails) return PaymentScreen.SELECTION
-      if (p.status === PaymentStatus.SUCCESS) return PaymentScreen.SUCCESS
-      if (p.status === PaymentStatus.CANCELLED) return PaymentScreen.EXPIRED
-      if (
-        p.status === PaymentStatus.EXPIRED ||
-        isAfter(new Date(), new Date(paymentData.expiredAt))
-      ) {
-        return PaymentScreen.EXPIRED
-      }
-      return PaymentScreen.DETAILS
-    },
-    [paymentData.expiredAt]
+  const checkoutState = useMemo(
+    () => getPaymentCheckoutState(paymentData),
+    [paymentData]
   )
+  const { mutateAsync: updatePaymentDepositSelection } =
+    usePaymentControllerUpdatePaymentDepositSelectionV1()
 
   const [isLoading, setIsLoading] = useState(false)
   const [activePopover, setActivePopover] = useState<PopoverId | null>(null)
 
-  const [screen, setScreen] = useState<PaymentScreen>(() =>
-    deriveScreen(paymentData)
-  )
   const [paymentSelection, setPaymentSelection] = useState<
     PaymentSelection<TokenId>
   >({
@@ -181,14 +167,15 @@ export default function Payments() {
     if (!selectedToken || !selectedNetwork) return
     setIsLoading(true)
     try {
-      await updatePaymentDepositSelection({
+      const { data: updatedPaymentData } = await updatePaymentDepositSelection({
         id: paymentData.id,
         data: {
           tokenId: selectedToken,
           networkId: selectedNetwork,
         },
       })
-      setScreen(PaymentScreen.DETAILS)
+      console.log('updatedPaymentData', updatedPaymentData)
+      setPaymentData(updatedPaymentData)
     } catch (error) {
       console.log('error', error)
       toast.error('Failed to update payment deposit selection')
@@ -214,7 +201,10 @@ export default function Payments() {
                   daysInHours
                   overtime={false}
                   onComplete={() => {
-                    setScreen(PaymentScreen.EXPIRED)
+                    setPaymentData((prev) => ({
+                      ...prev,
+                      status: PaymentStatus.EXPIRED,
+                    }))
                   }}
                   renderer={({ hours, minutes, seconds }) => (
                     <span>
@@ -255,7 +245,7 @@ export default function Payments() {
             </div>
             <Separator />
 
-            {screen === PaymentScreen.SELECTION && (
+            {checkoutState === CheckoutState.AWAITING_SELECTION && (
               <>
                 {/* Token Selector */}
                 <div className='space-y-2'>
@@ -445,16 +435,16 @@ export default function Payments() {
               </>
             )}
 
-            {screen === PaymentScreen.DETAILS &&
+            {checkoutState === CheckoutState.AWAITING_DEPOSIT &&
               paymentData.depositDetails?.address && (
                 <PaymentDetails
                   walletAddress={paymentData.depositDetails?.address}
                 />
               )}
 
-            {screen === PaymentScreen.SUCCESS && <SuccessScreen />}
+            {checkoutState === CheckoutState.SUCCESS && <SuccessScreen />}
 
-            {screen === PaymentScreen.EXPIRED && <ExpiredScreen />}
+            {checkoutState === CheckoutState.EXPIRED && <ExpiredScreen />}
           </CardContent>
 
           <CardFooter className='pt-4'>
