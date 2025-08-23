@@ -15,7 +15,7 @@ export class TransactionsController {
 
     await this.transactionsService.enqueueSweepWalletFundsJob({
       sourceWalletAddress: depositAccount.address,
-      network: NetworkId.ETHEREUM_HOLESKY,
+      networkId: NetworkId.ETHEREUM_HOLESKY,
     });
   }
 }

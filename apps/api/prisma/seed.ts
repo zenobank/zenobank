@@ -42,6 +42,7 @@ async function seedNetworks() {
 
 async function seedTokensOnNetworks() {
   await prisma.token.createMany({
+    skipDuplicates: true,
     data: [
       {
         id: 'USDC_ETHEREUM_MAINNET',
@@ -81,6 +82,16 @@ async function seedTokensOnNetworks() {
         standard: TokenStandard.ERC20,
         address: '0xdAC17F958D2ee523a2206206994597C13D831ec7', // Ethereum USDT
         decimals: 6,
+        isDeprecated: false,
+      },
+      {
+        id: 'LINK_ETHEREUM_HOLESKY',
+        networkId: NetworkId.ETHEREUM_HOLESKY,
+        symbol: 'LINK',
+        canonicalTokenId: 'LINK',
+        standard: TokenStandard.ERC20,
+        address: '0x685cE6742351ae9b618F383883D6d1e0c5A31B4B', // Ethereum LINK
+        decimals: 18,
         isDeprecated: false,
       },
     ],

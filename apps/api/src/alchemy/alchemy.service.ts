@@ -7,9 +7,10 @@ import {
   ALCHEMY_SDK,
   ALCHEMY_WEBHOOK_RECEIVER_PATH,
 } from './lib/constants';
-import { ALCHEMY_NETWORK_MAP } from './lib/network-map';
 import { Env, getEnv } from 'src/lib/utils/env';
 import { WebhookActivityDto } from './dto/webhook-activity.dto';
+import { NETWORK_TO_ALCHEMY_MAP } from './lib/network-map';
+import { TX_CONFIRMATION_QUEUE_NAME } from 'src/transactions/lib/constants';
 
 @Injectable()
 export class AlchemyService {
@@ -20,6 +21,9 @@ export class AlchemyService {
 
   async handleReceivedWebhook(body: WebhookActivityDto) {
     console.log(body);
+    // primer ver porque no se valida
+    // ahora, una vez que me llega, tengo la tx, tengo que añadirla a la cola y a la db para las confirmaciones
+    // ver dashboard de alchemy si llega o no
     return { received: true };
   }
 
@@ -48,7 +52,7 @@ export class AlchemyService {
       getEnv(Env.API_BASE_URL) + ALCHEMY_WEBHOOK_RECEIVER_PATH,
       WebhookType.ADDRESS_ACTIVITY,
       {
-        network: ALCHEMY_NETWORK_MAP[network],
+        network: NETWORK_TO_ALCHEMY_MAP[network],
         addresses: [address],
       },
     );

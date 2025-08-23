@@ -1,5 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { SweepWalletFundsJobData } from './transactions.interface';
+import {
+  SweepWalletFundsJobData,
+  TransactionRecordInput,
+  TxIdentifier,
+} from './lib/types';
 import { TokenService } from 'src/assets/token/token.service';
 import { TokenGasService } from 'src/assets/token/tokens-gas.service';
 import { isNativeToken, nativeTokenAddress } from 'src/assets/lib/utils';
@@ -7,7 +11,14 @@ import { privateKeyToAccount } from 'viem/accounts';
 import { client, walletClient } from 'src/lib/utils/client';
 import { erc20Abi } from 'viem';
 import { Env, getEnv } from 'src/lib/utils/env';
-import { NetworkId } from '@prisma/client';
+import { TX_CONFIRMATION_QUEUE_NAME } from './lib/constants';
+import { InjectQueue } from '@nestjs/bullmq';
+import { Queue } from 'bullmq';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { BlockchainAdapterFactory } from 'src/blockchain/adapters/blockchain-adapter.factory';
+import { NetworkId, Transaction } from '@prisma/client';
+import { TransactionResponseDto } from './dto/transaction-response.dto';
+import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class TransactionsService {
@@ -15,11 +26,48 @@ export class TransactionsService {
   constructor(
     private tokensService: TokenService,
     private tokenGasService: TokenGasService,
+    private readonly db: PrismaService,
+    @InjectQueue(TX_CONFIRMATION_QUEUE_NAME)
+    private readonly txConfirmationQueue: Queue<TxIdentifier>,
   ) {}
+
+  async recordTransaction({
+    txData,
+    networkId,
+  }: TransactionRecordInput): Promise<TransactionResponseDto> {
+    const tx = await this.db.transaction.create({
+      data: {
+        hash: txData.hash,
+        networkId: networkId,
+        fromAddress: txData.fromAddress,
+        toAddress: txData.toAddress,
+        title: txData.title,
+      },
+    });
+    return plainToInstance(TransactionResponseDto, tx);
+  }
+
+  /**
+   * Requires the transaction to already exist in DB.
+   */
+  async enqueueTransactionForConfirmation({ hash, networkId }: TxIdentifier) {
+    const tx = await this.db.transaction.findUniqueOrThrow({
+      where: {
+        networkId_hash: {
+          networkId: networkId,
+          hash,
+        },
+      },
+    });
+    await this.txConfirmationQueue.add(TX_CONFIRMATION_QUEUE_NAME, {
+      hash,
+      networkId,
+    });
+  }
 
   async enqueueSweepWalletFundsJob({
     sourceWalletAddress,
-    network,
+    networkId: network,
   }: SweepWalletFundsJobData) {
     this.logger.log(
       `Starting sweep wallet funds job for ${sourceWalletAddress} on ${network}`,
