@@ -93,6 +93,9 @@ model Network {
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
 
+  depositConfirmations Int
+  avgBlockTime         Int
+
   tokens           Token[]
   transactions     Transaction[]
   wallets          Wallet[]
@@ -143,11 +146,6 @@ model Transaction {
 
   title       String
   description String?
-  amount      String
-  amountFiat  String
-
-  tokenId String
-  token   Token  @relation(fields: [tokenId], references: [id])
 
   networkId NetworkId
   network   Network   @relation(fields: [networkId], references: [id])
@@ -158,12 +156,34 @@ model Transaction {
   confirmedAt   DateTime?
 
   payment Payment? @relation(name: "PaymentTx")
+  Token   Token?   @relation(fields: [tokenId], references: [id])
+  tokenId String?
 
   @@unique([networkId, hash])
-  @@index([tokenId])
   @@index([fromAddress])
   @@index([toAddress])
 }
+
+// model TransactionTransfer {
+//   id             String @id @default(uuid())
+//   transactionId  String
+//   transaction    Transaction @relation(fields: [transactionId], references: [id])
+
+//   fromAddress    String
+//   toAddress      String
+//   tokenId        String?     // null si es nativo
+//   amount         Decimal
+//   amountFiat     Decimal?    // snapshot opcional
+
+//   logIndex       Int?        // para EVM logs
+//   traceId        String?     // para internal txs
+
+//   createdAt      DateTime @default(now())
+
+//   @@index([transactionId])
+//   @@index([fromAddress])
+//   @@index([toAddress])
+// }
 
 enum WebhookProvider {
   ALCHEMY

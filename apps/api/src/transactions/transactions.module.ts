@@ -4,9 +4,9 @@ import { BullModule } from '@nestjs/bullmq';
 import {
   SWEEP_WALLET_FUNDS_QUEUE_NAME,
   TX_CONFIRMATION_QUEUE_NAME,
-} from './transactions.constants';
+} from './lib/constants';
 import { PrismaModule } from 'src/prisma/prisma.module';
-import { TransactionsProcessor } from './transactions-confirmation.worker';
+import { TransactionsProcessor } from './transaction-processor.worker';
 import { AssetModule } from 'src/assets/asset.module';
 import { BlockchainModule } from 'src/blockchain/blockchain.module';
 import { TransactionsController } from './transactions.controller';
