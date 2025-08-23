@@ -19,10 +19,4 @@ export class NetworksService {
     });
     return plainToInstance(NetworkResponseDto, network);
   }
-
-  async getNetworkOrThrow(id: NetworkId): Promise<NetworkResponseDto> {
-    const network = await this.getNetwork(id);
-    if (!network) throw new NotFoundException('Network not found');
-    return network;
-  }
 }

@@ -39,24 +39,34 @@ export class AlchemyService {
     );
   }
 
+  // required to create the webhook for with at least one address
   private async createWebhook(
     network: NetworkId,
-    addresses: string[],
+    address: string,
   ): Promise<ActivityWebhook> {
     const alchemyWebhook = await this.alchemy.notify.createWebhook(
       getEnv(Env.API_BASE_URL) + ALCHEMY_WEBHOOK_RECEIVER_PATH,
       WebhookType.ADDRESS_ACTIVITY,
       {
         network: ALCHEMY_NETWORK_MAP[network],
-        addresses,
+        addresses: [address],
       },
     );
     const newWebhook = await this.db.activityWebhook.create({
       data: {
         networkId: network,
         maxSize: ALCHEMY_MAX_ACTIVITY_WEBHOOK_SIZE,
+        currentSize: 1,
         webhookId: alchemyWebhook.id,
         providerId: WebhookProvider.ALCHEMY,
+        wallets: {
+          connect: {
+            networkId_address: {
+              networkId: network,
+              address,
+            },
+          },
+        },
       },
     });
     return newWebhook;
@@ -71,7 +81,7 @@ export class AlchemyService {
   }) {
     let webhook = await this.findWebhookWithSpace(network);
     if (!webhook) {
-      webhook = await this.createWebhook(network, [address]);
+      webhook = await this.createWebhook(network, address);
     } else {
       await this.alchemy.notify.updateWebhook(webhook.webhookId, {
         addAddresses: [address],

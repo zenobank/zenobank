@@ -12,6 +12,8 @@ import { TokenService } from 'src/assets/token/token.service';
 import { NetworksService } from 'src/networks/networks.service';
 import { WalletService } from 'src/wallet/services/wallet.service';
 import ms from 'src/lib/utils/ms';
+import { AlchemyService } from 'src/alchemy/alchemy.service';
+import { PaymentStatus } from '@prisma/client';
 
 @Injectable()
 export class PaymentService {
@@ -20,6 +22,7 @@ export class PaymentService {
     private readonly tokenService: TokenService,
     private readonly networksService: NetworksService,
     private readonly walletService: WalletService,
+    private readonly alchemyService: AlchemyService,
   ) {}
   async createPayment(
     createPaymentDto: CreatePaymentDto,
@@ -68,48 +71,61 @@ export class PaymentService {
   ): Promise<PaymentResponseDto> {
     const { tokenId: newTokenId, networkId: newNetworkId } = dto;
 
-    const [newToken, newNetwork, currentDepositDetails] = await Promise.all([
-      this.tokenService.getTokenOrThrow(newTokenId),
-      this.networksService.getNetworkOrThrow(newNetworkId),
+    const [token, network, currentDepositDetails] = await Promise.all([
+      this.tokenService.getToken(newTokenId),
+      this.networksService.getNetwork(newNetworkId),
       this.db.payment.findUnique({
         where: { id: paymentId },
-        include: { depositWallet: true },
       }),
     ]);
+    if (!token) {
+      throw new NotFoundException('Token not found');
+    }
+    if (!network) {
+      throw new NotFoundException('Network not found');
+    }
 
-    if (!currentDepositDetails)
+    if (!currentDepositDetails) {
       throw new NotFoundException('Payment not found');
-
-    let depositWalletId = currentDepositDetails.depositWalletId ?? null;
-    if (depositWalletId) {
+    }
+    if (
+      currentDepositDetails.depositWalletId !== null ||
+      currentDepositDetails.networkId !== null ||
+      currentDepositDetails.tokenId !== null
+    ) {
       throw new BadRequestException(
         'Can not change deposit details, please create a new payment',
       );
     }
-
-    if (currentDepositDetails.networkId !== newNetwork.id) {
-      const wallet = await this.walletService.createWallet({
-        networkId: newNetwork.id,
-        label: `deposit-${paymentId}`,
-      });
-      depositWalletId = wallet.id;
+    if (currentDepositDetails.status !== PaymentStatus.PENDING) {
+      throw new BadRequestException(
+        'Can not change deposit details, payment is not pending',
+      );
     }
 
-    // AQUÍ ES DONDE TENGO QUE REGISTRAR LA WALLET EN LA WEBHOOKS
+    const depositWallet = await this.walletService.createWallet({
+      networkId: network.id,
+      label: `deposit-${paymentId}`,
+    });
+
+    await this.alchemyService.suscribeAddressToWebhook({
+      address: depositWallet.address,
+      network: network.id,
+    });
 
     const updated = await this.db.payment.update({
       where: { id: paymentId },
       data: {
-        tokenId: newToken.id,
-        networkId: newNetwork.id,
-        depositWalletId,
+        tokenId: token.id,
+        networkId: network.id,
+        depositWalletId: depositWallet.id,
       },
       include: { depositWallet: true },
     });
 
     return PaymentResponseDto.fromPrisma({
       ...updated,
-      depositWalletAddress: updated.depositWallet?.address ?? null,
+      depositWalletAddress: depositWallet.address,
     });
   }
 }
