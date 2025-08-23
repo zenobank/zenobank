@@ -6,10 +6,11 @@ import { toast } from 'sonner'
 import { usePaymentControllerUpdatePaymentDepositSelectionV1 } from '@/lib/requests/api-client/aPIDocs'
 import {
   NetworkId,
+  NetworkResponseDto,
   PaymentResponseDto,
   PaymentStatus,
+  TokenResponseDto,
 } from '@/lib/requests/api-client/model'
-import { CheckoutState } from '@/lib/types/payment-checkout/payment-state'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -35,15 +36,13 @@ import {
   Popover,
 } from '@/components/ui/popover'
 import { Separator } from '@/components/ui/separator'
+import { CheckoutSelection } from '@/features/payments/types/selection'
+import { CheckoutState } from '@/features/payments/types/state'
 import PaymentDetails from './components/DetailsScreen'
 import ExpiredScreen from './components/ExpiredScreen'
 import SuccessScreen from './components/SuccessScreen'
 import { getPaymentCheckoutState } from './hooks/usePaymentState'
-
-interface PaymentSelection<TokenId> {
-  selectedToken: TokenId | null
-  selectedNetwork: NetworkId | null
-}
+import { getCanonicalTokenOptions } from './utils/cannonical-token-options'
 
 enum PopoverId {
   TOKEN = 'token',
@@ -56,6 +55,9 @@ export default function Payments() {
     networks,
     supportedTokens,
   } = Route.useLoaderData()
+  const { mutateAsync: updatePaymentDepositSelection } =
+    usePaymentControllerUpdatePaymentDepositSelectionV1()
+
   const [paymentData, setPaymentData] =
     useState<PaymentResponseDto>(initialPaymentData)
 
@@ -63,88 +65,71 @@ export default function Payments() {
     () => getPaymentCheckoutState(paymentData),
     [paymentData]
   )
-  const { mutateAsync: updatePaymentDepositSelection } =
-    usePaymentControllerUpdatePaymentDepositSelectionV1()
 
   const [isLoading, setIsLoading] = useState(false)
   const [activePopover, setActivePopover] = useState<PopoverId | null>(null)
 
-  const [paymentSelection, setPaymentSelection] = useState<
-    PaymentSelection<TokenId>
-  >({
-    selectedToken: paymentData?.depositDetails?.currencyId || null,
-    selectedNetwork: paymentData?.depositDetails?.networkId || null,
+  const [paymentSelection, setPaymentSelection] = useState<CheckoutSelection>({
+    selectedTokenId: paymentData?.depositDetails?.currencyId || null,
+    selectedNetworkId: paymentData?.depositDetails?.networkId || null,
   })
 
-  type TokenId = (typeof supportedTokens)[number]['id']
+  const cannonicalTokenOptions = useMemo(
+    () => getCanonicalTokenOptions(supportedTokens),
+    [supportedTokens]
+  )
+  const availableNetworksIdsForSelectedToken: NetworkId[] = useMemo(() => {
+    const networksIds =
+      cannonicalTokenOptions.find(
+        (cannonicalToken) =>
+          cannonicalToken.id === paymentSelection.selectedTokenId
+      )?.networks || []
 
-  // Group tokens by canonicalTokenId and get unique tokens
-  const uniqueTokens = useMemo(() => {
-    const tokenMap = new Map()
-    supportedTokens?.forEach((token) => {
-      if (!tokenMap.has(token.canonicalTokenId)) {
-        tokenMap.set(token.canonicalTokenId, token)
-      }
-    })
-    return Array.from(tokenMap.values())
-  }, [supportedTokens])
+    return networksIds
+  }, [cannonicalTokenOptions, paymentSelection.selectedTokenId])
 
-  const availableNetworks = useMemo(() => {
-    if (!paymentSelection.selectedToken) return []
-
-    const selectedTokenData = supportedTokens.find(
-      (t) => t.id === paymentSelection.selectedToken
+  const selectedTokenData: TokenResponseDto | null = useMemo(() => {
+    return (
+      supportedTokens.find((t) => t.id === paymentSelection.selectedTokenId) ||
+      null
     )
-    if (!selectedTokenData) return []
-
-    const tokensWithSameCanonical = supportedTokens.filter(
-      (t) => t.canonicalTokenId === selectedTokenData.canonicalTokenId
-    )
-
-    const networkIds = tokensWithSameCanonical.map((t) => t.networkId)
-    return networks.filter((network) =>
-      networkIds.some(
-        (networkId) => networkId.toString() === network.id.toString()
-      )
-    )
-  }, [paymentSelection.selectedToken, supportedTokens, networks])
+  }, [supportedTokens, paymentSelection.selectedTokenId])
 
   // Calculate token amount and USD conversion
-  const selectedTokenData = useMemo(() => {
-    if (!paymentSelection.selectedToken) return null
-    return supportedTokens.find((t) => t.id === paymentSelection.selectedToken)
-  }, [paymentSelection.selectedToken, supportedTokens])
 
   const selectedNetworkData = useMemo(() => {
-    if (!paymentSelection.selectedNetwork) return null
+    if (!paymentSelection.selectedNetworkId) return null
     return networks.find(
-      (n) => n.id.toString() === paymentSelection.selectedNetwork
+      (n) => n.id.toString() === paymentSelection.selectedNetworkId
     )
-  }, [paymentSelection.selectedNetwork, networks])
+  }, [paymentSelection.selectedNetworkId, networks])
 
   // Auto-select network if only one is available
   useEffect(() => {
-    if (paymentSelection.selectedToken && availableNetworks.length === 1) {
+    if (
+      paymentSelection.selectedTokenId &&
+      availableNetworksIdsForSelectedToken.length === 1
+    ) {
       setPaymentSelection((prev) => ({
         ...prev,
-        selectedNetwork: availableNetworks[0].id.toString() as NetworkId,
+        selectedNetworkId: availableNetworksIdsForSelectedToken[0],
       }))
     }
-  }, [paymentSelection.selectedToken, availableNetworks])
+  }, [paymentSelection.selectedTokenId, cannonicalTokenOptions])
 
   // Auto-open network selector when token is selected (only if multiple networks available)
   useEffect(() => {
     if (
-      paymentSelection.selectedToken &&
-      !paymentSelection.selectedNetwork &&
-      availableNetworks.length > 1
+      paymentSelection.selectedTokenId &&
+      !paymentSelection.selectedNetworkId &&
+      availableNetworksIdsForSelectedToken.length > 1
     ) {
       setActivePopover(PopoverId.NETWORK)
     }
   }, [
-    paymentSelection.selectedToken,
-    paymentSelection.selectedNetwork,
-    availableNetworks,
+    paymentSelection.selectedTokenId,
+    paymentSelection.selectedNetworkId,
+    availableNetworksIdsForSelectedToken,
   ])
 
   const [disabled, buttonText] = useMemo(() => {
@@ -162,7 +147,10 @@ export default function Payments() {
 
   const handleDepositSelectionSubmit = async () => {
     if (disabled) return
-    const { selectedToken, selectedNetwork } = paymentSelection
+    const {
+      selectedTokenId: selectedToken,
+      selectedNetworkId: selectedNetwork,
+    } = paymentSelection
 
     if (!selectedToken || !selectedNetwork) return
     setIsLoading(true)
@@ -293,16 +281,16 @@ export default function Payments() {
                         <CommandList>
                           <CommandEmpty>No cryptocurrency found.</CommandEmpty>
                           <CommandGroup>
-                            {uniqueTokens?.map((token) => (
+                            {cannonicalTokenOptions?.map((cannonicalToken) => (
                               <CommandItem
-                                key={token.id}
-                                value={token.id}
+                                key={cannonicalToken.id}
+                                value={cannonicalToken.id}
                                 onSelect={(currentValue) => {
                                   if (currentValue !== selectedTokenData?.id) {
                                     setPaymentSelection({
                                       ...paymentSelection,
-                                      selectedToken: currentValue,
-                                      selectedNetwork: null, // Reset network when token changes
+                                      selectedTokenId: currentValue,
+                                      selectedNetworkId: null,
                                     })
                                   }
                                   setActivePopover(null)
@@ -310,22 +298,23 @@ export default function Payments() {
                               >
                                 <div className='flex w-full items-center gap-3'>
                                   <img
-                                    src={`/images/tokens/${token.canonicalTokenId.toLowerCase()}.png`}
-                                    alt={token.symbol}
+                                    src={cannonicalToken.imageUrl}
+                                    alt={cannonicalToken.symbol}
                                     className='h-6 w-6 rounded-full'
                                   />
                                   <div className='flex-1'>
                                     <div className='text-sm font-bold'>
-                                      {token.symbol}
+                                      {cannonicalToken.symbol}
                                     </div>
                                     <div className='text-xs'>
-                                      {token.symbol}
+                                      {cannonicalToken.symbol}
                                     </div>
                                   </div>
                                   <Check
                                     className={cn(
                                       'ml-auto h-4 w-4',
-                                      selectedTokenData?.id === token.id
+                                      selectedTokenData?.id ===
+                                        cannonicalToken.id
                                         ? 'opacity-100'
                                         : 'opacity-0'
                                     )}
@@ -346,7 +335,11 @@ export default function Payments() {
                     open={activePopover === PopoverId.NETWORK}
                     onOpenChange={(open) => {
                       // Only allow opening if multiple networks available
-                      if (open && availableNetworks.length <= 1) return
+                      if (
+                        open &&
+                        availableNetworksIdsForSelectedToken.length <= 1
+                      )
+                        return
                       setActivePopover(open ? PopoverId.NETWORK : null)
                     }}
                   >
@@ -357,7 +350,8 @@ export default function Payments() {
                         aria-expanded={activePopover === PopoverId.NETWORK}
                         className='mx-auto h-12 w-full max-w-md justify-between'
                         disabled={
-                          !selectedTokenData || availableNetworks.length <= 1
+                          !selectedTokenData ||
+                          availableNetworksIdsForSelectedToken.length <= 1
                         }
                       >
                         {selectedNetworkData ? (
@@ -367,12 +361,12 @@ export default function Payments() {
                         ) : (
                           'Select network...'
                         )}
-                        {availableNetworks.length > 1 && (
+                        {availableNetworksIdsForSelectedToken.length > 1 && (
                           <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
                         )}
                       </Button>
                     </PopoverTrigger>
-                    {availableNetworks.length > 1 && (
+                    {availableNetworksIdsForSelectedToken.length > 1 && (
                       <PopoverContent className='w-96 p-0'>
                         <Command>
                           <CommandInput
@@ -382,37 +376,46 @@ export default function Payments() {
                           <CommandList>
                             <CommandEmpty>No network found.</CommandEmpty>
                             <CommandGroup>
-                              {availableNetworks.map((network) => (
-                                <CommandItem
-                                  key={network.id.toString()}
-                                  value={network.id.toString()}
-                                  onSelect={(currentValue) => {
-                                    if (
-                                      currentValue !==
-                                      selectedNetworkData?.id.toString()
-                                    ) {
-                                      setPaymentSelection({
-                                        ...paymentSelection,
-                                        selectedNetwork:
-                                          currentValue as NetworkId,
-                                      })
-                                    }
-                                    setActivePopover(null)
-                                  }}
-                                >
-                                  <div className='flex items-center gap-3'>
-                                    {network.displayName}
-                                    <Check
-                                      className={cn(
-                                        'ml-auto h-4 w-4',
-                                        selectedNetworkData?.id === network.id
-                                          ? 'opacity-100'
-                                          : 'opacity-0'
-                                      )}
-                                    />
-                                  </div>
-                                </CommandItem>
-                              ))}
+                              {availableNetworksIdsForSelectedToken.map(
+                                (networkId) => {
+                                  const network = networks.find(
+                                    (n) => n.id.toString() === networkId
+                                  )
+                                  if (!network) return null
+                                  return (
+                                    <CommandItem
+                                      key={network.id.toString()}
+                                      value={network.id.toString()}
+                                      onSelect={(currentValue) => {
+                                        if (
+                                          currentValue !==
+                                          selectedNetworkData?.id.toString()
+                                        ) {
+                                          setPaymentSelection({
+                                            ...paymentSelection,
+                                            selectedNetworkId:
+                                              currentValue as NetworkId,
+                                          })
+                                        }
+                                        setActivePopover(null)
+                                      }}
+                                    >
+                                      <div className='flex items-center gap-3'>
+                                        {network.displayName}
+                                        <Check
+                                          className={cn(
+                                            'ml-auto h-4 w-4',
+                                            selectedNetworkData?.id ===
+                                              network.id
+                                              ? 'opacity-100'
+                                              : 'opacity-0'
+                                          )}
+                                        />
+                                      </div>
+                                    </CommandItem>
+                                  )
+                                }
+                              )}
                             </CommandGroup>
                           </CommandList>
                         </Command>

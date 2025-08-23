@@ -4,7 +4,7 @@ import {
   PaymentResponseDto,
   PaymentStatus,
 } from '@/lib/requests/api-client/model'
-import { CheckoutState } from '@/lib/types/payment-checkout/payment-state'
+import { CheckoutState } from '@/features/payments/types/state'
 
 export const getPaymentCheckoutState = (
   payment: PaymentResponseDto
