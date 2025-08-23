@@ -5,9 +5,16 @@ import { PrismaModule } from 'src/prisma/prisma.module';
 import { AssetModule } from 'src/assets/asset.module';
 import { NetworksModule } from 'src/networks/networks.module';
 import { WalletModule } from 'src/wallet/wallet.module';
+import { AlchemyModule } from 'src/alchemy/alchemy.module';
 
 @Module({
-  imports: [PrismaModule, AssetModule, NetworksModule, WalletModule],
+  imports: [
+    PrismaModule,
+    AssetModule,
+    NetworksModule,
+    WalletModule,
+    AlchemyModule,
+  ],
   controllers: [PaymentController],
   providers: [PaymentService],
   exports: [PaymentService],

@@ -25,11 +25,6 @@ export class TokenService {
     });
     return token;
   }
-  async getTokenOrThrow(id: string): Promise<Token> {
-    const token = await this.getToken(id);
-    if (!token) throw new NotFoundException('Token not found');
-    return token;
-  }
 
   async getNetworkTokens(networkId: NetworkId): Promise<Token[]> {
     const tokens = await this.db.token.findMany({
