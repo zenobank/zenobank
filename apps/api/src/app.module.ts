@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TestModule } from './test/test.module';
-import { QuicknodeModule } from './providers/quicknode/quicknode.module';
 import { WalletModule } from './wallet/wallet.module';
 import { ConfigModule } from '@nestjs/config';
 import { Env, getEnv, validateEnvConfig } from './lib/utils/env';
@@ -12,14 +11,15 @@ import { TransactionsModule } from './transactions/transactions.module';
 import { BlockchainModule } from './blockchain/blockchain.module';
 import { PaymentController } from './payment/payment.controller';
 import { PaymentsModule } from './payment/payment.module';
-import { AlchemyController } from './providers/alchemy/alchemy.controller';
-import { AlchemyModule } from './providers/alchemy/alchemy.module';
+import { AlchemyModule } from './alchemy/alchemy.module';
 import { NetworksModule } from './networks/networks.module';
+import { WebhooksModule } from './webhooks/webhooks.module';
 
 @Module({
   imports: [
     TestModule,
-    QuicknodeModule,
+    AlchemyModule,
+    PaymentsModule,
     WalletModule,
     ConfigModule.forRoot({
       cache: true,
@@ -41,8 +41,9 @@ import { NetworksModule } from './networks/networks.module';
     PaymentsModule,
     AlchemyModule,
     NetworksModule,
+    WebhooksModule,
   ],
-  controllers: [AppController, PaymentController, AlchemyController],
+  controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {}

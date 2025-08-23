@@ -12,12 +12,14 @@ import {
 } from 'viem';
 import { arbitrum } from 'viem/chains';
 import { validationMetadatasToSchemas } from 'class-validator-jsonschema';
+import { AlchemyService } from 'src/alchemy/alchemy.service';
 
 @Controller('wallet')
 export class WalletController {
   constructor(
     private readonly walletService: WalletService,
     private readonly walletFactory: WalletFactory,
+    private readonly alchemyService: AlchemyService,
   ) {}
 
   @Get('validator-schema')
@@ -25,6 +27,14 @@ export class WalletController {
     const schemas = validationMetadatasToSchemas();
     console.log(schemas);
     return schemas;
+  }
+
+  @Post('test-suscribe-to-webhook')
+  async suscribeToWebhook() {
+    return this.alchemyService.suscribeAddressToWebhook({
+      address: '0x0766991DC00D109386D6e0685AE46BD307320e4b',
+      network: NetworkId.BASE_MAINNET,
+    });
   }
 
   @Get()
@@ -55,31 +65,5 @@ export class WalletController {
     });
     console.log(abc);
     return abc;
-  }
-
-  @Post('create-webhook/')
-  async createWebhook() {
-    const total = 100;
-    const batchSize = 10;
-
-    // Crear batch de wallets
-    const walletsBatch: { address: string; privateKey: string }[] = [];
-    for (let j = 0; j < batchSize && j < total; j++) {
-      const wallet = this.walletFactory.generate(NetworkId.ARBITRUM_MAINNET);
-      walletsBatch.push(wallet);
-      console.log(walletsBatch);
-    }
-
-    // Registrar batch en paralelo
-    await Promise.all(
-      walletsBatch.map((wallet) =>
-        this.walletService.registerWalletInWebhooks({
-          addresses: Array.from(walletsBatch.map((w) => w.address)),
-          networkId: NetworkId.ARBITRUM_MAINNET,
-        }),
-      ),
-    );
-
-    return { message: `${total} wallets creadas y registradas` };
   }
 }
