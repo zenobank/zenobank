@@ -3,15 +3,13 @@ import { Job, Queue } from 'bullmq';
 import { TX_CONFIRMATION_QUEUE_NAME } from './lib/constants';
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import {
-  hasExceededMaxWaitTime,
-  hasReachedMinBlockConfirmations,
-} from './lib/utils';
+
 import { BlockchainAdapterFactory } from 'src/blockchain/adapters/blockchain-adapter.factory';
 import { TxIdentifier } from './lib/types';
-import { TransactionStatus } from '@prisma/client';
-import ms from 'src/lib/utils/ms';
+import { Prisma, TransactionStatus } from '@prisma/client';
 import { now } from 'src/lib/utils/now';
+import { OnChainTxStatus } from 'src/blockchain/lib/types';
+import { buildTxSchedulerId } from './lib/utils';
 
 @Processor(TX_CONFIRMATION_QUEUE_NAME)
 @Injectable()
@@ -29,6 +27,10 @@ export class TransactionsProcessor extends WorkerHost {
   async process(job: Job<TxIdentifier>) {
     const { hash, networkId } = job.data;
 
+    await this.txConfirmationQueue.removeJobScheduler(
+      buildTxSchedulerId({ networkId, hash }),
+    );
+
     const network = await this.db.network.findUniqueOrThrow({
       where: { id: networkId },
     });
@@ -38,43 +40,48 @@ export class TransactionsProcessor extends WorkerHost {
 
     const txStatus = await blockchainAdapter.getTransactionStatus(hash);
 
+    const { stopJob, data: updateTxData } = this.buildTxUpdate(
+      txStatus,
+      network.depositConfirmations,
+    );
+
+    await this.db.transaction.update({
+      where: { networkId_hash: { hash, networkId } },
+      data: updateTxData,
+    });
+    if (stopJob) {
+      await this.txConfirmationQueue.removeJobScheduler(
+        buildTxSchedulerId({ networkId, hash }),
+      );
+    }
+  }
+  private buildTxUpdate(
+    txStatus: OnChainTxStatus,
+    requiredConfirmations: number,
+  ): { stopJob: boolean; data: Prisma.TransactionUpdateInput } {
     if (txStatus.status === 'reverted') {
-      await this.db.transaction.update({
-        where: { networkId_hash: { hash, networkId } },
+      return {
+        stopJob: true,
         data: {
           status: TransactionStatus.FAILED,
         },
-      });
-      return;
-    }
-
-    if (txStatus.confirmations >= network.depositConfirmations) {
-      await this.db.transaction.update({
-        where: { networkId_hash: { hash, networkId } },
+      };
+    } else if (txStatus.confirmations >= requiredConfirmations) {
+      return {
+        stopJob: true,
         data: {
           confirmations: txStatus.confirmations,
           confirmedAt: now(),
           status: TransactionStatus.CONFIRMED,
         },
-      });
-    } else {
-      await this.db.transaction.update({
-        where: { networkId_hash: { hash, networkId } },
-        data: {
-          confirmations: txStatus.confirmations,
-          status: TransactionStatus.PENDING,
-        },
-      });
-
-      // ver esto del delay, como funciona
-      return this.txConfirmationQueue.add(
-        TX_CONFIRMATION_QUEUE_NAME,
-        job.data,
-        {
-          jobId: job.id,
-          delay: ms('10s'),
-        },
-      );
+      };
     }
+    return {
+      stopJob: false,
+      data: {
+        confirmations: txStatus.confirmations,
+        status: TransactionStatus.PENDING,
+      },
+    };
   }
 }

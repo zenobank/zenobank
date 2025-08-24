@@ -15,10 +15,10 @@ import { TX_CONFIRMATION_QUEUE_NAME } from './lib/constants';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { BlockchainAdapterFactory } from 'src/blockchain/adapters/blockchain-adapter.factory';
-import { NetworkId, Transaction } from '@prisma/client';
 import { TransactionResponseDto } from './dto/transaction-response.dto';
 import { plainToInstance } from 'class-transformer';
+import ms from 'src/lib/utils/ms';
+import { buildTxSchedulerId } from './lib/utils';
 
 @Injectable()
 export class TransactionsService {
@@ -59,10 +59,20 @@ export class TransactionsService {
         },
       },
     });
-    await this.txConfirmationQueue.add(TX_CONFIRMATION_QUEUE_NAME, {
-      hash,
-      networkId,
-    });
+    await this.txConfirmationQueue.upsertJobScheduler(
+      buildTxSchedulerId({ networkId, hash }),
+      {
+        every: ms('5s'),
+        // max limit = 1h (720 tries)
+        limit: ms('1h') / ms('5s'),
+      },
+      {
+        data: {
+          hash,
+          networkId,
+        },
+      },
+    );
   }
 
   async enqueueSweepWalletFundsJob({
