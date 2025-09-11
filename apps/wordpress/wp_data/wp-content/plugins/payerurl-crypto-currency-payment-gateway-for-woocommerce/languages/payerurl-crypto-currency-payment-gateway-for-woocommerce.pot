@@ -1,0 +1,167 @@
+# Copyright (C) 2023 payerurl team
+# This file is distributed under the GPLv3.
+msgid ""
+msgstr ""
+"Project-Id-Version: ABC Crypto Checkout 1.5.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/payerurl-crypto-currency-payment-gateway-for-woocommerce\n"
+"Last-Translator: Mir MD Abdullah Al Monsor <mirmonsor@gmail.com>\n"
+"Language-Team: English <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2023-09-12T15:18:52+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.8.1\n"
+"X-Domain: ABC-crypto-currency-payment-gateway-for-wooCommerce\n"
+
+#. Plugin Name of the plugin
+msgid "ABC Crypto Checkout"
+msgstr ""
+
+#. Plugin URI of the plugin
+msgid "https://wordpress.org/plugins/payerurl-crypto-currency-payment-gateway-for-woocommerce/"
+msgstr ""
+
+#. Description of the plugin
+msgid "ABC Crypto Checkout is a crypto payment gateway. It is accepting stable coin USDT (TRC20 Network) and Binance Pay and Bitcoin (BTC) and Ethereum (ETH) checkout in WooCommerce platform."
+msgstr ""
+
+#. Author of the plugin
+msgid "payerurl team"
+msgstr ""
+
+#. Author URI of the plugin
+msgid "https://payerurl.com"
+msgstr ""
+
+#: admin-form-fields.php:5
+msgid "Enable Log"
+msgstr ""
+
+#: admin-form-fields.php:9
+msgid "Title"
+msgstr ""
+
+#: admin-form-fields.php:11
+msgid "USDT,BTC,ETH,Binance Pay"
+msgstr ""
+
+#: admin-form-fields.php:14
+msgid "Description"
+msgstr ""
+
+#: admin-form-fields.php:16
+msgid "Crypto payment by ABC Crypto Checkout (Payerurl)"
+msgstr ""
+
+#: admin-form-fields.php:19
+msgid "Payerurl API Credentials"
+msgstr ""
+
+#: admin-form-fields.php:24
+msgid "Public key"
+msgstr ""
+
+#: admin-form-fields.php:28
+msgid "Secret key"
+msgstr ""
+
+#: admin-form-fields.php:29
+msgid "<span style=\"color:red\">Please test the credentials</span>"
+msgstr ""
+
+#: admin-form-fields.php:33
+msgid "Test API"
+msgstr ""
+
+#: admin-form-fields.php:35
+msgid "<span style=\"color:red\">Before using this plugin, we are advising to test your credentials</span>"
+msgstr ""
+
+#: admin-form-fields.php:40
+msgid "Fee Settings"
+msgstr ""
+
+#: admin-form-fields.php:45
+msgid "Enable fee in cart page"
+msgstr ""
+
+#: admin-form-fields.php:49
+msgid "Fee title"
+msgstr ""
+
+#: admin-form-fields.php:55
+msgid "Fee type"
+msgstr ""
+
+#: admin-form-fields.php:60
+msgid "Fee:"
+msgstr ""
+
+#: admin-form-fields.php:66
+msgid "Advanced Settings"
+msgstr ""
+
+#: admin-form-fields.php:71
+msgid "Logo (W:125 H:40, Max:25kb, .png)"
+msgstr ""
+
+#: admin-form-fields.php:73
+msgid "Upload a company logo (W:125 H:40), Max:25kb, .png"
+msgstr ""
+
+#: admin-form-fields.php:76
+msgid "After payment done I want the order status will"
+msgstr ""
+
+#: admin-form-fields.php:83
+msgid "Tolerate amount type"
+msgstr ""
+
+#: admin-form-fields.php:88
+msgid "Tolerate amount"
+msgstr ""
+
+#: class-payerurl-gateway.php:33
+msgid "Proceed to Payerurl"
+msgstr ""
+
+#: class-payerurl-gateway.php:112
+msgid "An error occurred, We were unable to process your order, please try again."
+msgstr ""
+
+#: class-payerurl-gateway.php:140
+msgid "An error occurred, We were unable to process your order, please contact us telegram: <a href=\"https://t.me/Payerurl\" target=\"_blank\" style=\"color:blue;\">Live support (@payerurl)</a>"
+msgstr ""
+
+#: class-payerurl-gateway.php:243
+msgid "Add/Edit image"
+msgstr ""
+
+#: class-payerurl-gateway.php:244
+msgid "Add image"
+msgstr ""
+
+#: class-payerurl-gateway.php:425
+msgid "Add the public and secret key"
+msgstr ""
+
+#: class-payerurl-gateway.php:447
+msgid "Server error"
+msgstr ""
+
+#: payerurl.php:120
+msgid "View settings"
+msgstr ""
+
+#: payerurl.php:121
+msgid "Settings"
+msgstr ""
+
+#: payerurl.php:180
+msgid "ABC Crypto Checkout plugin requires woocommerce plugin, Please make sure it is installed and activated."
+msgstr ""
+
+#: payerurl.php:191
+msgid "Your shop currency "
+msgstr ""

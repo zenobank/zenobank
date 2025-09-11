@@ -25,7 +25,7 @@ model Wallet {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  depositForPayment Payment? @relation(name: "DepositWallet")
+  payments Payment[] @relation("DepositWallet")
 
   activityWebhook   ActivityWebhook? @relation(fields: [activityWebhookId], references: [id])
   activityWebhookId String?
@@ -35,6 +35,7 @@ model Wallet {
 
 enum PaymentStatus {
   PENDING
+  UNDER_PAYMENT
   SUCCESS
   EXPIRED
   CANCELLED
@@ -46,15 +47,18 @@ model Payment {
   title       String?
   description String?
 
-  currency     String
-  amount       String
-  amountFilled String        @default("0")
-  notifyUrl    String
-  orderId      String        @unique
-  expiredAt    DateTime
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  status       PaymentStatus @default(PENDING)
+  fiatCurrency String
+  fiatAmount   Decimal
+
+  tokenAmount       Decimal?
+  tokenAmountFilled Decimal  @default(0)
+
+  notifyUrl String
+  orderId   String        @unique
+  expiredAt DateTime
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  status    PaymentStatus @default(PENDING)
 
   tokenId String?
   token   Token?  @relation(fields: [tokenId], references: [id])
@@ -65,7 +69,7 @@ model Payment {
   transactionId String?      @unique
   transaction   Transaction? @relation(name: "PaymentTx", fields: [transactionId], references: [id])
 
-  depositWalletId String? @unique
+  depositWalletId String?
   depositWallet   Wallet? @relation(name: "DepositWallet", fields: [depositWalletId], references: [id])
 }
 
