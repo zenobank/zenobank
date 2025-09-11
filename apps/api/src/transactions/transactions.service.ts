@@ -4,9 +4,9 @@ import {
   TransactionRecordInput,
   TxIdentifier,
 } from './lib/types';
-import { TokenService } from 'src/assets/token/token.service';
-import { TokenGasService } from 'src/assets/token/tokens-gas.service';
-import { isNativeToken, nativeTokenAddress } from 'src/assets/lib/utils';
+import { TokenService } from 'src/currencies/token/token.service';
+import { TokenGasService } from 'src/currencies/token/tokens-gas.service';
+import { isNativeToken, nativeTokenAddress } from 'src/currencies/lib/utils';
 import { privateKeyToAccount } from 'viem/accounts';
 import { client, walletClient } from 'src/lib/utils/client';
 import { erc20Abi } from 'viem';

@@ -103,7 +103,7 @@ export class PaymentResponseDto {
   static fromPrisma(payment: PaymentWithAddress): PaymentResponseDto {
     return plainToInstance(PaymentResponseDto, {
       ...payment,
-      amount: payment.amount.toString(),
+      amount: payment.fiatAmount?.toString() ?? '0',
       paymentUrl: getPaymentUrl(payment.id),
       depositDetails:
         payment.depositWalletAddress && payment.tokenId && payment.networkId
