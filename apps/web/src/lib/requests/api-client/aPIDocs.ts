@@ -39,7 +39,8 @@ import type {
   TokenResponseDto,
   UpdateDepositSelectionDto,
   WalletControllerGetValidatorSchemaV1200,
-  WalletControllerTestV1200
+  WalletControllerTestV1200,
+  WebhookActivityDto
 } from './model';
 
 export const appControllerGetHelloV1 = (
@@ -113,6 +114,144 @@ export function useAppControllerGetHelloV1<TData = Awaited<ReturnType<typeof app
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getAppControllerGetHelloV1QueryOptions(options)
+
+  const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+export const testControllerCreateV1 = (
+    createTestDto: CreateTestDto, options?: AxiosRequestConfig
+ ): Promise<AxiosResponse<string>> => {
+    
+    
+    return axios.default.post(
+      `http://localhost:3001/api/v1/test`,
+      createTestDto,{
+        responseType: 'text',
+    ...options,}
+    );
+  }
+
+
+
+export const getTestControllerCreateV1MutationOptions = <TError = AxiosError<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof testControllerCreateV1>>, TError,{data: CreateTestDto}, TContext>, axios?: AxiosRequestConfig}
+): UseMutationOptions<Awaited<ReturnType<typeof testControllerCreateV1>>, TError,{data: CreateTestDto}, TContext> => {
+
+const mutationKey = ['testControllerCreateV1'];
+const {mutation: mutationOptions, axios: axiosOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, axios: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof testControllerCreateV1>>, {data: CreateTestDto}> = (props) => {
+          const {data} = props ?? {};
+
+          return  testControllerCreateV1(data,axiosOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type TestControllerCreateV1MutationResult = NonNullable<Awaited<ReturnType<typeof testControllerCreateV1>>>
+    export type TestControllerCreateV1MutationBody = CreateTestDto
+    export type TestControllerCreateV1MutationError = AxiosError<unknown>
+
+    export const useTestControllerCreateV1 = <TError = AxiosError<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof testControllerCreateV1>>, TError,{data: CreateTestDto}, TContext>, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof testControllerCreateV1>>,
+        TError,
+        {data: CreateTestDto},
+        TContext
+      > => {
+
+      const mutationOptions = getTestControllerCreateV1MutationOptions(options);
+
+      return useMutation(mutationOptions , queryClient);
+    }
+    
+export const paymentControllerTestV1 = (
+     options?: AxiosRequestConfig
+ ): Promise<AxiosResponse<null>> => {
+    
+    
+    return axios.default.get(
+      `http://localhost:3001/api/v1/payments/test`,options
+    );
+  }
+
+
+export const getPaymentControllerTestV1QueryKey = () => {
+    return [`http://localhost:3001/api/v1/payments/test`] as const;
+    }
+
+    
+export const getPaymentControllerTestV1QueryOptions = <TData = Awaited<ReturnType<typeof paymentControllerTestV1>>, TError = AxiosError<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof paymentControllerTestV1>>, TError, TData>>, axios?: AxiosRequestConfig}
+) => {
+
+const {query: queryOptions, axios: axiosOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getPaymentControllerTestV1QueryKey();
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof paymentControllerTestV1>>> = ({ signal }) => paymentControllerTestV1({ signal, ...axiosOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof paymentControllerTestV1>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type PaymentControllerTestV1QueryResult = NonNullable<Awaited<ReturnType<typeof paymentControllerTestV1>>>
+export type PaymentControllerTestV1QueryError = AxiosError<unknown>
+
+
+export function usePaymentControllerTestV1<TData = Awaited<ReturnType<typeof paymentControllerTestV1>>, TError = AxiosError<unknown>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof paymentControllerTestV1>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof paymentControllerTestV1>>,
+          TError,
+          Awaited<ReturnType<typeof paymentControllerTestV1>>
+        > , 'initialData'
+      >, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function usePaymentControllerTestV1<TData = Awaited<ReturnType<typeof paymentControllerTestV1>>, TError = AxiosError<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof paymentControllerTestV1>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof paymentControllerTestV1>>,
+          TError,
+          Awaited<ReturnType<typeof paymentControllerTestV1>>
+        > , 'initialData'
+      >, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function usePaymentControllerTestV1<TData = Awaited<ReturnType<typeof paymentControllerTestV1>>, TError = AxiosError<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof paymentControllerTestV1>>, TError, TData>>, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function usePaymentControllerTestV1<TData = Awaited<ReturnType<typeof paymentControllerTestV1>>, TError = AxiosError<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof paymentControllerTestV1>>, TError, TData>>, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getPaymentControllerTestV1QueryOptions(options)
 
   const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -317,174 +456,166 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
       return useMutation(mutationOptions , queryClient);
     }
     
-export const alchemyControllerHandleWebhookV1 = (
+export const assetControllerGetSupportedTokensV1 = (
      options?: AxiosRequestConfig
- ): Promise<AxiosResponse<null>> => {
+ ): Promise<AxiosResponse<TokenResponseDto[]>> => {
     
     
-    return axios.default.post(
-      `http://localhost:3001/api/v1/providers/alchemy/webhook`,undefined,options
+    return axios.default.get(
+      `http://localhost:3001/api/v1/assets/tokens`,options
     );
   }
 
 
+export const getAssetControllerGetSupportedTokensV1QueryKey = () => {
+    return [`http://localhost:3001/api/v1/assets/tokens`] as const;
+    }
 
-export const getAlchemyControllerHandleWebhookV1MutationOptions = <TError = AxiosError<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof alchemyControllerHandleWebhookV1>>, TError,void, TContext>, axios?: AxiosRequestConfig}
-): UseMutationOptions<Awaited<ReturnType<typeof alchemyControllerHandleWebhookV1>>, TError,void, TContext> => {
+    
+export const getAssetControllerGetSupportedTokensV1QueryOptions = <TData = Awaited<ReturnType<typeof assetControllerGetSupportedTokensV1>>, TError = AxiosError<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof assetControllerGetSupportedTokensV1>>, TError, TData>>, axios?: AxiosRequestConfig}
+) => {
 
-const mutationKey = ['alchemyControllerHandleWebhookV1'];
-const {mutation: mutationOptions, axios: axiosOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, axios: undefined};
+const {query: queryOptions, axios: axiosOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getAssetControllerGetSupportedTokensV1QueryKey();
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof assetControllerGetSupportedTokensV1>>> = ({ signal }) => assetControllerGetSupportedTokensV1({ signal, ...axiosOptions });
 
       
 
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof alchemyControllerHandleWebhookV1>>, void> = () => {
-          
-
-          return  alchemyControllerHandleWebhookV1(axiosOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type AlchemyControllerHandleWebhookV1MutationResult = NonNullable<Awaited<ReturnType<typeof alchemyControllerHandleWebhookV1>>>
-    
-    export type AlchemyControllerHandleWebhookV1MutationError = AxiosError<unknown>
-
-    export const useAlchemyControllerHandleWebhookV1 = <TError = AxiosError<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof alchemyControllerHandleWebhookV1>>, TError,void, TContext>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof alchemyControllerHandleWebhookV1>>,
-        TError,
-        void,
-        TContext
-      > => {
-
-      const mutationOptions = getAlchemyControllerHandleWebhookV1MutationOptions(options);
-
-      return useMutation(mutationOptions , queryClient);
-    }
-    
-export const testControllerCreateV1 = (
-    createTestDto: CreateTestDto, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<string>> => {
-    
-    
-    return axios.default.post(
-      `http://localhost:3001/api/v1/test`,
-      createTestDto,{
-        responseType: 'text',
-    ...options,}
-    );
-  }
-
-
-
-export const getTestControllerCreateV1MutationOptions = <TError = AxiosError<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof testControllerCreateV1>>, TError,{data: CreateTestDto}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationOptions<Awaited<ReturnType<typeof testControllerCreateV1>>, TError,{data: CreateTestDto}, TContext> => {
-
-const mutationKey = ['testControllerCreateV1'];
-const {mutation: mutationOptions, axios: axiosOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, axios: undefined};
-
       
 
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof assetControllerGetSupportedTokensV1>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof testControllerCreateV1>>, {data: CreateTestDto}> = (props) => {
-          const {data} = props ?? {};
-
-          return  testControllerCreateV1(data,axiosOptions)
-        }
-
-        
+export type AssetControllerGetSupportedTokensV1QueryResult = NonNullable<Awaited<ReturnType<typeof assetControllerGetSupportedTokensV1>>>
+export type AssetControllerGetSupportedTokensV1QueryError = AxiosError<unknown>
 
 
-  return  { mutationFn, ...mutationOptions }}
+export function useAssetControllerGetSupportedTokensV1<TData = Awaited<ReturnType<typeof assetControllerGetSupportedTokensV1>>, TError = AxiosError<unknown>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof assetControllerGetSupportedTokensV1>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof assetControllerGetSupportedTokensV1>>,
+          TError,
+          Awaited<ReturnType<typeof assetControllerGetSupportedTokensV1>>
+        > , 'initialData'
+      >, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAssetControllerGetSupportedTokensV1<TData = Awaited<ReturnType<typeof assetControllerGetSupportedTokensV1>>, TError = AxiosError<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof assetControllerGetSupportedTokensV1>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof assetControllerGetSupportedTokensV1>>,
+          TError,
+          Awaited<ReturnType<typeof assetControllerGetSupportedTokensV1>>
+        > , 'initialData'
+      >, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAssetControllerGetSupportedTokensV1<TData = Awaited<ReturnType<typeof assetControllerGetSupportedTokensV1>>, TError = AxiosError<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof assetControllerGetSupportedTokensV1>>, TError, TData>>, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-    export type TestControllerCreateV1MutationResult = NonNullable<Awaited<ReturnType<typeof testControllerCreateV1>>>
-    export type TestControllerCreateV1MutationBody = CreateTestDto
-    export type TestControllerCreateV1MutationError = AxiosError<unknown>
+export function useAssetControllerGetSupportedTokensV1<TData = Awaited<ReturnType<typeof assetControllerGetSupportedTokensV1>>, TError = AxiosError<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof assetControllerGetSupportedTokensV1>>, TError, TData>>, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-    export const useTestControllerCreateV1 = <TError = AxiosError<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof testControllerCreateV1>>, TError,{data: CreateTestDto}, TContext>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof testControllerCreateV1>>,
-        TError,
-        {data: CreateTestDto},
-        TContext
-      > => {
+  const queryOptions = getAssetControllerGetSupportedTokensV1QueryOptions(options)
 
-      const mutationOptions = getTestControllerCreateV1MutationOptions(options);
+  const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-      return useMutation(mutationOptions , queryClient);
-    }
-    
-export const quicknodeControllerHandleWebhookV1 = (
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+export const networksControllerGetNetworksV1 = (
      options?: AxiosRequestConfig
- ): Promise<AxiosResponse<null>> => {
+ ): Promise<AxiosResponse<NetworkResponseDto[]>> => {
     
     
-    return axios.default.post(
-      `http://localhost:3001/api/v1/providers/quicknode/webhook`,undefined,options
+    return axios.default.get(
+      `http://localhost:3001/api/v1/networks`,options
     );
   }
 
 
+export const getNetworksControllerGetNetworksV1QueryKey = () => {
+    return [`http://localhost:3001/api/v1/networks`] as const;
+    }
 
-export const getQuicknodeControllerHandleWebhookV1MutationOptions = <TError = AxiosError<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof quicknodeControllerHandleWebhookV1>>, TError,void, TContext>, axios?: AxiosRequestConfig}
-): UseMutationOptions<Awaited<ReturnType<typeof quicknodeControllerHandleWebhookV1>>, TError,void, TContext> => {
+    
+export const getNetworksControllerGetNetworksV1QueryOptions = <TData = Awaited<ReturnType<typeof networksControllerGetNetworksV1>>, TError = AxiosError<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof networksControllerGetNetworksV1>>, TError, TData>>, axios?: AxiosRequestConfig}
+) => {
 
-const mutationKey = ['quicknodeControllerHandleWebhookV1'];
-const {mutation: mutationOptions, axios: axiosOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, axios: undefined};
+const {query: queryOptions, axios: axiosOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getNetworksControllerGetNetworksV1QueryKey();
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof networksControllerGetNetworksV1>>> = ({ signal }) => networksControllerGetNetworksV1({ signal, ...axiosOptions });
 
       
 
+      
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof quicknodeControllerHandleWebhookV1>>, void> = () => {
-          
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof networksControllerGetNetworksV1>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
 
-          return  quicknodeControllerHandleWebhookV1(axiosOptions)
-        }
-
-        
+export type NetworksControllerGetNetworksV1QueryResult = NonNullable<Awaited<ReturnType<typeof networksControllerGetNetworksV1>>>
+export type NetworksControllerGetNetworksV1QueryError = AxiosError<unknown>
 
 
-  return  { mutationFn, ...mutationOptions }}
+export function useNetworksControllerGetNetworksV1<TData = Awaited<ReturnType<typeof networksControllerGetNetworksV1>>, TError = AxiosError<unknown>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof networksControllerGetNetworksV1>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof networksControllerGetNetworksV1>>,
+          TError,
+          Awaited<ReturnType<typeof networksControllerGetNetworksV1>>
+        > , 'initialData'
+      >, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useNetworksControllerGetNetworksV1<TData = Awaited<ReturnType<typeof networksControllerGetNetworksV1>>, TError = AxiosError<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof networksControllerGetNetworksV1>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof networksControllerGetNetworksV1>>,
+          TError,
+          Awaited<ReturnType<typeof networksControllerGetNetworksV1>>
+        > , 'initialData'
+      >, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useNetworksControllerGetNetworksV1<TData = Awaited<ReturnType<typeof networksControllerGetNetworksV1>>, TError = AxiosError<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof networksControllerGetNetworksV1>>, TError, TData>>, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-    export type QuicknodeControllerHandleWebhookV1MutationResult = NonNullable<Awaited<ReturnType<typeof quicknodeControllerHandleWebhookV1>>>
-    
-    export type QuicknodeControllerHandleWebhookV1MutationError = AxiosError<unknown>
+export function useNetworksControllerGetNetworksV1<TData = Awaited<ReturnType<typeof networksControllerGetNetworksV1>>, TError = AxiosError<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof networksControllerGetNetworksV1>>, TError, TData>>, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-    export const useQuicknodeControllerHandleWebhookV1 = <TError = AxiosError<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof quicknodeControllerHandleWebhookV1>>, TError,void, TContext>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof quicknodeControllerHandleWebhookV1>>,
-        TError,
-        void,
-        TContext
-      > => {
+  const queryOptions = getNetworksControllerGetNetworksV1QueryOptions(options)
 
-      const mutationOptions = getQuicknodeControllerHandleWebhookV1MutationOptions(options);
+  const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-      return useMutation(mutationOptions , queryClient);
-    }
-    
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
 export const walletControllerGetValidatorSchemaV1 = (
      options?: AxiosRequestConfig
  ): Promise<AxiosResponse<WalletControllerGetValidatorSchemaV1200>> => {
@@ -565,6 +696,61 @@ export function useWalletControllerGetValidatorSchemaV1<TData = Awaited<ReturnTy
 
 
 
+export const walletControllerSuscribeToWebhookV1 = (
+     options?: AxiosRequestConfig
+ ): Promise<AxiosResponse<null>> => {
+    
+    
+    return axios.default.post(
+      `http://localhost:3001/api/v1/wallet/test-suscribe-to-webhook`,undefined,options
+    );
+  }
+
+
+
+export const getWalletControllerSuscribeToWebhookV1MutationOptions = <TError = AxiosError<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof walletControllerSuscribeToWebhookV1>>, TError,void, TContext>, axios?: AxiosRequestConfig}
+): UseMutationOptions<Awaited<ReturnType<typeof walletControllerSuscribeToWebhookV1>>, TError,void, TContext> => {
+
+const mutationKey = ['walletControllerSuscribeToWebhookV1'];
+const {mutation: mutationOptions, axios: axiosOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, axios: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof walletControllerSuscribeToWebhookV1>>, void> = () => {
+          
+
+          return  walletControllerSuscribeToWebhookV1(axiosOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type WalletControllerSuscribeToWebhookV1MutationResult = NonNullable<Awaited<ReturnType<typeof walletControllerSuscribeToWebhookV1>>>
+    
+    export type WalletControllerSuscribeToWebhookV1MutationError = AxiosError<unknown>
+
+    export const useWalletControllerSuscribeToWebhookV1 = <TError = AxiosError<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof walletControllerSuscribeToWebhookV1>>, TError,void, TContext>, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof walletControllerSuscribeToWebhookV1>>,
+        TError,
+        void,
+        TContext
+      > => {
+
+      const mutationOptions = getWalletControllerSuscribeToWebhookV1MutationOptions(options);
+
+      return useMutation(mutationOptions , queryClient);
+    }
+    
 export const walletControllerGetWalletsV1 = (
      options?: AxiosRequestConfig
  ): Promise<AxiosResponse<null>> => {
@@ -725,61 +911,6 @@ export function useWalletControllerTestV1<TData = Awaited<ReturnType<typeof wall
 
 
 
-export const walletControllerCreateWebhookV1 = (
-     options?: AxiosRequestConfig
- ): Promise<AxiosResponse<null>> => {
-    
-    
-    return axios.default.post(
-      `http://localhost:3001/api/v1/wallet/create-webhook`,undefined,options
-    );
-  }
-
-
-
-export const getWalletControllerCreateWebhookV1MutationOptions = <TError = AxiosError<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof walletControllerCreateWebhookV1>>, TError,void, TContext>, axios?: AxiosRequestConfig}
-): UseMutationOptions<Awaited<ReturnType<typeof walletControllerCreateWebhookV1>>, TError,void, TContext> => {
-
-const mutationKey = ['walletControllerCreateWebhookV1'];
-const {mutation: mutationOptions, axios: axiosOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, axios: undefined};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof walletControllerCreateWebhookV1>>, void> = () => {
-          
-
-          return  walletControllerCreateWebhookV1(axiosOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type WalletControllerCreateWebhookV1MutationResult = NonNullable<Awaited<ReturnType<typeof walletControllerCreateWebhookV1>>>
-    
-    export type WalletControllerCreateWebhookV1MutationError = AxiosError<unknown>
-
-    export const useWalletControllerCreateWebhookV1 = <TError = AxiosError<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof walletControllerCreateWebhookV1>>, TError,void, TContext>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof walletControllerCreateWebhookV1>>,
-        TError,
-        void,
-        TContext
-      > => {
-
-      const mutationOptions = getWalletControllerCreateWebhookV1MutationOptions(options);
-
-      return useMutation(mutationOptions , queryClient);
-    }
-    
 export const transactionsControllerTestV1 = (
      options?: AxiosRequestConfig
  ): Promise<AxiosResponse<null>> => {
@@ -860,159 +991,58 @@ export function useTransactionsControllerTestV1<TData = Awaited<ReturnType<typeo
 
 
 
-export const assetControllerGetSupportedTokensV1 = (
-     options?: AxiosRequestConfig
- ): Promise<AxiosResponse<TokenResponseDto[]>> => {
+export const webhooksControllerHandleAlchemyWebhookV1 = (
+    webhookActivityDto: WebhookActivityDto, options?: AxiosRequestConfig
+ ): Promise<AxiosResponse<null>> => {
     
     
-    return axios.default.get(
-      `http://localhost:3001/api/v1/assets/tokens`,options
+    return axios.default.post(
+      `http://localhost:3001/api/v1/webhooks/alchemy`,
+      webhookActivityDto,options
     );
   }
 
 
-export const getAssetControllerGetSupportedTokensV1QueryKey = () => {
-    return [`http://localhost:3001/api/v1/assets/tokens`] as const;
+
+export const getWebhooksControllerHandleAlchemyWebhookV1MutationOptions = <TError = AxiosError<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof webhooksControllerHandleAlchemyWebhookV1>>, TError,{data: WebhookActivityDto}, TContext>, axios?: AxiosRequestConfig}
+): UseMutationOptions<Awaited<ReturnType<typeof webhooksControllerHandleAlchemyWebhookV1>>, TError,{data: WebhookActivityDto}, TContext> => {
+
+const mutationKey = ['webhooksControllerHandleAlchemyWebhookV1'];
+const {mutation: mutationOptions, axios: axiosOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, axios: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof webhooksControllerHandleAlchemyWebhookV1>>, {data: WebhookActivityDto}> = (props) => {
+          const {data} = props ?? {};
+
+          return  webhooksControllerHandleAlchemyWebhookV1(data,axiosOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type WebhooksControllerHandleAlchemyWebhookV1MutationResult = NonNullable<Awaited<ReturnType<typeof webhooksControllerHandleAlchemyWebhookV1>>>
+    export type WebhooksControllerHandleAlchemyWebhookV1MutationBody = WebhookActivityDto
+    export type WebhooksControllerHandleAlchemyWebhookV1MutationError = AxiosError<unknown>
+
+    export const useWebhooksControllerHandleAlchemyWebhookV1 = <TError = AxiosError<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof webhooksControllerHandleAlchemyWebhookV1>>, TError,{data: WebhookActivityDto}, TContext>, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof webhooksControllerHandleAlchemyWebhookV1>>,
+        TError,
+        {data: WebhookActivityDto},
+        TContext
+      > => {
+
+      const mutationOptions = getWebhooksControllerHandleAlchemyWebhookV1MutationOptions(options);
+
+      return useMutation(mutationOptions , queryClient);
     }
-
-    
-export const getAssetControllerGetSupportedTokensV1QueryOptions = <TData = Awaited<ReturnType<typeof assetControllerGetSupportedTokensV1>>, TError = AxiosError<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof assetControllerGetSupportedTokensV1>>, TError, TData>>, axios?: AxiosRequestConfig}
-) => {
-
-const {query: queryOptions, axios: axiosOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getAssetControllerGetSupportedTokensV1QueryKey();
-
-  
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof assetControllerGetSupportedTokensV1>>> = ({ signal }) => assetControllerGetSupportedTokensV1({ signal, ...axiosOptions });
-
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof assetControllerGetSupportedTokensV1>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type AssetControllerGetSupportedTokensV1QueryResult = NonNullable<Awaited<ReturnType<typeof assetControllerGetSupportedTokensV1>>>
-export type AssetControllerGetSupportedTokensV1QueryError = AxiosError<unknown>
-
-
-export function useAssetControllerGetSupportedTokensV1<TData = Awaited<ReturnType<typeof assetControllerGetSupportedTokensV1>>, TError = AxiosError<unknown>>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof assetControllerGetSupportedTokensV1>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof assetControllerGetSupportedTokensV1>>,
-          TError,
-          Awaited<ReturnType<typeof assetControllerGetSupportedTokensV1>>
-        > , 'initialData'
-      >, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useAssetControllerGetSupportedTokensV1<TData = Awaited<ReturnType<typeof assetControllerGetSupportedTokensV1>>, TError = AxiosError<unknown>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof assetControllerGetSupportedTokensV1>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof assetControllerGetSupportedTokensV1>>,
-          TError,
-          Awaited<ReturnType<typeof assetControllerGetSupportedTokensV1>>
-        > , 'initialData'
-      >, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useAssetControllerGetSupportedTokensV1<TData = Awaited<ReturnType<typeof assetControllerGetSupportedTokensV1>>, TError = AxiosError<unknown>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof assetControllerGetSupportedTokensV1>>, TError, TData>>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-
-export function useAssetControllerGetSupportedTokensV1<TData = Awaited<ReturnType<typeof assetControllerGetSupportedTokensV1>>, TError = AxiosError<unknown>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof assetControllerGetSupportedTokensV1>>, TError, TData>>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getAssetControllerGetSupportedTokensV1QueryOptions(options)
-
-  const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
-
-  return query;
-}
-
-
-
-
-export const networksControllerGetNetworksV1 = (
-     options?: AxiosRequestConfig
- ): Promise<AxiosResponse<NetworkResponseDto[]>> => {
-    
-    
-    return axios.default.get(
-      `http://localhost:3001/api/v1/networks`,options
-    );
-  }
-
-
-export const getNetworksControllerGetNetworksV1QueryKey = () => {
-    return [`http://localhost:3001/api/v1/networks`] as const;
-    }
-
-    
-export const getNetworksControllerGetNetworksV1QueryOptions = <TData = Awaited<ReturnType<typeof networksControllerGetNetworksV1>>, TError = AxiosError<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof networksControllerGetNetworksV1>>, TError, TData>>, axios?: AxiosRequestConfig}
-) => {
-
-const {query: queryOptions, axios: axiosOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getNetworksControllerGetNetworksV1QueryKey();
-
-  
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof networksControllerGetNetworksV1>>> = ({ signal }) => networksControllerGetNetworksV1({ signal, ...axiosOptions });
-
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof networksControllerGetNetworksV1>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type NetworksControllerGetNetworksV1QueryResult = NonNullable<Awaited<ReturnType<typeof networksControllerGetNetworksV1>>>
-export type NetworksControllerGetNetworksV1QueryError = AxiosError<unknown>
-
-
-export function useNetworksControllerGetNetworksV1<TData = Awaited<ReturnType<typeof networksControllerGetNetworksV1>>, TError = AxiosError<unknown>>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof networksControllerGetNetworksV1>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof networksControllerGetNetworksV1>>,
-          TError,
-          Awaited<ReturnType<typeof networksControllerGetNetworksV1>>
-        > , 'initialData'
-      >, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useNetworksControllerGetNetworksV1<TData = Awaited<ReturnType<typeof networksControllerGetNetworksV1>>, TError = AxiosError<unknown>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof networksControllerGetNetworksV1>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof networksControllerGetNetworksV1>>,
-          TError,
-          Awaited<ReturnType<typeof networksControllerGetNetworksV1>>
-        > , 'initialData'
-      >, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useNetworksControllerGetNetworksV1<TData = Awaited<ReturnType<typeof networksControllerGetNetworksV1>>, TError = AxiosError<unknown>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof networksControllerGetNetworksV1>>, TError, TData>>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-
-export function useNetworksControllerGetNetworksV1<TData = Awaited<ReturnType<typeof networksControllerGetNetworksV1>>, TError = AxiosError<unknown>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof networksControllerGetNetworksV1>>, TError, TData>>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getNetworksControllerGetNetworksV1QueryOptions(options)
-
-  const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
-
-  return query;
-}

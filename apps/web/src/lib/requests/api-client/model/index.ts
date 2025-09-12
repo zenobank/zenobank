@@ -22,3 +22,5 @@ export * from './tokenResponseDtoStandard';
 export * from './updateDepositSelectionDto';
 export * from './walletControllerGetValidatorSchemaV1200';
 export * from './walletControllerTestV1200';
+export * from './webhookActivityDto';
+export * from './webhookActivityDtoNetwork';

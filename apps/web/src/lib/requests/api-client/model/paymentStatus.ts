@@ -12,6 +12,7 @@ export type PaymentStatus = typeof PaymentStatus[keyof typeof PaymentStatus];
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const PaymentStatus = {
   PENDING: 'PENDING',
+  UNDER_PAYMENT: 'UNDER_PAYMENT',
   SUCCESS: 'SUCCESS',
   EXPIRED: 'EXPIRED',
   CANCELLED: 'CANCELLED',

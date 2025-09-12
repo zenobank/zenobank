@@ -10,5 +10,6 @@ import type { NetworkId } from './networkId';
 export interface DepositDetailsDto {
   address: string;
   currencyId: string;
+  amount: string;
   networkId: NetworkId;
 }

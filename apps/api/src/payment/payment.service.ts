@@ -17,6 +17,8 @@ import { AlchemyService } from 'src/alchemy/alchemy.service';
 import { NetworkId, PaymentStatus } from '@prisma/client';
 import { Convert } from 'easy-currencies';
 import { Decimal } from '@prisma/client/runtime/library';
+import { toBN } from 'src/lib/utils/numbers';
+import { isISO4217CurrencyCode, IsISO4217CurrencyCode } from 'class-validator';
 
 @Injectable()
 export class PaymentService {
@@ -33,8 +35,8 @@ export class PaymentService {
     const { amount, currency } = createPaymentDto;
     const payment = await this.db.payment.create({
       data: {
-        fiatAmount: new Decimal(amount),
-        fiatCurrency: currency,
+        amount,
+        currency,
         notifyUrl: 'https://example.com/notify',
         orderId: randomUUID(),
         expiredAt: new Date(Date.now() + ms('1h')),
@@ -117,14 +119,18 @@ export class PaymentService {
     });
 
     // we only support usd stablecoins. So we convert the amount to usd and we always assume that 1 USD = 1 stable coin (USDT, USDC, etc.)
-    let tokenAmount = currentDepositDetails.fiatAmount;
-    if (currentDepositDetails.fiatCurrency !== 'USD') {
-      const convertedAmount = await Convert(+currentDepositDetails.fiatAmount)
-        .from(currentDepositDetails.fiatCurrency)
-        .to('USD');
-      tokenAmount = new Decimal(convertedAmount);
+    let tokenAmount = currentDepositDetails.amount;
+
+    if (!isISO4217CurrencyCode(currentDepositDetails.currency)) {
+      throw new BadRequestException('Invalid currency');
     }
-    if (tokenAmount.lte(0)) {
+    if (currentDepositDetails.currency !== 'USD') {
+      const convertedAmount = await Convert(+currentDepositDetails.amount)
+        .from(currentDepositDetails.currency)
+        .to('USD');
+      tokenAmount = convertedAmount.toString();
+    }
+    if (toBN(tokenAmount).lte(0)) {
       throw new InternalServerErrorException('Conversion failed');
     }
 
@@ -150,11 +156,11 @@ export class PaymentService {
   }
 
   private async generateUniqueTokenAmount(
-    baseAmount: Decimal,
+    baseAmount: string,
     tokenId: string,
     networkId: NetworkId,
     maxRetries = 20,
-  ): Promise<Decimal> {
+  ): Promise<string> {
     const MIN_SUFFIX = 0.000001;
     const MAX_SUFFIX = 0.000999;
 
@@ -162,20 +168,26 @@ export class PaymentService {
       const randomSuffix =
         MIN_SUFFIX + Math.random() * (MAX_SUFFIX - MIN_SUFFIX);
 
-      const candidate = baseAmount.add(new Decimal(randomSuffix.toFixed(6)));
+      // sumamos base + sufijo
+      const candidate = toBN(baseAmount).plus(
+        toBN(randomSuffix.toFixed(6)), // sufijo con 6 decimales
+      );
+
+      // 🔑 forzamos a 6 decimales como string
+      const candidateStr = candidate.toFixed(6);
 
       const exists = await this.db.payment.findFirst({
         where: {
           tokenId,
           networkId,
-          tokenAmount: candidate,
+          tokenAmount: candidateStr,
           status: { in: [PaymentStatus.PENDING, PaymentStatus.UNDER_PAYMENT] },
         },
         select: { id: true },
       });
 
       if (!exists) {
-        return candidate;
+        return candidateStr;
       }
     }
 

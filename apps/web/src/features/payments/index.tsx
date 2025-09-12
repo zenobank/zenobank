@@ -6,7 +6,6 @@ import { toast } from 'sonner'
 import { usePaymentControllerUpdatePaymentDepositSelectionV1 } from '@/lib/requests/api-client/aPIDocs'
 import {
   NetworkId,
-  NetworkResponseDto,
   PaymentResponseDto,
   PaymentStatus,
   TokenResponseDto,
@@ -209,26 +208,33 @@ export default function Payments() {
           <CardContent className='space-y-3'>
             <div className='py-4 text-center'>
               <div>
-                <div className='flex items-center justify-center gap-3 text-3xl font-bold'>
-                  {selectedTokenData ? (
-                    <span className='relative flex items-center gap-2'>
-                      {paymentData.amount} {selectedTokenData.symbol}
-                      <CopyButton
-                        text={`${paymentData.amount} ${selectedTokenData.symbol}`}
-                      />
-                    </span>
-                  ) : (
-                    <>Select currency</>
-                  )}
-                </div>
-                <div className='mt-1 text-sm'>
-                  <Badge variant='secondary'>
-                    Network:{' '}
-                    {selectedNetworkData
-                      ? selectedNetworkData.displayName
-                      : '-'}
-                  </Badge>
-                </div>
+                {selectedTokenData && selectedNetworkData ? (
+                  // Show token amount with copy button when both token and network are selected
+                  <>
+                    <div className='flex items-center justify-center gap-3 text-3xl font-bold'>
+                      <span className='relative flex items-center gap-2'>
+                        {paymentData.depositDetails?.amount}{' '}
+                        {selectedTokenData.symbol}
+                        <CopyButton
+                          text={`${paymentData.amount} ${selectedTokenData.symbol}`}
+                        />
+                      </span>
+                    </div>
+                    <div className='mt-1 text-sm'>
+                      <Badge variant='secondary'>
+                        Network: {selectedNetworkData.displayName}
+                      </Badge>
+                    </div>
+                    <div className='text-muted-foreground mt-1 text-sm'>
+                      ≈ {paymentData.currency} {paymentData.amount}
+                    </div>
+                  </>
+                ) : (
+                  // Show currency amount when no token/network selected yet
+                  <div className='flex items-center justify-center gap-3 text-3xl font-bold'>
+                    {paymentData.currency} {paymentData.amount}
+                  </div>
+                )}
               </div>
             </div>
             <Separator />

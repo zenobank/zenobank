@@ -33,6 +33,13 @@ export class DepositDetailsDto {
   currencyId: string;
 
   @Expose()
+  @IsString()
+  @ApiProperty({
+    example: '100',
+  })
+  amount: string;
+
+  @Expose()
   @IsEnum(NetworkId)
   @ApiProperty({
     example: NetworkId.ARBITRUM_MAINNET,
@@ -103,12 +110,13 @@ export class PaymentResponseDto {
   static fromPrisma(payment: PaymentWithAddress): PaymentResponseDto {
     return plainToInstance(PaymentResponseDto, {
       ...payment,
-      amount: payment.fiatAmount?.toString() ?? '0',
+      amount: payment.amount,
       paymentUrl: getPaymentUrl(payment.id),
       depositDetails:
         payment.depositWalletAddress && payment.tokenId && payment.networkId
           ? plainToInstance(DepositDetailsDto, {
               address: payment.depositWalletAddress,
+              amount: payment.tokenAmount,
               currencyId: payment.tokenId,
               networkId: payment.networkId,
             })
