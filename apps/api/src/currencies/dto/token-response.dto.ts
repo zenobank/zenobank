@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { NetworkId, TokenStandard } from '@prisma/client';
+import { TokenStandard } from '@prisma/client';
+import { NetworkId } from 'src/networks/network.interface';
 import { Expose } from 'class-transformer';
 import { IsBoolean, IsEnum, IsInt, IsString, Min } from 'class-validator';
 

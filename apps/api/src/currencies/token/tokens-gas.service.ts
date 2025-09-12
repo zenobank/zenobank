@@ -3,7 +3,7 @@ import { publicClients } from 'src/lib/contants/client';
 import { parsePercent } from 'src/lib/utils/percent';
 import { PublicClient, encodeFunctionData, erc20Abi } from 'viem';
 import { isNativeToken } from '../lib/utils';
-import { NetworkId } from '@prisma/client';
+import { NetworkId } from 'src/networks/network.interface';
 
 @Injectable()
 export class TokenGasService {

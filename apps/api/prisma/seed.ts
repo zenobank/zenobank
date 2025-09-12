@@ -1,9 +1,5 @@
-import {
-  PrismaClient,
-  NetworkId,
-  NetworkType,
-  TokenStandard,
-} from '@prisma/client';
+import { PrismaClient, NetworkType, TokenStandard } from '@prisma/client';
+import { NetworkId } from 'src/networks/network.interface';
 
 const prisma = new PrismaClient();
 
@@ -15,6 +11,7 @@ async function seedNetworks() {
         networkType: NetworkType.EVM,
         name: 'Ethereum Mainnet',
         displayName: 'Ethereum',
+        isTestnet: false,
         depositConfirmations: 12,
         avgBlockTime: 12,
       },
@@ -23,6 +20,7 @@ async function seedNetworks() {
         networkType: NetworkType.EVM,
         name: 'Base Mainnet',
         displayName: 'Base',
+        isTestnet: false,
         depositConfirmations: 12,
         avgBlockTime: 12,
       },
@@ -31,6 +29,7 @@ async function seedNetworks() {
         networkType: NetworkType.EVM,
         name: 'Arbitrum Mainnet',
         displayName: 'Arbitrum',
+        isTestnet: false,
         depositConfirmations: 12,
         avgBlockTime: 12,
       },
@@ -40,6 +39,15 @@ async function seedNetworks() {
         name: 'Ethereum Holesky',
         isTestnet: true,
         displayName: 'Ethereum Holesky',
+        depositConfirmations: 12,
+        avgBlockTime: 12,
+      },
+      {
+        id: NetworkId.ETHEREUM_SEPOLIA,
+        networkType: NetworkType.EVM,
+        name: 'Ethereum Sepolia',
+        isTestnet: true,
+        displayName: 'Ethereum Sepolia',
         depositConfirmations: 12,
         avgBlockTime: 12,
       },

@@ -1,21 +1,23 @@
 import { Injectable } from '@nestjs/common';
 import { BlockchainAdapter } from './blockchain-adapter.interface';
 import { EvmAdapter } from './evm.adapter';
-import { NetworkId } from '@prisma/client';
+import { NetworkId } from 'src/networks/network.interface';
 
 @Injectable()
 export class BlockchainAdapterFactory {
   constructor() {}
 
-  getAdapter(network: NetworkId): BlockchainAdapter {
-    switch (network) {
+  getAdapter(networkId: NetworkId): BlockchainAdapter {
+    switch (networkId) {
       case NetworkId.ETHEREUM_MAINNET:
       case NetworkId.BASE_MAINNET:
       case NetworkId.ARBITRUM_MAINNET:
       case NetworkId.ETHEREUM_HOLESKY:
-        return new EvmAdapter(network);
+      case NetworkId.ETHEREUM_SEPOLIA:
+        return new EvmAdapter(networkId);
       default:
-        throw new Error(`No adapter found for network: ${network}`);
+        const _exhaustiveCheck: never = networkId;
+        throw new Error(`No adapter found for network: ${networkId}`);
     }
   }
 }

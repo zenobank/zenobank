@@ -1,6 +1,5 @@
 import { Controller, Get, Post } from '@nestjs/common';
 import { WalletService } from './services/wallet.service';
-import { NetworkId } from '@prisma/client';
 import { WalletFactory } from './wallet.factory';
 import { client } from 'src/lib/utils/client';
 import {
@@ -13,6 +12,7 @@ import {
 import { arbitrum } from 'viem/chains';
 import { validationMetadatasToSchemas } from 'class-validator-jsonschema';
 import { AlchemyService } from 'src/alchemy/alchemy.service';
+import { NetworkId } from 'src/networks/network.interface';
 
 @Controller('wallet')
 export class WalletController {
@@ -21,6 +21,15 @@ export class WalletController {
     private readonly walletFactory: WalletFactory,
     private readonly alchemyService: AlchemyService,
   ) {}
+
+  @Post('')
+  async createWallet(): Promise<any> {
+    const wallet = await this.walletService.createWallet({
+      networkId: NetworkId.ETHEREUM_SEPOLIA,
+      label: 'test',
+    });
+    return wallet;
+  }
 
   @Get('validator-schema')
   async getValidatorSchema(): Promise<any> {
@@ -32,8 +41,8 @@ export class WalletController {
   @Post('test-suscribe-to-webhook')
   async suscribeToWebhook() {
     return this.alchemyService.suscribeAddressToWebhook({
-      address: '0x0766991DC00D109386D6e0685AE46BD307320e4b',
-      network: NetworkId.BASE_MAINNET,
+      address: '0x4b7673AB39733493a44695b37b2C7DF814A28d1B',
+      network: NetworkId.ETHEREUM_SEPOLIA,
     });
   }
 

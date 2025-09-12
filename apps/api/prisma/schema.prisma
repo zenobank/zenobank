@@ -17,8 +17,8 @@ model Wallet {
   id      String @id @default(uuid())
   address String
 
-  networkId NetworkId
-  network   Network   @relation(fields: [networkId], references: [id])
+  networkId String
+  network   Network @relation(fields: [networkId], references: [id])
 
   privateKey String
   label      String?
@@ -63,8 +63,8 @@ model Payment {
   tokenId String?
   token   Token?  @relation(fields: [tokenId], references: [id])
 
-  networkId NetworkId?
-  network   Network?   @relation(fields: [networkId], references: [id])
+  networkId String?
+  network   Network? @relation(fields: [networkId], references: [id])
 
   transactionId String?      @unique
   transaction   Transaction? @relation(name: "PaymentTx", fields: [transactionId], references: [id])
@@ -81,19 +81,12 @@ enum TokenStandard {
   SPL
 }
 
-enum NetworkId {
-  ETHEREUM_MAINNET
-  BASE_MAINNET
-  ARBITRUM_MAINNET
-  ETHEREUM_HOLESKY
-}
-
 model Network {
-  id          NetworkId   @id
+  id          String      @id
   networkType NetworkType
   name        String      @unique
   displayName String
-  isTestnet   Boolean     @default(false)
+  isTestnet   Boolean
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
 
@@ -117,10 +110,10 @@ model Token {
   symbol       String
   isDeprecated Boolean       @default(false)
 
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  network   Network   @relation(fields: [networkId], references: [id])
-  networkId NetworkId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  network   Network  @relation(fields: [networkId], references: [id])
+  networkId String
 
   transactions Transaction[]
   payments     Payment[]
@@ -151,8 +144,8 @@ model Transaction {
   title       String
   description String?
 
-  networkId NetworkId
-  network   Network   @relation(fields: [networkId], references: [id])
+  networkId String
+  network   Network @relation(fields: [networkId], references: [id])
 
   confirmations Int               @default(0)
   status        TransactionStatus @default(PENDING)
@@ -199,8 +192,8 @@ model ActivityWebhook {
 
   providerId WebhookProvider
 
-  networkId NetworkId
-  network   Network   @relation(fields: [networkId], references: [id])
+  networkId String
+  network   Network @relation(fields: [networkId], references: [id])
 
   currentSize Int @default(0)
   maxSize     Int
