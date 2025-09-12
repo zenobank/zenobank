@@ -19,7 +19,7 @@ export class PaymentController {
 
   @Get('test')
   async test() {
-    const amount = await Convert(15).from('USD').to('EUR');
+    const amount = await Convert(15).from('USD').to('USD');
     console.log('Converted:', amount);
     return { amount };
   }

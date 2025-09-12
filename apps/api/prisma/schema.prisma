@@ -47,11 +47,11 @@ model Payment {
   title       String?
   description String?
 
-  fiatCurrency String
-  fiatAmount   Decimal
+  currency String
+  amount   String
 
-  tokenAmount       Decimal?
-  tokenAmountFilled Decimal  @default(0)
+  tokenAmount       String?
+  tokenAmountFilled String  @default("0")
 
   notifyUrl String
   orderId   String        @unique
