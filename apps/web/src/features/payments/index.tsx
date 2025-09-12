@@ -208,7 +208,9 @@ export default function Payments() {
           <CardContent className='space-y-3'>
             <div className='py-4 text-center'>
               <div>
-                {selectedTokenData && selectedNetworkData ? (
+                {checkoutState === CheckoutState.AWAITING_DEPOSIT &&
+                selectedTokenData &&
+                selectedNetworkData ? (
                   // Show token amount with copy button when both token and network are selected
                   <>
                     <div className='flex items-center justify-center gap-3 text-3xl font-bold'>
@@ -216,7 +218,7 @@ export default function Payments() {
                         {paymentData.depositDetails?.amount}{' '}
                         {selectedTokenData.symbol}
                         <CopyButton
-                          text={`${paymentData.amount} ${selectedTokenData.symbol}`}
+                          text={`${paymentData.depositDetails?.amount} ${selectedTokenData.symbol}`}
                         />
                       </span>
                     </div>
@@ -224,9 +226,6 @@ export default function Payments() {
                       <Badge variant='secondary'>
                         Network: {selectedNetworkData.displayName}
                       </Badge>
-                    </div>
-                    <div className='text-muted-foreground mt-1 text-sm'>
-                      ≈ {paymentData.currency} {paymentData.amount}
                     </div>
                   </>
                 ) : (

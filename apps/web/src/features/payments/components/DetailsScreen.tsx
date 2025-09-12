@@ -9,12 +9,9 @@ export default function PaymentDetails({
   return (
     <div className='space-y-4'>
       <div className='mx-auto flex w-full flex-col items-center justify-center'>
-        <span className='text-muted-foreground'>Send funds to</span>
+        <span className='text-muted-foreground'>Send exact amount to</span>
         <div className='relative flex items-center justify-between text-sm'>
-          <span className='font-medium'>
-            {walletAddress.slice(0, 6)}...
-            {walletAddress.slice(-6)}
-          </span>
+          <span className='font-medium'>{walletAddress}</span>
           <CopyButton text={walletAddress} />
         </div>
       </div>
