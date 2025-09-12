@@ -1,5 +1,5 @@
 import { IsString, IsOptional, IsEnum } from 'class-validator';
-import { NetworkId } from '@prisma/client';
+import { NetworkId } from 'src/networks/network.interface';
 
 export class CreateWalletDto {
   @IsEnum(NetworkId)

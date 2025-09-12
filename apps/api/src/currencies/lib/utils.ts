@@ -1,4 +1,4 @@
-import { NetworkId } from '@prisma/client';
+import { NetworkId } from 'src/networks/network.interface';
 
 export function isNativeToken(tokenAddress: string, network: NetworkId) {
   throw new Error('Not implemented');

@@ -1,5 +1,5 @@
 import { BlockchainAdapterFactory } from './blockchain-adapter.factory';
-import { NetworkId } from '@prisma/client';
+import { NetworkId } from 'src/networks/network.interface';
 
 describe('BlockchainAdapterFactory', () => {
   let factory: BlockchainAdapterFactory;

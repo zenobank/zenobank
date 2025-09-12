@@ -1,6 +1,6 @@
 import { BlockchainAdapter } from './blockchain-adapter.interface';
 import { client } from 'src/lib/utils/client';
-import { NetworkId } from '@prisma/client';
+import { NetworkId } from 'src/networks/network.interface';
 import { OnChainTxStatus } from '../lib/types';
 
 export class EvmAdapter implements BlockchainAdapter {

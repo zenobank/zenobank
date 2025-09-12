@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { NetworkId } from '@prisma/client';
+import { NetworkId } from 'src/networks/network.interface';
 import { generatePrivateKey, privateKeyToAddress } from 'viem/accounts';
 
 @Injectable()
@@ -13,9 +13,11 @@ export class WalletFactory {
       case NetworkId.BASE_MAINNET:
       case NetworkId.ETHEREUM_HOLESKY:
       case NetworkId.ETHEREUM_MAINNET:
+      case NetworkId.ETHEREUM_SEPOLIA:
         return this.generateEvmAddress();
 
       default:
+        const _exhaustiveCheck: never = networkId;
         throw new Error(`Unsupported address type: ${networkId}`);
     }
   }

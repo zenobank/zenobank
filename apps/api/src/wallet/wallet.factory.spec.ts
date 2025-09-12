@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { WalletFactory } from './wallet.factory';
-import { NetworkId } from '@prisma/client';
+import { NetworkId } from 'src/networks/network.interface';
 
 describe('WalletFactory', () => {
   let walletFactory: WalletFactory;

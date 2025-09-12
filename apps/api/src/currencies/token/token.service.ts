@@ -5,7 +5,8 @@ import { requestWithRepeatDelay } from 'src/lib/utils/request-with-repeat-delay'
 import { erc20Abi } from 'viem';
 import { isNativeToken, nativeTokenAddress } from '../lib/utils';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { NetworkId, Token } from '@prisma/client';
+import { Token } from '@prisma/client';
+import { NetworkId } from 'src/networks/network.interface';
 import { plainToInstance } from 'class-transformer';
 import { TokenResponseDto } from '../dto/token-response.dto';
 

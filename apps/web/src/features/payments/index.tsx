@@ -215,7 +215,9 @@ export default function Payments() {
                   <>
                     <div className='flex items-center justify-center gap-3 text-3xl font-bold'>
                       <span className='relative flex items-center gap-2'>
-                        {paymentData.depositDetails?.amount}{' '}
+                        <span className='select-all'>
+                          {paymentData.depositDetails?.amount}
+                        </span>{' '}
                         {selectedTokenData.symbol}
                         <CopyButton
                           text={`${paymentData.depositDetails?.amount} ${selectedTokenData.symbol}`}

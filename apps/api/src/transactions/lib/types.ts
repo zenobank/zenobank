@@ -1,4 +1,4 @@
-import { NetworkId } from '@prisma/client';
+import { NetworkId } from 'src/networks/network.interface';
 
 export interface TxIdentifier {
   hash: string;

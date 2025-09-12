@@ -1,5 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { ActivityWebhook, NetworkId, WebhookProvider } from '@prisma/client';
+import { ActivityWebhook, WebhookProvider } from '@prisma/client';
+import { NetworkId } from 'src/networks/network.interface';
 import { Alchemy, Network, WebhookType } from 'alchemy-sdk';
 import { PrismaService } from 'src/prisma/prisma.service';
 import {
@@ -21,6 +22,9 @@ export class AlchemyService {
 
   async handleReceivedWebhook(body: WebhookActivityDto) {
     console.log(body);
+    // aquí veo la chain y el token
+    // busco un pago con esa cantidad exacta a esa wallet, lo pongo como completado
+
     // primer ver porque no se valida
     // ahora, una vez que me llega, tengo la tx, tengo que añadirla a la cola y a la db para las confirmaciones
     // ver dashboard de alchemy si llega o no

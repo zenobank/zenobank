@@ -1,7 +1,7 @@
 import { Account, createPublicClient, PublicClient } from 'viem';
-import { arbitrum, base, holesky, mainnet } from 'viem/chains';
+import { arbitrum, base, holesky, mainnet, sepolia } from 'viem/chains';
 import { http } from 'viem';
-import { NetworkId } from '@prisma/client';
+import { NetworkId } from 'src/networks/network.interface';
 
 export const publicClients: Record<NetworkId, PublicClient> = {
   [NetworkId.ETHEREUM_MAINNET]: createPublicClient({
@@ -27,6 +27,13 @@ export const publicClients: Record<NetworkId, PublicClient> = {
   }) as PublicClient,
   [NetworkId.ETHEREUM_HOLESKY]: createPublicClient({
     chain: holesky,
+    transport: http(),
+    batch: {
+      multicall: true,
+    },
+  }) as PublicClient,
+  [NetworkId.ETHEREUM_SEPOLIA]: createPublicClient({
+    chain: sepolia,
     transport: http(),
     batch: {
       multicall: true,
