@@ -15,7 +15,7 @@ enum NetworkType {
 
 model Wallet {
   id      String @id @default(uuid())
-  address String
+  address String @db.Citext
 
   networkId String
   network   Network @relation(fields: [networkId], references: [id])
@@ -36,7 +36,7 @@ model Wallet {
 enum PaymentStatus {
   PENDING
   UNDER_PAYMENT
-  SUCCESS
+  COMPLETED
   EXPIRED
   CANCELLED
 }
@@ -105,7 +105,7 @@ model Token {
   canonicalTokenId String
 
   standard     TokenStandard
-  address      String
+  address      String        @db.Citext
   decimals     Int
   symbol       String
   isDeprecated Boolean       @default(false)
@@ -138,8 +138,8 @@ model Transaction {
   id   String @id @default(uuid())
   hash String
 
-  fromAddress String
-  toAddress   String
+  fromAddress String @db.Citext
+  toAddress   String @db.Citext
 
   title       String
   description String?

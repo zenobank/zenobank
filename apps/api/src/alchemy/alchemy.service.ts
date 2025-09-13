@@ -1,33 +1,110 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { ActivityWebhook, WebhookProvider } from '@prisma/client';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  Logger,
+  UnauthorizedException,
+} from '@nestjs/common';
+import {
+  ActivityWebhook,
+  PaymentStatus,
+  WebhookProvider,
+} from '@prisma/client';
 import { NetworkId } from 'src/networks/network.interface';
-import { Alchemy, Network, WebhookType } from 'alchemy-sdk';
+import {
+  AddressActivityResponse,
+  AddressActivityWebhook,
+  Alchemy,
+  Network as AlchemyNetwork,
+  WebhookType as AlchemyWebhookType,
+} from 'alchemy-sdk';
 import { PrismaService } from 'src/prisma/prisma.service';
 import {
   ALCHEMY_MAX_ACTIVITY_WEBHOOK_SIZE,
   ALCHEMY_SDK,
   ALCHEMY_WEBHOOK_RECEIVER_PATH,
-} from './lib/constants';
+} from './lib/alchemy.constants';
 import { Env, getEnv } from 'src/lib/utils/env';
 import { WebhookActivityDto } from './dto/webhook-activity.dto';
-import { NETWORK_TO_ALCHEMY_MAP } from './lib/network-map';
+import {
+  ALCHEMY_TO_NETWORK_MAP,
+  NETWORK_TO_ALCHEMY_MAP,
+} from './lib/alchemy.network-map';
 import { TX_CONFIRMATION_QUEUE_NAME } from 'src/transactions/lib/constants';
+import * as crypto from 'crypto';
+import { formatUnits, hexToBigInt } from 'viem';
+import { AddressActivityWebhookResponse } from './lib/alchemy.interface';
+import { isNumber } from 'class-validator';
 
 @Injectable()
 export class AlchemyService {
+  private readonly logger = new Logger(AlchemyService.name);
   constructor(
     private readonly db: PrismaService,
     @Inject(ALCHEMY_SDK) private readonly alchemy: Alchemy,
   ) {}
 
-  async handleReceivedWebhook(body: WebhookActivityDto) {
-    console.log(body);
-    // aquí veo la chain y el token
-    // busco un pago con esa cantidad exacta a esa wallet, lo pongo como completado
+  async processAddressActivityWebhook(body: AddressActivityWebhookResponse) {
+    if (body.type !== AlchemyWebhookType.ADDRESS_ACTIVITY) {
+      this.logger.warn('Webhook type is not address activity', { body });
+      return;
+    }
+    const network = ALCHEMY_TO_NETWORK_MAP[body.event.network];
+    const supportedTokens = await this.db.token.findMany({
+      where: {
+        networkId: network,
+      },
+    });
+    const supportedTokensAddresses = supportedTokens.map((t) =>
+      t.address.toLowerCase(),
+    );
 
-    // primer ver porque no se valida
-    // ahora, una vez que me llega, tengo la tx, tengo que añadirla a la cola y a la db para las confirmaciones
-    // ver dashboard de alchemy si llega o no
+    const filteredActivities = body.event.activity
+      .filter((a) => a.erc721TokenId == null && a.erc1155Metadata == null)
+      .filter((a) => a.category === 'token')
+      .filter((a) =>
+        supportedTokensAddresses.includes(
+          a.rawContract?.address?.toLowerCase() ?? '',
+        ),
+      )
+      .filter((a) => a.log?.removed === false);
+
+    for (const activity of filteredActivities) {
+      const tokenAmount = activity.value;
+      const tokenId = supportedTokens.find(
+        (t) =>
+          t.address.toLowerCase() ===
+          activity.rawContract?.address?.toLowerCase(),
+      )?.id;
+      if (!tokenId || !activity.toAddress || !tokenAmount) {
+        this.logger.error('Invalid activity', { activity });
+        continue;
+      }
+      if (isNumber(tokenAmount) && tokenAmount <= 0) {
+        this.logger.error('Invalid token amount', { activity });
+        continue;
+      }
+      const payment = await this.db.payment.findFirst({
+        where: {
+          tokenAmount: tokenAmount.toString(),
+          tokenId: tokenId,
+          networkId: network,
+          depositWallet: {
+            address: activity.toAddress,
+            networkId: network,
+          },
+          status: PaymentStatus.PENDING,
+        },
+      });
+      if (payment) {
+        this.logger.log(`Updating payment ${payment.id} status to completed`);
+        await this.db.payment.update({
+          where: { id: payment.id },
+          data: { status: PaymentStatus.COMPLETED },
+        });
+      }
+    }
+
     return { received: true };
   }
 
@@ -54,7 +131,7 @@ export class AlchemyService {
   ): Promise<ActivityWebhook> {
     const alchemyWebhook = await this.alchemy.notify.createWebhook(
       getEnv(Env.API_BASE_URL) + ALCHEMY_WEBHOOK_RECEIVER_PATH,
-      WebhookType.ADDRESS_ACTIVITY,
+      AlchemyWebhookType.ADDRESS_ACTIVITY,
       {
         network: NETWORK_TO_ALCHEMY_MAP[network],
         addresses: [address],

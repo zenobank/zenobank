@@ -1,7 +1,7 @@
 import { NetworkId } from 'src/networks/network.interface';
 import { Transform } from 'class-transformer';
 import { IsEnum, IsString } from 'class-validator';
-import { ALCHEMY_TO_NETWORK_MAP } from '../lib/network-map';
+import { ALCHEMY_TO_NETWORK_MAP } from '../lib/alchemy.network-map';
 
 export class WebhookActivityDto {
   @IsString()

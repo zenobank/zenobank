@@ -10,7 +10,7 @@ export const getPaymentCheckoutState = (
   payment: PaymentResponseDto
 ): CheckoutState => {
   if (!payment.depositDetails) return CheckoutState.AWAITING_SELECTION
-  if (payment.status === PaymentStatus.SUCCESS) return CheckoutState.SUCCESS
+  if (payment.status === PaymentStatus.COMPLETED) return CheckoutState.COMPLETED
   if (payment.status === PaymentStatus.CANCELLED) return CheckoutState.EXPIRED
   if (
     payment.status === PaymentStatus.EXPIRED ||

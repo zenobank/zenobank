@@ -3,13 +3,15 @@ import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as express from 'express';
 import { ClassSerializerInterceptor, VersioningType } from '@nestjs/common';
+import { ALCHEMY_WEBHOOK_RECEIVER_PATH } from './alchemy/lib/alchemy.constants';
+import { Request, Response, NextFunction } from 'express';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   // Enable CORS
   app.enableCors({
-    origin: true, // Allow all origins in development
+    origin: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
     credentials: true,
@@ -35,9 +37,9 @@ async function bootstrap() {
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
-  // quicknode webhook validation
-  app.use('/api/v1/providers/quicknode/webhook', express.raw({ type: '*/*' }));
-  app.use((req, res, next) => {
+  // alchemy webhook validation
+  app.use(ALCHEMY_WEBHOOK_RECEIVER_PATH, express.raw({ type: '*/*' }));
+  app.use((req: Request, res: Response, next: NextFunction) => {
     res.removeHeader('X-Powered-By');
     next();
   });

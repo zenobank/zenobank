@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AlchemyService } from './alchemy.service';
-import { ALCHEMY_SDK } from './lib/constants';
+import { ALCHEMY_SDK } from './lib/alchemy.constants';
 import { Alchemy } from 'alchemy-sdk';
 import { Env, getEnv } from 'src/lib/utils/env';
 import { PrismaModule } from 'src/prisma/prisma.module';
