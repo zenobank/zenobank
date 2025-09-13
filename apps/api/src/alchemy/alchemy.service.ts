@@ -1,23 +1,11 @@
-import {
-  BadRequestException,
-  Inject,
-  Injectable,
-  Logger,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import {
   ActivityWebhook,
   PaymentStatus,
   WebhookProvider,
 } from '@prisma/client';
 import { NetworkId } from 'src/networks/network.interface';
-import {
-  AddressActivityResponse,
-  AddressActivityWebhook,
-  Alchemy,
-  Network as AlchemyNetwork,
-  WebhookType as AlchemyWebhookType,
-} from 'alchemy-sdk';
+import { Alchemy, WebhookType as AlchemyWebhookType } from 'alchemy-sdk';
 import { PrismaService } from 'src/prisma/prisma.service';
 import {
   ALCHEMY_MAX_ACTIVITY_WEBHOOK_SIZE,
@@ -25,14 +13,10 @@ import {
   ALCHEMY_WEBHOOK_RECEIVER_PATH,
 } from './lib/alchemy.constants';
 import { Env, getEnv } from 'src/lib/utils/env';
-import { WebhookActivityDto } from './dto/webhook-activity.dto';
 import {
   ALCHEMY_TO_NETWORK_MAP,
   NETWORK_TO_ALCHEMY_MAP,
 } from './lib/alchemy.network-map';
-import { TX_CONFIRMATION_QUEUE_NAME } from 'src/transactions/lib/constants';
-import * as crypto from 'crypto';
-import { formatUnits, hexToBigInt } from 'viem';
 import { AddressActivityWebhookResponse } from './lib/alchemy.interface';
 import { isNumber } from 'class-validator';
 
@@ -50,6 +34,10 @@ export class AlchemyService {
       return;
     }
     const network = ALCHEMY_TO_NETWORK_MAP[body.event.network];
+    if (!network) {
+      this.logger.error(`Invalid network ${body.event.network}`);
+      return;
+    }
     const supportedTokens = await this.db.token.findMany({
       where: {
         networkId: network,
@@ -68,7 +56,7 @@ export class AlchemyService {
         ),
       )
       .filter((a) => a.log?.removed === false);
-
+    this.logger.log(`Filtered activities length ${filteredActivities.length}`);
     for (const activity of filteredActivities) {
       const tokenAmount = activity.value;
       const tokenId = supportedTokens.find(
@@ -102,6 +90,16 @@ export class AlchemyService {
           where: { id: payment.id },
           data: { status: PaymentStatus.COMPLETED },
         });
+      } else {
+        this.logger.warn(
+          `Payment not found ${JSON.stringify({
+            tokenAmount,
+            tokenId,
+            depositWallet: activity.toAddress,
+            networkId: network,
+            tokenAddress: activity.rawContract?.address,
+          })}`,
+        );
       }
     }
 
