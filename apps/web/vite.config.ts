@@ -3,14 +3,6 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react-swc'
 import tailwindcss from '@tailwindcss/vite'
 import { tanstackRouter } from '@tanstack/router-plugin/vite'
-import { createHash } from 'crypto'
-
-globalThis.crypto = {
-  ...globalThis.crypto,
-  hash: (alg: string) => createHash(alg),
-} as typeof globalThis.crypto & {
-  hash: (alg: string) => ReturnType<typeof createHash>
-}
 
 // https://vite.dev/config/
 export default defineConfig({
