@@ -4,8 +4,7 @@
   "description": "",
   "private": true,
   "scripts": {
-    "prebuild": "pnpm p:push && prisma generate",
-    "build": "nest build",
+    "build": "prisma migrate deploy && nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "tunel": "lt -s dkfjadskfjaercl --port 3001",
