@@ -15,7 +15,7 @@ enum NetworkType {
 
 model Wallet {
   id      String @id @default(uuid())
-  address String @db.Citext
+  address String
 
   networkId String
   network   Network @relation(fields: [networkId], references: [id])
@@ -105,7 +105,7 @@ model Token {
   canonicalTokenId String
 
   standard     TokenStandard
-  address      String        @db.Citext
+  address      String
   decimals     Int
   symbol       String
   isDeprecated Boolean       @default(false)
@@ -138,8 +138,8 @@ model Transaction {
   id   String @id @default(uuid())
   hash String
 
-  fromAddress String @db.Citext
-  toAddress   String @db.Citext
+  fromAddress String
+  toAddress   String
 
   title       String
   description String?

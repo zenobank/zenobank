@@ -6,4 +6,14 @@
  * OpenAPI spec version: 1.0
  */
 
-export type NetworkResponseDtoId = { [key: string]: unknown };
+export type NetworkResponseDtoId = typeof NetworkResponseDtoId[keyof typeof NetworkResponseDtoId];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NetworkResponseDtoId = {
+  ETHEREUM_MAINNET: 'ETHEREUM_MAINNET',
+  BASE_MAINNET: 'BASE_MAINNET',
+  ARBITRUM_MAINNET: 'ARBITRUM_MAINNET',
+  ETHEREUM_HOLESKY: 'ETHEREUM_HOLESKY',
+  ETHEREUM_SEPOLIA: 'ETHEREUM_SEPOLIA',
+} as const;

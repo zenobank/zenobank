@@ -80,12 +80,12 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
                 <PasswordInput placeholder='********' {...field} />
               </FormControl>
               <FormMessage />
-              <Link
+              {/* <Link
                 to='/forgot-password'
                 className='text-muted-foreground absolute -top-0.5 right-0 text-sm font-medium hover:opacity-75'
               >
                 Forgot password?
-              </Link>
+              </Link> */}
             </FormItem>
           )}
         />
