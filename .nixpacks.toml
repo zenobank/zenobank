@@ -1,0 +1,6 @@
+[build]
+# Directorios o archivos a ignorar en el build
+ignore = [
+  "apps/wordpress/wp_data",
+  "apps/wordpress/wp_data/**"
+]
