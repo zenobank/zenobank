@@ -1,6 +1,5 @@
 import { createFileRoute, Link, Outlet } from '@tanstack/react-router'
 import { ClerkFullLogo } from '@/assets/clerk-full-logo'
-import { LearnMore } from '@/components/learn-more'
 
 export const Route = createFileRoute('/(auth)')({
   component: ClerkAuthLayout,

@@ -7,15 +7,6 @@ export class Env {
   @IsString()
   API_BASE_URL: string;
 
-  static readonly QUICKNODE_API_KEY = 'QUICKNODE_API_KEY';
-  @IsString()
-  QUICKNODE_API_KEY: string;
-
-  static readonly QUICKNODE_WEBHOOK_SECURITY_TOKEN =
-    'QUICKNODE_WEBHOOK_SECURITY_TOKEN';
-  @IsString()
-  QUICKNODE_WEBHOOK_SECURITY_TOKEN: string;
-
   static readonly DATABASE_URL = 'DATABASE_URL';
   @IsString()
   DATABASE_URL: string;
