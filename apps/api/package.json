@@ -4,7 +4,7 @@
   "description": "",
   "private": true,
   "scripts": {
-    "prebuild": "pnpm p:generate",
+    "prebuild": "prisma generate --schema apps/api/prisma/schema.prisma",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
@@ -48,6 +48,9 @@
     "swagger-ui-express": "^5.0.1",
     "uuid": "^11.1.0",
     "viem": "^2.33.2"
+  },
+  "engines": {
+    "node": "20.11.1"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",
