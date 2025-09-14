@@ -20,7 +20,6 @@ export * from './tokenResponseDto';
 export * from './tokenResponseDtoNetworkId';
 export * from './tokenResponseDtoStandard';
 export * from './updateDepositSelectionDto';
+export * from './walletControllerCreateWalletV1201';
 export * from './walletControllerGetValidatorSchemaV1200';
 export * from './walletControllerTestV1200';
-export * from './webhookActivityDto';
-export * from './webhookActivityDtoNetwork';

@@ -452,7 +452,7 @@ export default function Payments() {
                 />
               )}
 
-            {checkoutState === CheckoutState.SUCCESS && <SuccessScreen />}
+            {checkoutState === CheckoutState.COMPLETED && <SuccessScreen />}
 
             {checkoutState === CheckoutState.EXPIRED && <ExpiredScreen />}
           </CardContent>

@@ -6,4 +6,4 @@
  * OpenAPI spec version: 1.0
  */
 
-export type WebhookActivityDtoNetwork = { [key: string]: unknown };
+export type WalletControllerCreateWalletV1201 = { [key: string]: unknown };
