@@ -230,7 +230,7 @@ class WP_HTML_Decoder {
 		 * to `&#x1f1` it will encode `Ǳ`. It does not:
 		 *  - know how to parse the original `🅰`.
 		 *  - fail to parse and return plaintext `&#x1f1`.
-		 *  - fail to parse and return the replacement character `�`
+		 *  - fail to parse and return the replacement character ``
 		 */
 		if ( '#' === $text[ $at + 1 ] ) {
 			if ( $at + 2 >= $length ) {
@@ -266,13 +266,13 @@ class WP_HTML_Decoder {
 			// Whereas `&#` and only zeros is invalid.
 			if ( 0 === $digit_count ) {
 				$match_byte_length = $end_of_span - $at;
-				return '�';
+				return '';
 			}
 
 			// If there are too many digits then it's not worth parsing. It's invalid.
 			if ( $digit_count > $max_digits ) {
 				$match_byte_length = $end_of_span - $at;
-				return '�';
+				return '';
 			}
 
 			$digits     = substr( $text, $digits_at + $zero_count, $digit_count );
@@ -407,21 +407,21 @@ class WP_HTML_Decoder {
 	 *
 	 * This encoder implements the UTF-8 encoding algorithm for converting
 	 * a code point into a byte sequence. If it receives an invalid code
-	 * point it will return the Unicode Replacement Character U+FFFD `�`.
+	 * point it will return the Unicode Replacement Character U+FFFD ``.
 	 *
 	 * Example:
 	 *
 	 *     '🅰' === WP_HTML_Decoder::code_point_to_utf8_bytes( 0x1f170 );
 	 *
 	 *     // Half of a surrogate pair is an invalid code point.
-	 *     '�' === WP_HTML_Decoder::code_point_to_utf8_bytes( 0xd83c );
+	 *     '' === WP_HTML_Decoder::code_point_to_utf8_bytes( 0xd83c );
 	 *
 	 * @since 6.6.0
 	 *
 	 * @see https://www.rfc-editor.org/rfc/rfc3629 For the UTF-8 standard.
 	 *
 	 * @param int $code_point Which code point to convert.
-	 * @return string Converted code point, or `�` if invalid.
+	 * @return string Converted code point, or `` if invalid.
 	 */
 	public static function code_point_to_utf8_bytes( $code_point ): string {
 		// Pre-check to ensure a valid code point.
@@ -430,7 +430,7 @@ class WP_HTML_Decoder {
 			( $code_point >= 0xD800 && $code_point <= 0xDFFF ) ||
 			$code_point > 0x10FFFF
 		) {
-			return '�';
+			return '';
 		}
 
 		if ( $code_point <= 0x7F ) {
