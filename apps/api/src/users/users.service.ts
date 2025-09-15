@@ -9,7 +9,6 @@ import { WalletService } from 'src/wallet/services/wallet.service';
 export class UsersService {
   constructor(
     private readonly db: PrismaService,
-    @Inject(SVIX_CLIENT) private readonly svix: Svix,
     private readonly walletService: WalletService,
   ) {}
 

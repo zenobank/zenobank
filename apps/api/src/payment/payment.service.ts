@@ -31,7 +31,7 @@ export class PaymentService {
     private readonly db: PrismaService,
     private readonly tokenService: TokenService,
     private readonly networksService: NetworksService,
-    private readonly walletService: WalletService,
+
     @Inject(forwardRef(() => AlchemyService))
     private readonly alchemyService: AlchemyService,
   ) {}
