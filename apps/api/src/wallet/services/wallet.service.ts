@@ -1,5 +1,5 @@
 import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
-import { NetworkType, Wallet } from '@repo/db';
+import { NetworkType, Wallet } from '@prisma/client';
 import { WalletFactory } from 'src/wallet/wallet.factory';
 import { CreateWalletDto } from 'src/wallet/dto/create-wallet.dto';
 import { PrismaService } from 'src/prisma/prisma.service';

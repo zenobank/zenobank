@@ -5,10 +5,9 @@
   "tasks": {
   
     "build": {
-      "dependsOn": ["^build", "^db:generate"],
+      "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": ["dist/**", ".next/**", "!.next/cache/**"],
-      "env": ["DATABASE_URL"]
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
     },
     "lint": {
       "dependsOn": ["^lint"]
@@ -19,18 +18,7 @@
     "dev": {
       "cache": false,
       "persistent": true
-    },
-    
-    "db:generate": {
-      "cache": false
-    },
-     "db:migrate": {
-    "cache": false,
-    "persistent": true 
-    },
-  "db:deploy": {
-    "cache": false
-  }
+    }
     }
  
   

@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { PrismaClient, NetworkId } from '@repo/db';
+import { PrismaClient, NetworkId } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
