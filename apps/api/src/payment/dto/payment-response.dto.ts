@@ -12,6 +12,7 @@ import {
   IsEnum,
   IsISO4217CurrencyCode,
   IsDate,
+  IsUrl,
 } from 'class-validator';
 
 type PaymentWithAddress = Payment & {
@@ -104,6 +105,13 @@ export class PaymentResponseDto {
   @ApiProperty()
   paymentUrl: string;
 
+  @Expose()
+  @IsUrl()
+  @ApiProperty({
+    example: 'https://example.com/notify',
+  })
+  notifyUrl: string;
+
   constructor(partial: Partial<PaymentResponseDto>) {
     Object.assign(this, partial);
   }
@@ -111,14 +119,16 @@ export class PaymentResponseDto {
   static fromPrisma(payment: PaymentWithAddress): PaymentResponseDto {
     return plainToInstance(PaymentResponseDto, {
       ...payment,
-      amount: payment.amount,
+      amount: payment.priceAmount,
       paymentUrl: getPaymentUrl(payment.id),
       depositDetails:
-        payment.depositWalletAddress && payment.tokenId && payment.networkId
+        payment.depositWalletAddress &&
+        payment.payCurrencyId &&
+        payment.networkId
           ? plainToInstance(DepositDetailsDto, {
               address: payment.depositWalletAddress,
-              amount: payment.tokenAmount,
-              currencyId: payment.tokenId,
+              amount: payment.payAmount,
+              currencyId: payment.payCurrencyId,
               networkId: payment.networkId,
             })
           : null,

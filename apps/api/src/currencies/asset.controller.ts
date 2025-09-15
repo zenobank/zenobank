@@ -2,11 +2,11 @@ import { Controller, Get } from '@nestjs/common';
 import { TokenService } from './token/token.service';
 import { TokenResponseDto } from './dto/token-response.dto';
 
-@Controller('assets')
+@Controller('currencies')
 export class AssetController {
   constructor(private readonly tokenService: TokenService) {}
 
-  @Get('tokens')
+  @Get('')
   async getSupportedTokens(): Promise<TokenResponseDto[]> {
     return this.tokenService.getSupportedTokens();
   }

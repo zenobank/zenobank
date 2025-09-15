@@ -8,6 +8,6 @@
 
 export interface CreatePaymentDto {
   /** @minimum 1 */
-  amount: string;
-  currency: string;
+  priceAmount: string;
+  priceCurrency: string;
 }

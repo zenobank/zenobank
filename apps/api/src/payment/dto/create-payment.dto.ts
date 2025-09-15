@@ -13,12 +13,12 @@ export class CreatePaymentDto {
   @ApiProperty({
     example: '100',
   })
-  amount: string;
+  priceAmount: string;
 
   @IsNotEmpty()
   @IsISO4217CurrencyCode()
   @ApiProperty({
     example: 'USD',
   })
-  currency: string;
+  priceCurrency: string;
 }
