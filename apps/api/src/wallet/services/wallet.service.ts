@@ -4,7 +4,7 @@ import { CreateWalletDto } from 'src/wallet/dto/create-wallet.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { NetworkId } from 'src/networks/network.interface';
 import { AlchemyService } from 'src/alchemy/alchemy.service';
-import { Wallet, NetworkType } from '@db/client';
+import { Wallet, NetworkType } from '@prisma/client';
 
 @Injectable()
 export class WalletService {
