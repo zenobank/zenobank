@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Network, Token } from '@prisma/client';
+import { Network, Token } from '@repo/db';
 import { NetworkId } from 'src/networks/network.interface';
 import { IsEnum, IsString } from 'class-validator';
 

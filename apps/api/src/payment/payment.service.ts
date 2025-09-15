@@ -17,10 +17,9 @@ import { NetworksService } from 'src/networks/networks.service';
 import { WalletService } from 'src/wallet/services/wallet.service';
 import ms from 'src/lib/utils/ms';
 import { AlchemyService } from 'src/alchemy/alchemy.service';
-import { Payment, PaymentStatus } from '@prisma/client';
+import { Payment, PaymentStatus } from '@repo/db';
 import { NetworkId } from 'src/networks/network.interface';
 import { Convert } from 'easy-currencies';
-import { Decimal } from '@prisma/client/runtime/library';
 import { toBN } from 'src/lib/utils/numbers';
 import { isISO4217CurrencyCode, IsISO4217CurrencyCode } from 'class-validator';
 
@@ -43,7 +42,7 @@ export class PaymentService {
       data: {
         priceAmount,
         priceCurrency,
-        notifyUrl: ['https://example.com/notify'],
+        notifyUrl: 'https://example.com/notify',
         orderId: randomUUID(),
         expiredAt: new Date(Date.now() + ms('1h')),
       },

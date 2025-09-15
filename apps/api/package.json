@@ -4,14 +4,10 @@
   "description": "",
   "private": true,
   "scripts": {
-    "build": "pnpm p:push && pnpm p:generate && nest build",
+    "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "tunel": "lt -s dkfjadskfjaercl --port 3001",
-    "p:seed": "pnpm tsx prisma/seed.ts",
-    "p:generate": "pnpx prisma generate",
-    "p:push": "pnpx prisma db push",
-    "p:fix": "rm -rf node_modules/.prisma && rm -rf node_modules/@prisma/client && rm -rf ../../node_modules/.prisma && rm -rf ../../node_modules/@prisma/client && pnpm dlx prisma generate",
     "dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
@@ -30,7 +26,6 @@
     "@nestjs/mapped-types": "*",
     "@nestjs/platform-express": "^10.0.0",
     "@nestjs/swagger": "^11.2.0",
-    "@prisma/client": "^6.16.1",
     "@types/uuid": "^10.0.0",
     "alchemy-sdk": "^3.6.3",
     "axios": "^1.11.0",
@@ -41,13 +36,13 @@
     "class-validator-jsonschema": "^5.0.2",
     "dotenv": "^17.2.2",
     "easy-currencies": "^1.8.3",
-    "prisma": "^6.13.0",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
     "svix": "^1.76.1",
     "swagger-ui-express": "^5.0.1",
     "uuid": "^11.1.0",
-    "viem": "^2.33.2"
+    "viem": "^2.33.2",
+    "@repo/db": "workspace:*"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",
@@ -91,12 +86,5 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "@prisma/client",
-      "@prisma/engines",
-      "prisma"
-    ]
   }
 }
