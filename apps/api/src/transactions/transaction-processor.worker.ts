@@ -6,7 +6,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 
 import { BlockchainAdapterFactory } from 'src/blockchain/adapters/blockchain-adapter.factory';
 import { TxIdentifier } from './lib/types';
-import { Prisma, TransactionStatus } from '@db/client';
+import { Prisma, TransactionStatus } from '@prisma/client';
 import { now } from 'src/lib/utils/now';
 import { OnChainTxStatus } from 'src/blockchain/lib/types';
 import { buildTxSchedulerId } from './lib/utils';

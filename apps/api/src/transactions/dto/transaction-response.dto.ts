@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { TransactionStatus } from '@db/client';
+import { TransactionStatus } from '@prisma/client';
 import { IsEnum, IsNumber, IsString } from 'class-validator';
 
 export class TransactionResponseDto {
