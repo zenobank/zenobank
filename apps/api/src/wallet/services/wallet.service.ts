@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { NetworkType, Wallet } from '@prisma/client';
 import { WalletFactory } from 'src/wallet/wallet.factory';
 import { CreateWalletDto } from 'src/wallet/dto/create-wallet.dto';
@@ -12,6 +12,7 @@ export class WalletService {
 
   constructor(
     private readonly db: PrismaService,
+    @Inject(forwardRef(() => AlchemyService))
     private readonly alchemyService: AlchemyService,
   ) {}
 
