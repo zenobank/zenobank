@@ -17,7 +17,7 @@ import { NetworksService } from 'src/networks/networks.service';
 import { WalletService } from 'src/wallet/services/wallet.service';
 import ms from 'src/lib/utils/ms';
 import { AlchemyService } from 'src/alchemy/alchemy.service';
-import { Payment, PaymentStatus } from '@prisma/client';
+import { Payment, PaymentStatus } from '@db/client';
 import { NetworkId } from 'src/networks/network.interface';
 import { Convert } from 'easy-currencies';
 import { toBN } from 'src/lib/utils/numbers';

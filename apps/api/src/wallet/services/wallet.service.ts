@@ -1,10 +1,10 @@
 import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
-import { NetworkType, Wallet } from '@prisma/client';
 import { WalletFactory } from 'src/wallet/wallet.factory';
 import { CreateWalletDto } from 'src/wallet/dto/create-wallet.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { NetworkId } from 'src/networks/network.interface';
 import { AlchemyService } from 'src/alchemy/alchemy.service';
+import { Wallet, NetworkType } from '@db/client';
 
 @Injectable()
 export class WalletService {
