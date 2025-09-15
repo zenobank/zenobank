@@ -22,12 +22,4 @@ export class WalletController {
     private readonly walletFactory: WalletFactory,
     private readonly alchemyService: AlchemyService,
   ) {}
-
-  @Post('test-suscribe-to-webhook')
-  async suscribeToWebhook() {
-    return this.alchemyService.suscribeAddressToWebhook({
-      address: '0x4b7673AB39733493a44695b37b2C7DF814A28d1B',
-      network: NetworkId.ETHEREUM_SEPOLIA,
-    });
-  }
 }

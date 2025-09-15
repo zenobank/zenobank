@@ -17,13 +17,6 @@ import { Convert } from 'easy-currencies';
 export class PaymentController {
   constructor(private readonly paymentsService: PaymentService) {}
 
-  @Get('test')
-  async test() {
-    const amount = await Convert(15).from('USD').to('USD');
-    console.log('Converted:', amount);
-    return { amount };
-  }
-
   @Post('')
   async createPayment(
     @Body() createPaymentDto: CreatePaymentDto,
