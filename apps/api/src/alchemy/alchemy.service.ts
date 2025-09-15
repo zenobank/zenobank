@@ -1,9 +1,5 @@
 import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
-import {
-  ActivityWebhook,
-  PaymentStatus,
-  WebhookProvider,
-} from '@prisma/client';
+import { ActivityWebhook, PaymentStatus, WebhookProvider } from '@repo/db';
 import { NetworkId } from 'src/networks/network.interface';
 import { Alchemy, WebhookType as AlchemyWebhookType } from 'alchemy-sdk';
 import { PrismaService } from 'src/prisma/prisma.service';

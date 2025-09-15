@@ -1,6 +1,6 @@
 // dto/payment-response.dto.ts
 import { ApiProperty } from '@nestjs/swagger';
-import { Payment, PaymentStatus } from '@prisma/client';
+import { Payment, PaymentStatus } from '@repo/db';
 import { NetworkId } from 'src/networks/network.interface';
 import { Env, getEnv } from 'src/lib/utils/env';
 import { getPaymentUrl } from '../lib/utils';
