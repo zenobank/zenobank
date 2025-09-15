@@ -1,7 +1,10 @@
 import {
   BadRequestException,
+  forwardRef,
+  Inject,
   Injectable,
   InternalServerErrorException,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { CreatePaymentDto } from './dto/create-payment.dto';
@@ -14,7 +17,7 @@ import { NetworksService } from 'src/networks/networks.service';
 import { WalletService } from 'src/wallet/services/wallet.service';
 import ms from 'src/lib/utils/ms';
 import { AlchemyService } from 'src/alchemy/alchemy.service';
-import { PaymentStatus } from '@prisma/client';
+import { Payment, PaymentStatus } from '@prisma/client';
 import { NetworkId } from 'src/networks/network.interface';
 import { Convert } from 'easy-currencies';
 import { Decimal } from '@prisma/client/runtime/library';
@@ -23,22 +26,24 @@ import { isISO4217CurrencyCode, IsISO4217CurrencyCode } from 'class-validator';
 
 @Injectable()
 export class PaymentService {
+  private readonly logger = new Logger(PaymentService.name);
   constructor(
     private readonly db: PrismaService,
     private readonly tokenService: TokenService,
     private readonly networksService: NetworksService,
     private readonly walletService: WalletService,
+    @Inject(forwardRef(() => AlchemyService))
     private readonly alchemyService: AlchemyService,
   ) {}
   async createPayment(
     createPaymentDto: CreatePaymentDto,
   ): Promise<PaymentResponseDto> {
-    const { amount, currency } = createPaymentDto;
+    const { priceAmount, priceCurrency } = createPaymentDto;
     const payment = await this.db.payment.create({
       data: {
-        amount,
-        currency,
-        notifyUrl: 'https://example.com/notify',
+        priceAmount,
+        priceCurrency,
+        notifyUrl: ['https://example.com/notify'],
         orderId: randomUUID(),
         expiredAt: new Date(Date.now() + ms('1h')),
       },
@@ -53,6 +58,16 @@ export class PaymentService {
     const payment = await this.getPayment(id);
     if (!payment) throw new NotFoundException('Payment not found');
     return payment;
+  }
+  async markPaymentAsCompleted(id: string): Promise<PaymentResponseDto> {
+    this.logger.log(`Marking payment ${id} as completed`);
+    await this.db.payment.update({
+      where: { id },
+      data: { status: PaymentStatus.COMPLETED, paidAt: new Date() },
+    });
+    this.logger.log(`Marked payment ${id} as completed`);
+
+    return (await this.getPayment(id))!;
   }
 
   async getPayment(id: string): Promise<PaymentResponseDto | null> {
@@ -97,7 +112,7 @@ export class PaymentService {
     if (
       currentDepositDetails.depositWalletId !== null ||
       currentDepositDetails.networkId !== null ||
-      currentDepositDetails.tokenId !== null
+      currentDepositDetails.payCurrencyId !== null
     ) {
       throw new BadRequestException(
         'Can not change deposit details, please create a new payment',
@@ -109,10 +124,7 @@ export class PaymentService {
       );
     }
 
-    const depositWallet = await this.walletService.createWallet({
-      networkId: network.id,
-      label: `deposit-${paymentId}`,
-    });
+    const depositWallet = null as any;
 
     await this.alchemyService.suscribeAddressToWebhook({
       address: depositWallet.address,
@@ -120,14 +132,14 @@ export class PaymentService {
     });
 
     // we only support usd stablecoins. So we convert the amount to usd and we always assume that 1 USD = 1 stable coin (USDT, USDC, etc.)
-    let tokenAmount = currentDepositDetails.amount;
+    let tokenAmount = currentDepositDetails.priceAmount;
 
-    if (!isISO4217CurrencyCode(currentDepositDetails.currency)) {
+    if (!isISO4217CurrencyCode(currentDepositDetails.priceCurrency)) {
       throw new BadRequestException('Invalid currency');
     }
-    if (currentDepositDetails.currency !== 'USD') {
-      const convertedAmount = await Convert(+currentDepositDetails.amount)
-        .from(currentDepositDetails.currency)
+    if (currentDepositDetails.priceCurrency !== 'USD') {
+      const convertedAmount = await Convert(+currentDepositDetails.priceAmount)
+        .from(currentDepositDetails.priceCurrency)
         .to('USD');
       tokenAmount = convertedAmount.toString();
     }
@@ -138,9 +150,9 @@ export class PaymentService {
     const updated = await this.db.payment.update({
       where: { id: paymentId },
       data: {
-        tokenId: token.id,
+        payCurrencyId: token.id,
         networkId: network.id,
-        tokenAmount: await this.generateUniqueTokenAmount(
+        payAmount: await this.generateUniqueTokenAmount(
           tokenAmount,
           token.id,
           network.id,
@@ -158,7 +170,7 @@ export class PaymentService {
 
   private async generateUniqueTokenAmount(
     baseAmount: string,
-    tokenId: string,
+    payCurrencyId: string,
     networkId: NetworkId,
     maxRetries = 20,
   ): Promise<string> {
@@ -179,9 +191,9 @@ export class PaymentService {
 
       const exists = await this.db.payment.findFirst({
         where: {
-          tokenId,
+          payCurrencyId,
           networkId,
-          tokenAmount: candidateStr,
+          payAmount: candidateStr,
           status: { in: [PaymentStatus.PENDING, PaymentStatus.UNDER_PAYMENT] },
         },
         select: { id: true },

@@ -1,4 +1,4 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import {
   ActivityWebhook,
   PaymentStatus,
@@ -19,6 +19,9 @@ import {
 } from './lib/alchemy.network-map';
 import { AddressActivityWebhookResponse } from './lib/alchemy.interface';
 import { isNumber } from 'class-validator';
+import { PaymentService } from 'src/payment/payment.service';
+import { Svix } from 'svix';
+import { SVIX_CLIENT } from 'src/webhooks/webhooks.constants';
 
 @Injectable()
 export class AlchemyService {
@@ -26,6 +29,9 @@ export class AlchemyService {
   constructor(
     private readonly db: PrismaService,
     @Inject(ALCHEMY_SDK) private readonly alchemy: Alchemy,
+    @Inject(forwardRef(() => PaymentService))
+    private readonly paymentService: PaymentService,
+    @Inject(SVIX_CLIENT) private readonly svix: Svix,
   ) {}
 
   async processAddressActivityWebhook(body: AddressActivityWebhookResponse) {
@@ -74,8 +80,8 @@ export class AlchemyService {
       }
       const payment = await this.db.payment.findFirst({
         where: {
-          tokenAmount: tokenAmount.toString(),
-          tokenId: tokenId,
+          payAmount: tokenAmount.toString(),
+          payCurrencyId: tokenId,
           networkId: network,
           depositWallet: {
             address: activity.toAddress,
@@ -85,16 +91,20 @@ export class AlchemyService {
         },
       });
       if (payment) {
-        this.logger.log(`Updating payment ${payment.id} status to completed`);
-        await this.db.payment.update({
-          where: { id: payment.id },
-          data: { status: PaymentStatus.COMPLETED },
-        });
+        // send webhook
+        const completedPayment =
+          await this.paymentService.markPaymentAsCompleted(payment.id);
+        if (completedPayment.notifyUrl) {
+          await this.svix.message.create(completedPayment.notifyUrl, {
+            eventType: 'payment_completed',
+            payload: completedPayment,
+          });
+        }
       } else {
         this.logger.warn(
           `Payment not found ${JSON.stringify({
-            tokenAmount,
-            tokenId,
+            payAmount: tokenAmount,
+            payCurrencyId: tokenId,
             depositWallet: activity.toAddress,
             networkId: network,
             tokenAddress: activity.rawContract?.address,

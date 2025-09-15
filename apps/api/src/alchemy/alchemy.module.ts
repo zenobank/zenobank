@@ -1,10 +1,11 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { AlchemyService } from './alchemy.service';
 import { ALCHEMY_SDK } from './lib/alchemy.constants';
 import { Alchemy } from 'alchemy-sdk';
 import { Env, getEnv } from 'src/lib/utils/env';
 import { PrismaModule } from 'src/prisma/prisma.module';
-
+import { PaymentsModule } from 'src/payment/payment.module';
+import { SvixModule } from 'src/webhooks/svix.module';
 @Module({
   providers: [
     AlchemyService,
@@ -18,6 +19,6 @@ import { PrismaModule } from 'src/prisma/prisma.module';
   ],
   controllers: [],
   exports: [AlchemyService],
-  imports: [PrismaModule],
+  imports: [PrismaModule, forwardRef(() => PaymentsModule), SvixModule],
 })
 export class AlchemyModule {}

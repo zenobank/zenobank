@@ -14,6 +14,10 @@ import { PaymentsModule } from './payment/payment.module';
 import { AlchemyModule } from './alchemy/alchemy.module';
 import { NetworksModule } from './networks/networks.module';
 import { WebhooksModule } from './webhooks/webhooks.module';
+import { SVIX_CLIENT } from './webhooks/webhooks.constants';
+import { Svix } from 'svix';
+import { SvixModule } from './webhooks/svix.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -42,6 +46,8 @@ import { WebhooksModule } from './webhooks/webhooks.module';
     AlchemyModule,
     NetworksModule,
     WebhooksModule,
+    SvixModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { PaymentService as PaymentService } from './payment.service';
 import { PaymentController } from './payment.controller';
 import { PrismaModule } from 'src/prisma/prisma.module';
@@ -12,8 +12,8 @@ import { AlchemyModule } from 'src/alchemy/alchemy.module';
     PrismaModule,
     AssetModule,
     NetworksModule,
-    WalletModule,
-    AlchemyModule,
+    forwardRef(() => WalletModule),
+    forwardRef(() => AlchemyModule),
   ],
   controllers: [PaymentController],
   providers: [PaymentService],

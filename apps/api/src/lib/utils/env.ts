@@ -23,6 +23,10 @@ export class Env {
   static readonly ALCHEMY_AUTH_TOKEN = 'ALCHEMY_AUTH_TOKEN';
   @IsString()
   ALCHEMY_AUTH_TOKEN: string;
+
+  static readonly SVIX_API_KEY = 'SVIX_API_KEY';
+  @IsString()
+  SVIX_API_KEY: string;
 }
 
 export function validateEnvConfig(config: Record<string, unknown>) {

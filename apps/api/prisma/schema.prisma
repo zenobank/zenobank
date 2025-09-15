@@ -13,6 +13,15 @@ enum NetworkType {
   SOLANA
 }
 
+model Store {
+  id        String   @id @default(uuid())
+  name      String
+  domain    String
+  wallets   Wallet[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model Wallet {
   id      String @id @default(uuid())
   address String
@@ -20,15 +29,16 @@ model Wallet {
   networkId String
   network   Network @relation(fields: [networkId], references: [id])
 
-  privateKey String
-  label      String?
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  label     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   payments Payment[] @relation("DepositWallet")
 
   activityWebhook   ActivityWebhook? @relation(fields: [activityWebhookId], references: [id])
   activityWebhookId String?
+  Store             Store?           @relation(fields: [storeId], references: [id])
+  storeId           String?
 
   @@unique([networkId, address])
 }
@@ -42,26 +52,28 @@ enum PaymentStatus {
 }
 
 model Payment {
-  id String @id @default(uuid())
+  id      String @id @default(uuid())
+  orderId String @unique
 
   title       String?
   description String?
 
-  currency String
-  amount   String
+  priceCurrency String
+  priceAmount   String
 
-  tokenAmount       String?
-  tokenAmountFilled String  @default("0")
+  payAmount       String?
+  payAmountFilled String  @default("0")
 
-  notifyUrl String
-  orderId   String        @unique
-  expiredAt DateTime
+  notifyUrl String?
+  paidAt    DateTime?
+
+  expiredAt DateTime?
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt
   status    PaymentStatus @default(PENDING)
 
-  tokenId String?
-  token   Token?  @relation(fields: [tokenId], references: [id])
+  payCurrencyId String?
+  payCurrency   Token?  @relation(fields: [payCurrencyId], references: [id])
 
   networkId String?
   network   Network? @relation(fields: [networkId], references: [id])
