@@ -19,8 +19,12 @@
     "noImplicitAny": false,
     "strictBindCallApply": true,
     "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": false,
+    "paths": {
+      "@db/*": ["./generated/prisma/*"]
+    }
   },
+
   "ts-node": {
     "ignoreDiagnostics": [2578]
   }

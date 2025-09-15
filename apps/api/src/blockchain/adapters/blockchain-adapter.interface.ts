@@ -1,4 +1,4 @@
-import { TransactionStatus } from '@prisma/client';
+import { TransactionStatus } from '@db/client';
 import { OnChainTxStatus } from '../lib/types';
 
 export interface BlockchainAdapter {
