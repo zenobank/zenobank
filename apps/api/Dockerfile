@@ -1,25 +1,41 @@
 FROM node:22-alpine AS base
-
-RUN npm i -g pnpm
-
-FROM base AS dependencies
-
+ 
+FROM base AS builder
+RUN apk update
+RUN apk add --no-cache libc6-compat
+# Set working directory
 WORKDIR /app
-COPY package.json pnpm-lock.yaml ./
-RUN pnpm install
-
-FROM base AS build
-
-WORKDIR /app
+# Replace <your-major-version> with the major version installed in your repository. For example:
+# RUN pnpm global add turbo@^2
+RUN pnpm global add turbo@^2
 COPY . .
-COPY --from=dependencies /app/node_modules ./node_modules
-RUN pnpm build
-RUN pnpm prune --prod
-
-FROM base AS deploy
-
+ 
+# Generate a partial monorepo with a pruned lockfile for a target workspace.
+# Assuming "web" is the name entered in the project's package.json: { name: "web" }
+RUN turbo prune api --docker
+ 
+# Add lockfile and package.json's of isolated subworkspace
+FROM base AS installer
+RUN apk update
+RUN apk add --no-cache libc6-compat
 WORKDIR /app
-COPY --from=build /app/dist/ ./dist/
-COPY --from=build /app/node_modules ./node_modules
+ 
+# First install the dependencies (as they change less often)
+COPY --from=builder /app/out/json/ .
+RUN pnpm install --frozen-lockfile
+ 
+# Build the project
+COPY --from=builder /app/out/full/ .
+RUN pnpm turbo run build
+ 
+FROM base AS runner
+WORKDIR /app
+ 
+# Don't run production as root
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+USER nextjs
+ 
 
-CMD [ "node", "dist/main.js" ]
+ 
+CMD node apps/api/dist/main.js
