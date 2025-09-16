@@ -13,12 +13,14 @@ enum NetworkType {
 }
 
 model Store {
-  id        String   @id @default(uuid())
+  id        String    @id @default(uuid())
   name      String
   domain    String
   wallets   Wallet[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  Payment   Payment[]
+  apiKey    String    @unique @default(uuid())
 }
 
 model Wallet {
@@ -51,7 +53,7 @@ enum PaymentStatus {
 }
 
 model Payment {
-  id      String @id @default(uuid())
+  id      String @id @default(cuid())
   orderId String @unique
 
   title       String?
@@ -59,6 +61,9 @@ model Payment {
 
   priceCurrency String
   priceAmount   String
+
+  storeId String?
+  store   Store?  @relation(fields: [storeId], references: [id])
 
   payAmount       String?
   payAmountFilled String  @default("0")

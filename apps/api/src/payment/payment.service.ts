@@ -37,8 +37,12 @@ export class PaymentService {
 
   async createPayment(
     createPaymentDto: CreatePaymentDto,
+    apiKey: string,
   ): Promise<PaymentResponseDto> {
     const { priceAmount, priceCurrency } = createPaymentDto;
+    const store = await this.db.store.findUniqueOrThrow({
+      where: { apiKey },
+    });
     const payment = await this.db.payment.create({
       data: {
         priceAmount,
@@ -46,6 +50,7 @@ export class PaymentService {
         notifyUrl: 'https://example.com/notify',
         orderId: randomUUID(),
         expiredAt: new Date(Date.now() + ms('1h')),
+        storeId: store.id,
       },
     });
     this.logger.log(`Created payment ${payment.id}`);
@@ -125,8 +130,19 @@ export class PaymentService {
       );
     }
 
-    const depositWallet = null as any;
+    const wallets = await this.db.wallet.findMany({
+      where: {
+        storeId: currentDepositDetails.storeId,
+      },
+    });
 
+    const depositWallet = wallets.find((w) => w.networkId === network.id);
+    if (!depositWallet) {
+      this.logger.error(
+        `Deposit wallet not found. store ${currentDepositDetails.storeId} network ${network.id}`,
+      );
+      throw new NotFoundException('Deposit wallet not found');
+    }
     await this.alchemyService.suscribeAddressToWebhook({
       address: depositWallet.address,
       network: network.id,

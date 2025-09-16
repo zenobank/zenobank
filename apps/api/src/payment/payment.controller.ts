@@ -6,22 +6,27 @@ import {
   Param,
   Patch,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { PaymentService } from './payment.service';
 import { PaymentResponseDto } from './dto/payment-response.dto';
 import { UpdateDepositSelectionDto } from './dto/update-payment-selection.dto';
 import { Convert } from 'easy-currencies';
+import { ApiKeyGuard } from 'src/auth/api-key.guard';
+import { ApiKey } from 'src/auth/api-key.decorator';
 
 @Controller('payments')
 export class PaymentController {
   constructor(private readonly paymentsService: PaymentService) {}
 
   @Post('')
+  @UseGuards(ApiKeyGuard)
   async createPayment(
     @Body() createPaymentDto: CreatePaymentDto,
+    @ApiKey() apiKey: string,
   ): Promise<PaymentResponseDto> {
-    return this.paymentsService.createPayment(createPaymentDto);
+    return this.paymentsService.createPayment(createPaymentDto, apiKey);
   }
 
   @Get(':id')

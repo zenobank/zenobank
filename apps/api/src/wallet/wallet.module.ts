@@ -10,6 +10,6 @@ import { AlchemyModule } from 'src/alchemy/alchemy.module';
   imports: [PrismaModule, forwardRef(() => AlchemyModule)],
   controllers: [WalletController],
   providers: [WalletService, WalletFactory],
-  exports: [WalletService],
+  exports: [WalletService, WalletFactory],
 })
 export class WalletModule {}
