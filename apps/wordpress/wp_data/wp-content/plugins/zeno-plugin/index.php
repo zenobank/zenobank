@@ -18,22 +18,22 @@ if (! defined('ABSPATH')) {
 /*
  * This action hook registers our PHP class as a WooCommerce payment gateway
  */
-add_filter('woocommerce_payment_gateways', 'misha_add_gateway_class');
-function misha_add_gateway_class($gateways)
+add_filter('woocommerce_payment_gateways', 'zeno_add_gateway_class');
+function zeno_add_gateway_class($gateways)
 {
-	$gateways[] = 'WC_Misha_Gateway'; // your class name is here
+	$gateways[] = 'WC_Zeno_Gateway'; // your class name is here
 	return $gateways;
 }
 
 /*
  * The class itself, please note that it is inside plugins_loaded action hook
  */
-add_action('plugins_loaded', 'misha_init_gateway_class');
-function misha_init_gateway_class()
+add_action('plugins_loaded', 'zeno_init_gateway_class');
+function zeno_init_gateway_class()
 {
 
 
-	class WC_Misha_Gateway extends WC_Payment_Gateway
+	class WC_Zeno_Gateway extends WC_Payment_Gateway
 	{
 
 		/**
@@ -42,11 +42,11 @@ function misha_init_gateway_class()
 		public function __construct()
 		{
 
-			$this->id = 'misha'; // payment gateway plugin ID
+			$this->id = 'zeno'; // payment gateway plugin ID
 			$this->icon = ''; // URL of the icon that will be displayed on checkout page near your gateway name
 			$this->has_fields = false; // in case you need a custom credit card form
-			$this->method_title = 'Misha Gateway';
-			$this->method_description = 'Description of Misha payment gateway'; // will be displayed on the options page
+			$this->method_title = 'Zeno Gateway';
+			$this->method_description = 'Description of Zeno payment gateway'; // will be displayed on the options page
 
 			// gateways can support subscriptions, refunds, saved payment methods,
 			// but in this tutorial we begin with simple payments
@@ -62,9 +62,7 @@ function misha_init_gateway_class()
 			$this->title = $this->get_option('title');
 			$this->description = $this->get_option('description');
 			$this->enabled = $this->get_option('enabled');
-			// $this->testmode = 'yes' === $this->get_option('testmode');
-			// $this->private_key = $this->testmode ? $this->get_option('test_private_key') : $this->get_option('private_key');
-			// $this->publishable_key = $this->testmode ? $this->get_option('test_publishable_key') : $this->get_option('publishable_key');
+
 
 			// This action hook saves the settings
 			add_action('woocommerce_update_options_payment_gateways_' . $this->id, array($this, 'process_admin_options'));
@@ -85,7 +83,7 @@ function misha_init_gateway_class()
 			$this->form_fields = array(
 				'enabled' => array(
 					'title'       => 'Enable/Disable',
-					'label'       => 'Enable Misha Gateway',
+					'label'       => 'Enable Zeno Gateway',
 					'type'        => 'checkbox',
 					'description' => '',
 					'default'     => 'no'
@@ -116,22 +114,16 @@ function misha_init_gateway_class()
 
 
 
-		// /*
-		//  * Custom CSS and JS, in most cases required only when you decided to go with a custom credit card form
-		//  */
+
 		public function payment_scripts() {}
 
-		/*
- 		 * Fields validation, more in Step 5
-		 */
+
 		public function validate_fields()
 		{
 
 			return true;
 		}
-		/*
-		 * We're processing the payments here, everything about it is in Step 5
-		 */
+
 		public function process_payment($order_id)
 		{
 
@@ -151,7 +143,7 @@ function misha_init_gateway_class()
 				)
 			);
 
-			// Llamada a tu backend
+			// Backend call
 			$response = wp_remote_post('https://sfwersdfsdf.free.beeceptor.com', $args);
 
 			if (is_wp_error($response)) {
@@ -185,5 +177,25 @@ function misha_init_gateway_class()
 			$order = wc_get_order($_GET['id']);
 			$order->payment_complete();
 		}
+	}
+
+	add_action('woocommerce_blocks_loaded', 'zeno_gateway_block_support');
+	function zeno_gateway_block_support()
+	{
+
+		if (! class_exists('Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType')) {
+			return;
+		}
+
+		// here we're including our "gateway block support class"
+		require_once __DIR__ . '/includes/class-wc-zeno-gateway-blocks-support.php';
+
+		// registering the PHP class we have just included
+		add_action(
+			'woocommerce_blocks_payment_method_type_registration',
+			function (Automattic\WooCommerce\Blocks\Payments\PaymentMethodRegistry $payment_method_registry) {
+				$payment_method_registry->register(new WC_Zeno_Gateway_Blocks_Support);
+			}
+		);
 	}
 }
