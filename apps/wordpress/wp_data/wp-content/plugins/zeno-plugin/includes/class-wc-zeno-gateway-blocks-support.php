@@ -40,7 +40,7 @@ final class WC_Zeno_Gateway_Blocks_Support extends AbstractPaymentMethodType
             true
         );
 
-        return array('wc-misha-blocks-integration');
+        return array('wc-zeno-blocks-integration');
     }
 
     public function get_payment_method_data()
