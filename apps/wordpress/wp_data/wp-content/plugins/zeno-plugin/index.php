@@ -136,16 +136,20 @@ function zeno_init_gateway_class()
  			 * Array with parameters for API interaction
 			*/
 			$args = array(
+				'headers' => array(
+					'x-api-key' => 'demo-api-key', // aquí metes tu API key
+				),
 				'body' => array(
 					'priceAmount'     => $order->get_total(),
 					'priceCurrency'   => $order->get_currency(),
 					'order_id'        => $order_id,
 					'customer_email'  => $order->get_billing_email(),
 					'customer_name'   => $order->get_formatted_billing_full_name(),
-					'callback_url'    => home_url('/?wc-api=zeno_webhook'), // webhook en WP
-					'return_url'      => $this->get_return_url($order)   // página gracias
-				)
+					'callback_url'    => home_url('/?wc-api=zeno_webhook'),
+					'return_url'      => $this->get_return_url($order),
+				),
 			);
+
 
 			// Backend call
 			$response = wp_remote_post(ZENO_BACKEND_URL . '/api/v1/payments', $args);
@@ -169,7 +173,7 @@ function zeno_init_gateway_class()
 				);
 			}
 
-			wc_add_notice('Payment initialization failed. Please try again.', 'error');
+			wc_add_notice('Payment initialization failed.1 Please try again. ' . print_r($response, true), 'error');
 			return array(
 				'result' => 'error',
 			);

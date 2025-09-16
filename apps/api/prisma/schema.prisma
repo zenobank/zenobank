@@ -20,7 +20,7 @@ model Store {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   Payment   Payment[]
-  apiKey    String    @unique @default(uuid())
+  apiKey    String    @unique @default(cuid())
 }
 
 model Wallet {
