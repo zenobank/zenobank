@@ -48,6 +48,7 @@ export class PaymentService {
         expiredAt: new Date(Date.now() + ms('1h')),
       },
     });
+    this.logger.log(`Created payment ${payment.id}`);
     return PaymentResponseDto.fromPrisma({
       ...payment,
       depositWalletAddress: null,
