@@ -148,10 +148,10 @@ function zeno_init_gateway_class()
 			);
 
 			// Backend call
-			$response = wp_remote_post(ZENO_BACKEND_URL, $args);
+			$response = wp_remote_post(ZENO_BACKEND_URL . '/api/v1/payments', $args);
 
 			if (is_wp_error($response)) {
-				wc_add_notice('Connection error.', 'error');
+				wc_add_notice('Connection error11' . $response->get_error_message(), 'error');
 				return array(
 					'result'   => 'error',
 				);

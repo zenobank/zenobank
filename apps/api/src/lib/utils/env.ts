@@ -1,11 +1,15 @@
 import { plainToInstance } from 'class-transformer';
-import { IsString, validateSync } from 'class-validator';
+import { IsString, IsUrl, validateSync } from 'class-validator';
 import 'dotenv/config';
 
 export class Env {
   static readonly API_BASE_URL = 'API_BASE_URL';
   @IsString()
   API_BASE_URL: string;
+
+  static readonly PAYMENT_FRONTEND_BASE_URL = 'PAYMENT_FRONTEND_BASE_URL';
+  @IsString()
+  PAYMENT_FRONTEND_BASE_URL: string;
 
   static readonly DATABASE_URL = 'DATABASE_URL';
   @IsString()
