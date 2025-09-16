@@ -137,13 +137,13 @@ function zeno_init_gateway_class()
 			*/
 			$args = array(
 				'body' => array(
-					'priceAmount'          => $order->get_total(),
-					'priceCurrency'        => $order->get_currency(),
+					'priceAmount'     => $order->get_total(),
+					'priceCurrency'   => $order->get_currency(),
 					'order_id'        => $order_id,
-					// 'customer_email'  => $order->get_billing_email(),
-					// 'customer_name'   => $order->get_formatted_billing_full_name(),
-					// 'callback_url'    => home_url('/?wc-api=zeno_webhook'), // webhook en WP
-					// 'return_url'      => $this->get_return_url($order)   // página gracias
+					'customer_email'  => $order->get_billing_email(),
+					'customer_name'   => $order->get_formatted_billing_full_name(),
+					'callback_url'    => home_url('/?wc-api=zeno_webhook'), // webhook en WP
+					'return_url'      => $this->get_return_url($order)   // página gracias
 				)
 			);
 

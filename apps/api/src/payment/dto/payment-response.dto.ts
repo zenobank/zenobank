@@ -13,10 +13,18 @@ import {
   IsISO4217CurrencyCode,
   IsDate,
   IsUrl,
+  IsNotEmpty,
 } from 'class-validator';
 
 type PaymentWithAddress = Payment & {
   depositWalletAddress: string | null;
+};
+
+// Tipo más estricto que requiere campos críticos
+type RequiredPaymentFields = {
+  id: string;
+  priceAmount: string;
+  priceCurrency: string;
 };
 
 export class DepositDetailsDto {
@@ -54,22 +62,28 @@ export class DepositDetailsDto {
 export class PaymentResponseDto {
   @Expose()
   @IsString()
+  @IsNotEmpty()
   @ApiProperty({
     example: '123e4567-e89b-12d3-a456-426614174000',
+    required: true,
   })
   id: string;
 
   @Expose()
   @IsString()
+  @IsNotEmpty()
   @ApiProperty({
     example: '100',
+    required: true,
   })
   amount: string;
 
   @Expose()
   @IsISO4217CurrencyCode()
+  @IsNotEmpty()
   @ApiProperty({
     example: 'USD',
+    required: true,
   })
   currency: string;
 
@@ -94,7 +108,7 @@ export class PaymentResponseDto {
   @ApiProperty({
     example: new Date(Date.now() + ms('1h')).toISOString(),
   })
-  expiredAt: Date;
+  expiredAt: Date | null;
 
   @Expose()
   @ApiProperty({ type: DepositDetailsDto, nullable: true })
@@ -102,7 +116,10 @@ export class PaymentResponseDto {
 
   @Expose()
   @IsString()
-  @ApiProperty()
+  @IsUrl()
+  @ApiProperty({
+    required: true,
+  })
   paymentUrl: string;
 
   @Expose()
@@ -110,17 +127,29 @@ export class PaymentResponseDto {
   @ApiProperty({
     example: 'https://example.com/notify',
   })
-  notifyUrl: string;
+  notifyUrl: string | null;
 
   constructor(partial: Partial<PaymentResponseDto>) {
     Object.assign(this, partial);
   }
 
-  static fromPrisma(payment: PaymentWithAddress): PaymentResponseDto {
-    return plainToInstance(PaymentResponseDto, {
-      ...payment,
+  static fromPrisma(
+    payment: PaymentWithAddress & RequiredPaymentFields,
+  ): PaymentResponseDto {
+    const paymentUrl = getPaymentUrl(payment.id);
+    if (!paymentUrl) {
+      throw new Error('Payment URL could not be generated');
+    }
+
+    const dto = {
+      id: payment.id,
       amount: payment.priceAmount,
-      paymentUrl: getPaymentUrl(payment.id),
+      currency: payment.priceCurrency,
+      status: payment.status,
+      createdAt: payment.createdAt,
+      expiredAt: payment.expiredAt,
+      notifyUrl: payment.notifyUrl,
+      paymentUrl,
       depositDetails:
         payment.depositWalletAddress &&
         payment.payCurrencyId &&
@@ -132,6 +161,8 @@ export class PaymentResponseDto {
               networkId: payment.networkId,
             })
           : null,
-    });
+    } satisfies PaymentResponseDto;
+
+    return plainToInstance(PaymentResponseDto, dto);
   }
 }
