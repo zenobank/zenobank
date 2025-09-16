@@ -15,6 +15,10 @@ if (! defined('ABSPATH')) {
 	exit;
 }
 
+
+define('ZENO_BACKEND_URL', 'http://localhost:3001');
+define('ZENO_PAYMENT_GATEWAY_ID', 'zeno');
+
 /*
  * This action hook registers our PHP class as a WooCommerce payment gateway
  */
@@ -42,7 +46,7 @@ function zeno_init_gateway_class()
 		public function __construct()
 		{
 
-			$this->id = 'zeno'; // payment gateway plugin ID
+			$this->id = ZENO_PAYMENT_GATEWAY_ID; // payment gateway plugin ID
 			$this->icon = ''; // URL of the icon that will be displayed on checkout page near your gateway name
 			$this->has_fields = false; // in case you need a custom credit card form
 			$this->method_title = 'Zeno Gateway';
@@ -133,18 +137,18 @@ function zeno_init_gateway_class()
 			*/
 			$args = array(
 				'body' => array(
-					'amount'          => $order->get_total(),
-					'currency'        => $order->get_currency(),
+					'priceAmount'          => $order->get_total(),
+					'priceCurrency'        => $order->get_currency(),
 					'order_id'        => $order_id,
-					'customer_email'  => $order->get_billing_email(),
-					'customer_name'   => $order->get_formatted_billing_full_name(),
-					'callback_url'    => home_url('/?wc-api=zeno_webhook'), // webhook en WP
-					'return_url'      => $this->get_return_url($order)   // página gracias
+					// 'customer_email'  => $order->get_billing_email(),
+					// 'customer_name'   => $order->get_formatted_billing_full_name(),
+					// 'callback_url'    => home_url('/?wc-api=zeno_webhook'), // webhook en WP
+					// 'return_url'      => $this->get_return_url($order)   // página gracias
 				)
 			);
 
 			// Backend call
-			$response = wp_remote_post('https://sfwersdfsdf.free.beeceptor.com', $args);
+			$response = wp_remote_post(ZENO_BACKEND_URL, $args);
 
 			if (is_wp_error($response)) {
 				wc_add_notice('Connection error.', 'error');
@@ -156,17 +160,19 @@ function zeno_init_gateway_class()
 			$code = wp_remote_retrieve_response_code($response);
 			$body = json_decode(wp_remote_retrieve_body($response), true);
 
-			if (200 === $code && ! empty($body['checkout_url'])) {
+			$body = json_decode(wp_remote_retrieve_body($response), true);
+
+			if (! empty($body['paymentUrl'])) {
 				return array(
 					'result'   => 'success',
-					'redirect' => esc_url_raw($body['checkout_url']),
-				);
-			} else {
-				wc_add_notice('Payment initialization failed. Please try again.', 'error');
-				return array(
-					'result'   => 'error',
+					'redirect' => esc_url_raw($body['paymentUrl']),
 				);
 			}
+
+			wc_add_notice('Payment initialization failed. Please try again.', 'error');
+			return array(
+				'result' => 'error',
+			);
 		}
 
 		/*
