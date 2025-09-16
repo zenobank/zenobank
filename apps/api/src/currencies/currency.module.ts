@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { TokenService } from './token/token.service';
 import { TokenGasService } from './token/tokens-gas.service';
 import { PrismaModule } from 'src/prisma/prisma.module';
-import { AssetController } from './asset.controller';
+import { AssetController } from './currency.controller';
 
 @Module({
   providers: [TokenService, TokenGasService],
