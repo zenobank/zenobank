@@ -16,7 +16,7 @@ if (! defined('ABSPATH')) {
 }
 
 
-define('ZENO_BACKEND_URL', 'http://localhost:3001');
+define('ZENO_BACKEND_URL', 'https://dkfjadskfjaercl.loca.lt');
 define('ZENO_PAYMENT_GATEWAY_ID', 'zeno');
 
 /*
