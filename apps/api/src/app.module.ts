@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 
-import { TestModule } from './test/test.module';
 import { WalletModule } from './wallet/wallet.module';
 import { ConfigModule } from '@nestjs/config';
 import { Env, getEnv, validateEnvConfig } from './lib/utils/env';
@@ -20,7 +19,6 @@ import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
-    TestModule,
     AlchemyModule,
     PaymentsModule,
     WalletModule,

@@ -238,7 +238,6 @@ export default function Payments() {
                 )}
               </div>
             </div>
-            <Separator />
 
             {checkoutState === CheckoutState.AWAITING_SELECTION && (
               <>
