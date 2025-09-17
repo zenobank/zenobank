@@ -13,15 +13,16 @@ import {
   ALCHEMY_WEBHOOK_RECEIVER_PATH,
 } from './lib/alchemy.constants';
 import { Env, getEnv } from 'src/lib/utils/env';
-import {
-  ALCHEMY_TO_NETWORK_MAP,
-  NETWORK_TO_ALCHEMY_MAP,
-} from './lib/alchemy.network-map';
 import { AddressActivityWebhookResponse } from './lib/alchemy.interface';
 import { isNumber } from 'class-validator';
 import { PaymentService } from 'src/payment/payment.service';
 import { Svix } from 'svix';
 import { SVIX_CLIENT } from 'src/webhooks/webhooks.constants';
+import {
+  ALCHEMY_WEBHOOK_TO_NETWORK_MAP,
+  NETWORK_TO_ALCHEMY_SDK,
+} from './lib/alchemy.network-map';
+import axios from 'axios';
 
 @Injectable()
 export class AlchemyService {
@@ -36,10 +37,13 @@ export class AlchemyService {
 
   async processAddressActivityWebhook(body: AddressActivityWebhookResponse) {
     if (body.type !== AlchemyWebhookType.ADDRESS_ACTIVITY) {
-      this.logger.warn('Webhook type is not address activity', { body });
+      this.logger.warn(
+        `Webhook type is not address activity body.type: ${body.type}`,
+      );
       return;
     }
-    const network = ALCHEMY_TO_NETWORK_MAP[body.event.network];
+    this.logger.log('Processing address activity webhook');
+    const network = ALCHEMY_WEBHOOK_TO_NETWORK_MAP[body.event.network];
     if (!network) {
       this.logger.error(`Invalid network ${body.event.network}`);
       return;
@@ -78,6 +82,7 @@ export class AlchemyService {
         this.logger.error('Invalid token amount', { activity });
         continue;
       }
+
       const payment = await this.db.payment.findFirst({
         where: {
           payAmount: tokenAmount.toString(),
@@ -95,7 +100,7 @@ export class AlchemyService {
         const completedPayment =
           await this.paymentService.markPaymentAsCompleted(payment.id);
         if (completedPayment.notifyUrl) {
-          await this.svix.message.create(completedPayment.notifyUrl, {
+          axios.post(completedPayment.notifyUrl, {
             eventType: 'payment_completed',
             payload: completedPayment,
           });
@@ -141,7 +146,7 @@ export class AlchemyService {
       getEnv(Env.API_BASE_URL) + ALCHEMY_WEBHOOK_RECEIVER_PATH,
       AlchemyWebhookType.ADDRESS_ACTIVITY,
       {
-        network: NETWORK_TO_ALCHEMY_MAP[network],
+        network: NETWORK_TO_ALCHEMY_SDK[network],
         addresses: [address],
       },
     );

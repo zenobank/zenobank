@@ -56,7 +56,7 @@ export default function Payments() {
   } = Route.useLoaderData()
   const { mutateAsync: updatePaymentDepositSelection } =
     usePaymentControllerUpdatePaymentDepositSelectionV1()
-
+  console.log('initialPaymentData', initialPaymentData)
   const [paymentData, setPaymentData] =
     useState<PaymentResponseDto>(initialPaymentData)
 

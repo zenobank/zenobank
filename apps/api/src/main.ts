@@ -33,12 +33,13 @@ async function bootstrap() {
     .setTitle('API Docs')
     .setDescription('API description')
     .setVersion('1.0')
+    .addApiKey({ type: 'apiKey', name: 'x-api-key', in: 'header' }, 'api-key')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
   // alchemy webhook validation
-  app.use(ALCHEMY_WEBHOOK_RECEIVER_PATH, express.raw({ type: '*/*' }));
+  // app.use(ALCHEMY_WEBHOOK_RECEIVER_PATH, express.raw({ type: '*/*' }));
   app.use((req: Request, res: Response, next: NextFunction) => {
     res.removeHeader('X-Powered-By');
     next();

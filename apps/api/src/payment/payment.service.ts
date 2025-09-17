@@ -66,7 +66,6 @@ export class PaymentService {
     return payment;
   }
   async markPaymentAsCompleted(id: string): Promise<PaymentResponseDto> {
-    this.logger.log(`Marking payment ${id} as completed`);
     await this.db.payment.update({
       where: { id },
       data: { status: PaymentStatus.COMPLETED, paidAt: new Date() },

@@ -15,6 +15,7 @@ import { UpdateDepositSelectionDto } from './dto/update-payment-selection.dto';
 import { Convert } from 'easy-currencies';
 import { ApiKeyGuard } from 'src/auth/api-key.guard';
 import { ApiKey } from 'src/auth/api-key.decorator';
+import { ApiSecurity } from '@nestjs/swagger';
 
 @Controller('payments')
 export class PaymentController {
@@ -22,6 +23,7 @@ export class PaymentController {
 
   @Post('')
   @UseGuards(ApiKeyGuard)
+  @ApiSecurity('api-key')
   async createPayment(
     @Body() createPaymentDto: CreatePaymentDto,
     @ApiKey() apiKey: string,
