@@ -181,27 +181,29 @@ export default function Payments() {
               <div className='flex items-center'>
                 <CardTitle className='text-lg'>Send Payment</CardTitle>
               </div>
-              <Badge variant='secondary'>
-                <TimerIcon />
-                <Countdown
-                  date={new Date(paymentData.expiredAt)}
-                  daysInHours
-                  overtime={false}
-                  onComplete={() => {
-                    setPaymentData((prev) => ({
-                      ...prev,
-                      status: PaymentStatus.EXPIRED,
-                    }))
-                  }}
-                  renderer={({ hours, minutes, seconds }) => (
-                    <span>
-                      {hours !== 0 && String(hours).padStart(2, '0') + ':'}
-                      {String(minutes).padStart(2, '0')}:
-                      {String(seconds).padStart(2, '0')}
-                    </span>
-                  )}
-                />
-              </Badge>
+              {paymentData.expiredAt && (
+                <Badge variant='secondary'>
+                  <TimerIcon />
+                  <Countdown
+                    date={new Date(paymentData.expiredAt)}
+                    daysInHours
+                    overtime={false}
+                    onComplete={() => {
+                      setPaymentData((prev) => ({
+                        ...prev,
+                        status: PaymentStatus.EXPIRED,
+                      }))
+                    }}
+                    renderer={({ hours, minutes, seconds }) => (
+                      <span>
+                        {hours !== 0 && String(hours).padStart(2, '0') + ':'}
+                        {String(minutes).padStart(2, '0')}:
+                        {String(seconds).padStart(2, '0')}
+                      </span>
+                    )}
+                  />
+                </Badge>
+              )}
             </div>
           </CardHeader>
 

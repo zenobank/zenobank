@@ -14,7 +14,7 @@ export const getPaymentCheckoutState = (
   if (payment.status === PaymentStatus.CANCELLED) return CheckoutState.EXPIRED
   if (
     payment.status === PaymentStatus.EXPIRED ||
-    isAfter(new Date(), new Date(payment.expiredAt))
+    (payment.expiredAt && isAfter(new Date(), new Date(payment.expiredAt)))
   ) {
     return CheckoutState.EXPIRED
   }
