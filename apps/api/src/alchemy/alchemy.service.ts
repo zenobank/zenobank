@@ -179,11 +179,17 @@ export class AlchemyService {
   }) {
     let webhook = await this.findWebhookWithSpace(network);
     if (!webhook) {
+      this.logger.log(
+        `Webhook not found, creating webhook for network ${network} and address ${address}`,
+      );
       webhook = await this.createWebhook(network, address);
     } else {
       await this.alchemy.notify.updateWebhook(webhook.webhookId, {
         addAddresses: [address],
       });
+      this.logger.log(
+        `Webhook found, added address ${address} to webhook ${webhook.webhookId}. Network ${network}`,
+      );
     }
 
     await this.db.activityWebhook.update({

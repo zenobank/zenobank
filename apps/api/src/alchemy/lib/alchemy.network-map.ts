@@ -14,7 +14,7 @@ export const ALCHEMY_SDK_TO_NETWORK_MAP: Record<AlchemyNetwork, NetworkId> =
     Object.entries(NETWORK_TO_ALCHEMY_SDK).map(([k, v]) => [v, k as NetworkId]),
   ) as Record<AlchemyNetwork, NetworkId>;
 
-export const NETWORK_TO_ALCHEMY_WEBHOOK: Record<
+export const NETWORK_TO_ALCHEMY_WEBHOOK_RECEIVED_EVENTS: Record<
   NetworkId,
   keyof typeof AlchemyNetwork
 > = {
@@ -28,7 +28,7 @@ export const ALCHEMY_WEBHOOK_TO_NETWORK_MAP: Record<
   keyof typeof AlchemyNetwork,
   NetworkId
 > = Object.fromEntries(
-  Object.entries(NETWORK_TO_ALCHEMY_WEBHOOK).map(([k, v]) => [
+  Object.entries(NETWORK_TO_ALCHEMY_WEBHOOK_RECEIVED_EVENTS).map(([k, v]) => [
     v,
     k as NetworkId,
   ]),

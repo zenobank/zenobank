@@ -1,11 +1,8 @@
-import { IsString, IsOptional, IsEnum } from 'class-validator';
-import { NetworkId } from 'src/networks/network.interface';
+import { IsString, IsNotEmpty, IsEthereumAddress } from 'class-validator';
 
 export class CreateWalletDto {
-  @IsEnum(NetworkId)
-  networkId: NetworkId;
-
   @IsString()
-  @IsOptional()
-  label?: string;
+  @IsNotEmpty()
+  @IsEthereumAddress()
+  address: string;
 }

@@ -1,6 +1,4 @@
 import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
-import { WalletFactory } from 'src/wallet/wallet.factory';
-import { CreateWalletDto } from 'src/wallet/dto/create-wallet.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { NetworkId } from 'src/networks/network.interface';
 import { AlchemyService } from 'src/alchemy/alchemy.service';
@@ -23,12 +21,17 @@ export class WalletService {
    * @param address - The EVM wallet address to register
    * @returns Promise<Wallet[]> - Array of created wallet records for each EVM network
    */
-  async registerEvmWallet(address: string): Promise<Wallet[]> {
+
+  async registerEvmWallet(_address: string): Promise<Wallet[]> {
+    const address = _address.toLowerCase();
     const networks = await this.db.network.findMany({
       where: {
         networkType: NetworkType.EVM,
       },
     });
+    this.logger.log(
+      `Registering evm wallet ${address} to ${networks.length} networks`,
+    );
     const wallets = await this.db.$transaction(async (tx) => {
       return await Promise.all(
         networks.map((network) =>
