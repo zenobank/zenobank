@@ -1,14 +1,12 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import { toDto } from 'src/lib/utils/to-dto';
+import { toEnumValue } from 'src/lib/utils/to-enum';
+import { NetworkId } from 'src/networks/network.interface';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { WalletService } from 'src/wallet/services/wallet.service';
+
 import { CreateStoreDto } from './dtos/create-store.dto';
 import { StoreResponseDto } from './dtos/store-response.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { Svix } from 'svix';
-import { SVIX_CLIENT } from 'src/webhooks/webhooks.constants';
-import { WalletService } from 'src/wallet/services/wallet.service';
-import { plainToInstance } from 'class-transformer';
-import { toDto } from 'src/lib/utils/to-dto';
-import { NetworkId } from 'src/networks/network.interface';
-import { toEnumValue } from 'src/lib/utils/to-enum';
 
 @Injectable()
 export class UsersService {
