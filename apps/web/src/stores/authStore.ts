@@ -52,4 +52,4 @@ export const useAuthStore = create<AuthState>()((set) => {
   }
 })
 
-// export const useAuth = () => useAuthStore((state) => state.auth)
+// 1export const useAuth = () => useAuthStore((state) => state.auth)
