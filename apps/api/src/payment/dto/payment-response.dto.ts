@@ -99,14 +99,14 @@ export class PaymentResponseDto {
   @Expose()
   @IsDate()
   @ApiProperty({
-    example: new Date().toISOString(),
+    example: '2025-09-18T17:15:26.969Z',
   })
   createdAt: Date;
 
   @Expose()
   @IsDate()
   @ApiProperty({
-    example: new Date(Date.now() + ms('1h')).toISOString(),
+    example: '2025-09-18T18:15:26.971Z',
   })
   expiredAt: Date | null;
 
