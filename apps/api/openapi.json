@@ -330,13 +330,13 @@
           "createdAt": {
             "format": "date-time",
             "type": "string",
-            "example": "2025-09-18T17:04:12.454Z"
+            "example": "2025-09-18T17:09:27.960Z"
           },
           "expiredAt": {
             "format": "date-time",
             "type": "string",
             "nullable": true,
-            "example": "2025-09-18T18:04:12.454Z"
+            "example": "2025-09-18T18:09:27.960Z"
           },
           "depositDetails": {
             "nullable": true,
