@@ -94,8 +94,10 @@ describe('Integration Tests', () => {
       };
 
       // Act - Crear payment
-      const createdPayment =
-        await paymentController.createPayment(createPaymentDto);
+      const createdPayment = await paymentController.createPayment(
+        createPaymentDto,
+        'test',
+      );
 
       // Act - Recuperar payment por ID
       const retrievedPayment = await paymentController.getPayment(
