@@ -19,7 +19,6 @@ export class WebhooksController {
   async receiveAlchemyWebhook(@Req() req: Request & { rawBody?: Buffer }) {
     const raw = req.rawBody?.toString('utf8');
     const body = raw ? JSON.parse(raw) : req.body;
-    console.log('lsjdf');
     return this.alchemyService.processAddressActivityWebhook(body);
   }
 }
