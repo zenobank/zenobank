@@ -32,9 +32,7 @@
             "api-key": []
           }
         ],
-        "tags": [
-          "Payment"
-        ]
+        "tags": ["Payment"]
       }
     },
     "/api/v1/payments/{id}": {
@@ -62,9 +60,7 @@
             }
           }
         },
-        "tags": [
-          "Payment"
-        ]
+        "tags": ["Payment"]
       }
     },
     "/api/v1/payments/{id}/deposit": {
@@ -102,9 +98,7 @@
             }
           }
         },
-        "tags": [
-          "Payment"
-        ]
+        "tags": ["Payment"]
       }
     },
     "/api/v1/currencies": {
@@ -126,9 +120,7 @@
             }
           }
         },
-        "tags": [
-          "Asset"
-        ]
+        "tags": ["Asset"]
       }
     },
     "/api/v1/networks": {
@@ -150,9 +142,7 @@
             }
           }
         },
-        "tags": [
-          "Networks"
-        ]
+        "tags": ["Networks"]
       }
     },
     "/api/v1/wallet": {
@@ -174,9 +164,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "Wallet"
-        ]
+        "tags": ["Wallet"]
       }
     },
     "/api/v1/webhooks/alchemy": {
@@ -188,9 +176,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "Webhooks"
-        ]
+        "tags": ["Webhooks"]
       }
     },
     "/api/v1/users/store": {
@@ -212,9 +198,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "Users"
-        ]
+        "tags": ["Users"]
       }
     }
   },
@@ -248,10 +232,7 @@
             "example": "USD"
           }
         },
-        "required": [
-          "priceAmount",
-          "priceCurrency"
-        ]
+        "required": ["priceAmount", "priceCurrency"]
       },
       "PaymentStatus": {
         "type": "string",
@@ -297,12 +278,7 @@
             ]
           }
         },
-        "required": [
-          "address",
-          "currencyId",
-          "amount",
-          "networkId"
-        ]
+        "required": ["address", "currencyId", "amount", "networkId"]
       },
       "PaymentResponseDto": {
         "type": "object",
@@ -385,10 +361,7 @@
             ]
           }
         },
-        "required": [
-          "tokenId",
-          "networkId"
-        ]
+        "required": ["tokenId", "networkId"]
       },
       "TokenResponseDto": {
         "type": "object",
@@ -403,13 +376,7 @@
           },
           "standard": {
             "type": "string",
-            "enum": [
-              "NATIVE",
-              "ERC20",
-              "BEP20",
-              "TRC20",
-              "SPL"
-            ],
+            "enum": ["NATIVE", "ERC20", "BEP20", "TRC20", "SPL"],
             "example": "ERC20"
           },
           "address": {
@@ -477,23 +444,14 @@
           "networkType": {
             "type": "string",
             "example": "EVM",
-            "enum": [
-              "EVM",
-              "SOLANA"
-            ]
+            "enum": ["EVM", "SOLANA"]
           },
           "isTestnet": {
             "type": "boolean",
             "example": false
           }
         },
-        "required": [
-          "id",
-          "name",
-          "displayName",
-          "networkType",
-          "isTestnet"
-        ]
+        "required": ["id", "name", "displayName", "networkType", "isTestnet"]
       },
       "CreateWalletDto": {
         "type": "object",
@@ -502,9 +460,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "address"
-        ]
+        "required": ["address"]
       },
       "CreateStoreDto": {
         "type": "object",
@@ -522,11 +478,7 @@
             "example": "0xc429e068b65b3462f0e422b3ea388a7a37b23bff"
           }
         },
-        "required": [
-          "name",
-          "domain",
-          "walletAddress"
-        ]
+        "required": ["name", "domain", "walletAddress"]
       }
     }
   }
