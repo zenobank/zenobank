@@ -1,4 +1,10 @@
-import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
+import {
+  forwardRef,
+  Inject,
+  Injectable,
+  Logger,
+  ConflictException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { NetworkId } from 'src/networks/network.interface';
 import { AlchemyService } from 'src/alchemy/alchemy.service';
@@ -24,14 +30,31 @@ export class WalletService {
 
   async registerEvmWallet(_address: string): Promise<Wallet[]> {
     const address = _address.toLowerCase();
+
+    // Check if wallet already exists in any EVM network
+    const existingWallets = await this.db.wallet.findMany({
+      where: {
+        address,
+        network: {
+          networkType: NetworkType.EVM,
+        },
+      },
+    });
+
+    if (existingWallets.length > 0) {
+      throw new ConflictException(`Wallet ${address} already exists`);
+    }
+
     const networks = await this.db.network.findMany({
       where: {
         networkType: NetworkType.EVM,
       },
     });
+
     this.logger.log(
       `Registering evm wallet ${address} to ${networks.length} networks`,
     );
+
     const wallets = await this.db.$transaction(async (tx) => {
       return await Promise.all(
         networks.map((network) =>
@@ -44,6 +67,7 @@ export class WalletService {
         ),
       );
     });
+
     await Promise.all(
       wallets.map((wallet) =>
         this.alchemyService.suscribeAddressToWebhook({
@@ -52,6 +76,7 @@ export class WalletService {
         }),
       ),
     );
+
     return wallets;
   }
 }

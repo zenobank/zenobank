@@ -209,11 +209,19 @@
         },
         "responses": {
           "201": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoreResponseDto"
+                }
+              }
+            }
           }
         },
+        "summary": "Create a new store",
         "tags": [
-          "Users"
+          "users"
         ]
       }
     }
@@ -526,6 +534,98 @@
           "name",
           "domain",
           "walletAddress"
+        ]
+      },
+      "WalletResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for the wallet",
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          "address": {
+            "type": "string",
+            "description": "Wallet address",
+            "example": "0xc429e068b65b3462f0e422b3ea388a7a37b23bff"
+          },
+          "network": {
+            "enum": [
+              "ETHEREUM_MAINNET",
+              "BASE_MAINNET",
+              "ARBITRUM_MAINNET",
+              "ETHEREUM_HOLESKY",
+              "ETHEREUM_SEPOLIA"
+            ],
+            "type": "string",
+            "description": "Wallet network",
+            "example": "ETHEREUM_MAINNET"
+          },
+          "label": {
+            "type": "string",
+            "nullable": true,
+            "description": "Wallet label",
+            "example": "Main Wallet"
+          }
+        },
+        "required": [
+          "id",
+          "address",
+          "network",
+          "label"
+        ]
+      },
+      "StoreResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for the store",
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the store",
+            "example": "My Store"
+          },
+          "domain": {
+            "type": "string",
+            "description": "Domain of the store",
+            "example": "my-store.com"
+          },
+          "apiKey": {
+            "type": "string",
+            "description": "API key for the store",
+            "example": "cuid_1234567890abcdef"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Creation timestamp",
+            "example": "2023-01-01T00:00:00.000Z"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Last update timestamp",
+            "example": "2023-01-01T00:00:00.000Z"
+          },
+          "wallets": {
+            "description": "Associated wallets",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WalletResponseDto"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "domain",
+          "apiKey",
+          "createdAt",
+          "updatedAt",
+          "wallets"
         ]
       }
     }
