@@ -16,7 +16,7 @@ export class Env {
   DATABASE_URL: string;
 
   static readonly REDIS_QUEUE_URL = 'REDIS_QUEUE_URL';
-  @IsNotEmpty()
+  @IsString()
   REDIS_QUEUE_URL: string;
 
   static readonly GAS_TANKER_TESTING_PRIVATE_KEY =
