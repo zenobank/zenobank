@@ -1,10 +1,10 @@
 import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import * as express from 'express';
 import { ClassSerializerInterceptor, VersioningType } from '@nestjs/common';
 import { ALCHEMY_WEBHOOK_RECEIVER_PATH } from './alchemy/lib/alchemy.constants';
 import { Request, Response, NextFunction } from 'express';
+import * as fs from 'fs';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -37,6 +37,8 @@ async function bootstrap() {
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
+  fs.writeFileSync('./openapi.json', JSON.stringify(document, null, 2));
+
   SwaggerModule.setup('docs', app, document);
   // alchemy webhook validation
   // app.use(ALCHEMY_WEBHOOK_RECEIVER_PATH, express.raw({ type: '*/*' }));

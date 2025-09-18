@@ -1,0 +1,533 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/api/v1/payments": {
+      "post": {
+        "operationId": "PaymentController_createPayment_v1",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePaymentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "tags": [
+          "Payment"
+        ]
+      }
+    },
+    "/api/v1/payments/{id}": {
+      "get": {
+        "operationId": "PaymentController_getPayment_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Payment"
+        ]
+      }
+    },
+    "/api/v1/payments/{id}/deposit": {
+      "patch": {
+        "operationId": "PaymentController_updatePaymentDepositSelection_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateDepositSelectionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Payment"
+        ]
+      }
+    },
+    "/api/v1/currencies": {
+      "get": {
+        "operationId": "AssetController_getSupportedTokens_v1",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TokenResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Asset"
+        ]
+      }
+    },
+    "/api/v1/networks": {
+      "get": {
+        "operationId": "NetworksController_getNetworks_v1",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NetworkResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Networks"
+        ]
+      }
+    },
+    "/api/v1/wallet": {
+      "post": {
+        "operationId": "WalletController_registerEvmWallet_v1",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateWalletDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Wallet"
+        ]
+      }
+    },
+    "/api/v1/webhooks/alchemy": {
+      "post": {
+        "operationId": "WebhooksController_receiveAlchemyWebhook_v1",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Webhooks"
+        ]
+      }
+    },
+    "/api/v1/users/store": {
+      "post": {
+        "operationId": "UsersController_createStore_v1",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateStoreDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Users"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "API Docs",
+    "description": "API description",
+    "version": "1.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [],
+  "components": {
+    "securitySchemes": {
+      "api-key": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-api-key"
+      }
+    },
+    "schemas": {
+      "CreatePaymentDto": {
+        "type": "object",
+        "properties": {
+          "priceAmount": {
+            "type": "string",
+            "minimum": 1,
+            "example": "100"
+          },
+          "priceCurrency": {
+            "type": "string",
+            "example": "USD"
+          }
+        },
+        "required": [
+          "priceAmount",
+          "priceCurrency"
+        ]
+      },
+      "PaymentStatus": {
+        "type": "string",
+        "enum": [
+          "PENDING",
+          "UNDER_PAYMENT",
+          "COMPLETED",
+          "EXPIRED",
+          "CANCELLED"
+        ]
+      },
+      "NetworkId": {
+        "type": "string",
+        "enum": [
+          "ETHEREUM_MAINNET",
+          "BASE_MAINNET",
+          "ARBITRUM_MAINNET",
+          "ETHEREUM_HOLESKY",
+          "ETHEREUM_SEPOLIA"
+        ]
+      },
+      "DepositDetailsDto": {
+        "type": "object",
+        "properties": {
+          "address": {
+            "type": "string",
+            "example": "0x1234567890123456789012345678901234567890"
+          },
+          "currencyId": {
+            "type": "string",
+            "example": "USDC_ARBITRUM"
+          },
+          "amount": {
+            "type": "string",
+            "example": "100"
+          },
+          "networkId": {
+            "example": "ARBITRUM_MAINNET",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/NetworkId"
+              }
+            ]
+          }
+        },
+        "required": [
+          "address",
+          "currencyId",
+          "amount",
+          "networkId"
+        ]
+      },
+      "PaymentResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          "amount": {
+            "type": "string",
+            "example": "100"
+          },
+          "currency": {
+            "type": "string",
+            "example": "USD"
+          },
+          "status": {
+            "example": "PENDING",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PaymentStatus"
+              }
+            ]
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2025-09-18T16:05:25.326Z"
+          },
+          "expiredAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true,
+            "example": "2025-09-18T17:05:25.326Z"
+          },
+          "depositDetails": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DepositDetailsDto"
+              }
+            ]
+          },
+          "paymentUrl": {
+            "type": "string",
+            "format": "uri"
+          },
+          "notifyUrl": {
+            "type": "string",
+            "nullable": true,
+            "format": "uri",
+            "example": "https://example.com/notify"
+          }
+        },
+        "required": [
+          "id",
+          "amount",
+          "currency",
+          "status",
+          "createdAt",
+          "expiredAt",
+          "depositDetails",
+          "paymentUrl",
+          "notifyUrl"
+        ]
+      },
+      "UpdateDepositSelectionDto": {
+        "type": "object",
+        "properties": {
+          "tokenId": {
+            "type": "string",
+            "example": "USDC_BASE"
+          },
+          "networkId": {
+            "example": "ETHEREUM_MAINNET",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/NetworkId"
+              }
+            ]
+          }
+        },
+        "required": [
+          "tokenId",
+          "networkId"
+        ]
+      },
+      "TokenResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "USDC_ETHEREUM_MAINNET"
+          },
+          "canonicalTokenId": {
+            "type": "string",
+            "example": "USDC"
+          },
+          "standard": {
+            "type": "string",
+            "enum": [
+              "NATIVE",
+              "ERC20",
+              "BEP20",
+              "TRC20",
+              "SPL"
+            ],
+            "example": "ERC20"
+          },
+          "address": {
+            "type": "string",
+            "example": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+          },
+          "decimals": {
+            "type": "number",
+            "minimum": 0,
+            "example": 6
+          },
+          "symbol": {
+            "type": "string",
+            "example": "USDC"
+          },
+          "isDeprecated": {
+            "type": "boolean",
+            "example": false
+          },
+          "networkId": {
+            "enum": [
+              "ETHEREUM_MAINNET",
+              "BASE_MAINNET",
+              "ARBITRUM_MAINNET",
+              "ETHEREUM_HOLESKY",
+              "ETHEREUM_SEPOLIA"
+            ],
+            "type": "string",
+            "example": "ETHEREUM_MAINNET"
+          }
+        },
+        "required": [
+          "id",
+          "canonicalTokenId",
+          "standard",
+          "address",
+          "decimals",
+          "symbol",
+          "isDeprecated",
+          "networkId"
+        ]
+      },
+      "NetworkResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "enum": [
+              "ETHEREUM_MAINNET",
+              "BASE_MAINNET",
+              "ARBITRUM_MAINNET",
+              "ETHEREUM_HOLESKY",
+              "ETHEREUM_SEPOLIA"
+            ],
+            "type": "string",
+            "example": "ETHEREUM_MAINNET"
+          },
+          "name": {
+            "type": "string",
+            "example": "Ethereum Mainnet"
+          },
+          "displayName": {
+            "type": "string",
+            "example": "Ethereum"
+          },
+          "networkType": {
+            "type": "string",
+            "example": "EVM",
+            "enum": [
+              "EVM",
+              "SOLANA"
+            ]
+          },
+          "isTestnet": {
+            "type": "boolean",
+            "example": false
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "displayName",
+          "networkType",
+          "isTestnet"
+        ]
+      },
+      "CreateWalletDto": {
+        "type": "object",
+        "properties": {
+          "address": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "address"
+        ]
+      },
+      "CreateStoreDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "My Store"
+          },
+          "domain": {
+            "type": "string",
+            "example": "my-store.com"
+          },
+          "walletAddress": {
+            "type": "string",
+            "example": "0xc429e068b65b3462f0e422b3ea388a7a37b23bff"
+          }
+        },
+        "required": [
+          "name",
+          "domain",
+          "walletAddress"
+        ]
+      }
+    }
+  }
+}
