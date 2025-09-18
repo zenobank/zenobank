@@ -15,14 +15,12 @@ export const Route = createRootRouteWithContext<{
   queryClient: QueryClient
 }>()({
   beforeLoad: ({ location }) => {
-    // Verificar si la ruta actual NO es payments/id
     const isPaymentRoute =
       location.pathname.startsWith('/payments/') &&
       location.pathname !== '/payments/' &&
       location.pathname.split('/').length === 3
 
     if (!isPaymentRoute) {
-      // Redirección inmediata ANTES de renderizar
       throw redirect({ href: import.meta.env.VITE_MAIN_DOMAIN_URL })
     }
   },
