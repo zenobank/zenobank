@@ -4,6 +4,7 @@
       "mode": "auto"
     }
   ],
+  "editor.accessibilitySupport": "off",
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "always"

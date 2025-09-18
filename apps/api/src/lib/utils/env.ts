@@ -1,5 +1,5 @@
 import { plainToInstance } from 'class-transformer';
-import { IsString, IsUrl, validateSync } from 'class-validator';
+import { IsNotEmpty, IsString, IsUrl, validateSync } from 'class-validator';
 import 'dotenv/config';
 
 export class Env {
@@ -16,7 +16,7 @@ export class Env {
   DATABASE_URL: string;
 
   static readonly REDIS_QUEUE_URL = 'REDIS_QUEUE_URL';
-  @IsString()
+  @IsNotEmpty()
   REDIS_QUEUE_URL: string;
 
   static readonly GAS_TANKER_TESTING_PRIVATE_KEY =
