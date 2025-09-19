@@ -193,17 +193,19 @@ export class PaymentService {
     const MIN_SUFFIX = 0.000001;
     const MAX_SUFFIX = 0.000999;
 
+    const MAX_DECIMALS = 4;
+
     for (let i = 0; i < maxRetries; i++) {
       const randomSuffix =
         MIN_SUFFIX + Math.random() * (MAX_SUFFIX - MIN_SUFFIX);
 
       // sumamos base + sufijo
       const candidate = toBN(baseAmount).plus(
-        toBN(randomSuffix.toFixed(6)), // sufijo con 6 decimales
+        toBN(randomSuffix.toFixed(MAX_DECIMALS)), // sufijo con 6 decimales
       );
 
       // 🔑 forzamos a 6 decimales como string
-      const candidateStr = candidate.toFixed(6);
+      const candidateStr = candidate.toFixed(MAX_DECIMALS);
 
       const exists = await this.db.payment.findFirst({
         where: {
