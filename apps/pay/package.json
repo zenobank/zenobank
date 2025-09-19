@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "api:g": "orval",
-    "knip": "knip"
+    "knip": "knip",
+    "format": "prettier --write ."
   },
   "dependencies": {
     "@clerk/themes": "^2.4.10",

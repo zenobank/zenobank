@@ -1,8 +1,8 @@
 // orval.config.ts
-import * as dotenv from 'dotenv'
-import { defineConfig } from 'orval'
+import * as dotenv from 'dotenv';
+import { defineConfig } from 'orval';
 
-dotenv.config()
+dotenv.config();
 
 export default defineConfig({
   api: {
@@ -15,4 +15,4 @@ export default defineConfig({
       clean: true,
     },
   },
-})
+});

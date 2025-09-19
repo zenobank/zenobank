@@ -1,8 +1,8 @@
-import { NetworkId } from '@/src/lib/requests/api-client/model'
+import { NetworkId } from '@/src/lib/requests/api-client/model';
 
 export interface CanonicalTokenOption {
-  id: string
-  symbol: string
-  imageUrl: string
-  networks: NetworkId[]
+  id: string;
+  symbol: string;
+  imageUrl: string;
+  networks: NetworkId[];
 }

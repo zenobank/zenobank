@@ -1,13 +1,13 @@
-import { Toaster as Sonner, ToasterProps } from 'sonner'
-import { useTheme } from '@/context/theme-context'
+import { Toaster as Sonner, ToasterProps } from 'sonner';
+import { useTheme } from '@/context/theme-context';
 
 const Toaster = ({ ...props }: ToasterProps) => {
-  const { theme = 'system' } = useTheme()
+  const { theme = 'system' } = useTheme();
 
   return (
     <Sonner
       theme={theme as ToasterProps['theme']}
-      className='toaster group [&_div[data-content]]:w-full'
+      className="toaster group [&_div[data-content]]:w-full"
       style={
         {
           '--normal-bg': 'var(--popover)',
@@ -17,7 +17,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
       }
       {...props}
     />
-  )
-}
+  );
+};
 
-export { Toaster }
+export { Toaster };

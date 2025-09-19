@@ -19,13 +19,7 @@ import {
 import { cn } from '@/src/lib/utils';
 import { Badge } from '@/src/components/ui/badge';
 import { Button } from '@/src/components/ui/button';
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-  CardFooter,
-} from '@/src/components/ui/card';
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/src/components/ui/card';
 import {
   Command,
   CommandInput,
@@ -35,11 +29,7 @@ import {
   CommandItem,
 } from '@/src/components/ui/command';
 import { CopyButton } from '@/src/components/ui/copy-button';
-import {
-  PopoverContent,
-  PopoverTrigger,
-  Popover,
-} from '@/src/components/ui/popover';
+import { PopoverContent, PopoverTrigger, Popover } from '@/src/components/ui/popover';
 import { Separator } from '@/src/components/ui/separator';
 import { CheckoutSelection } from '@/src/features/payments/types/selection';
 import { CheckoutState } from '@/src/features/payments/types/state';
@@ -59,17 +49,14 @@ enum PopoverId {
 }
 
 export default function Payament({ id }: PaymentsProps) {
-  const { mutateAsync: updatePaymentDepositSelection } =
-    usePaymentControllerUpdatePaymentDepositSelectionV1();
+  const { mutateAsync: updatePaymentDepositSelection } = usePaymentControllerUpdatePaymentDepositSelectionV1();
   const {
     data: { data: paymentData } = {},
     refetch: refetchPaymentData,
     isLoading: isLoadingPaymentData,
   } = usePaymentControllerGetPaymentV1(id);
-  const { data: { data: supportedTokens } = {} } =
-    useAssetControllerGetSupportedTokensV1();
-  const { data: { data: networks } = {} } =
-    useNetworksControllerGetNetworksV1();
+  const { data: { data: supportedTokens } = {} } = useAssetControllerGetSupportedTokensV1();
+  const { data: { data: networks } = {} } = useNetworksControllerGetNetworksV1();
   const [isLoading, setIsLoading] = useState(false);
   const [activePopover, setActivePopover] = useState<PopoverId | null>(null);
 
@@ -83,42 +70,29 @@ export default function Payament({ id }: PaymentsProps) {
     return getPaymentCheckoutState(paymentData);
   }, [paymentData, isLoadingPaymentData]);
 
-  const cannonicalTokenOptions = useMemo(
-    () => getCanonicalTokenOptions(supportedTokens),
-    [supportedTokens],
-  );
+  const cannonicalTokenOptions = useMemo(() => getCanonicalTokenOptions(supportedTokens), [supportedTokens]);
   const availableNetworksIdsForSelectedToken: NetworkId[] = useMemo(() => {
     const networksIds =
-      cannonicalTokenOptions.find(
-        (cannonicalToken) =>
-          cannonicalToken.id === paymentSelection.selectedTokenId,
-      )?.networks || [];
+      cannonicalTokenOptions.find((cannonicalToken) => cannonicalToken.id === paymentSelection.selectedTokenId)
+        ?.networks || [];
 
     return networksIds;
   }, [cannonicalTokenOptions, paymentSelection.selectedTokenId]);
 
   const selectedTokenData: TokenResponseDto | null = useMemo(() => {
-    return (
-      supportedTokens?.find((t) => t.id === paymentSelection.selectedTokenId) ||
-      null
-    );
+    return supportedTokens?.find((t) => t.id === paymentSelection.selectedTokenId) || null;
   }, [supportedTokens, paymentSelection.selectedTokenId]);
 
   // Calculate token amount and USD conversion
 
   const selectedNetworkData = useMemo(() => {
     if (!paymentSelection.selectedNetworkId) return null;
-    return networks?.find(
-      (n) => n.id.toString() === paymentSelection.selectedNetworkId,
-    );
+    return networks?.find((n) => n.id.toString() === paymentSelection.selectedNetworkId);
   }, [paymentSelection.selectedNetworkId, networks]);
 
   // Auto-select network if only one is available
   useEffect(() => {
-    if (
-      paymentSelection.selectedTokenId &&
-      availableNetworksIdsForSelectedToken.length === 1
-    ) {
+    if (paymentSelection.selectedTokenId && availableNetworksIdsForSelectedToken.length === 1) {
       setPaymentSelection((prev) => ({
         ...prev,
         selectedNetworkId: availableNetworksIdsForSelectedToken[0] as NetworkId,
@@ -135,11 +109,7 @@ export default function Payament({ id }: PaymentsProps) {
     ) {
       setActivePopover(PopoverId.NETWORK);
     }
-  }, [
-    paymentSelection.selectedTokenId,
-    paymentSelection.selectedNetworkId,
-    availableNetworksIdsForSelectedToken,
-  ]);
+  }, [paymentSelection.selectedTokenId, paymentSelection.selectedNetworkId, availableNetworksIdsForSelectedToken]);
 
   const [disabled, buttonText] = useMemo(() => {
     if (isLoading) {
@@ -156,10 +126,7 @@ export default function Payament({ id }: PaymentsProps) {
 
   const handleDepositSelectionSubmit = async () => {
     if (disabled || !paymentData?.id) return;
-    const {
-      selectedTokenId: selectedToken,
-      selectedNetworkId: selectedNetwork,
-    } = paymentSelection;
+    const { selectedTokenId: selectedToken, selectedNetworkId: selectedNetwork } = paymentSelection;
 
     if (!selectedToken || !selectedNetwork) return;
     setIsLoading(true);
@@ -200,8 +167,7 @@ export default function Payament({ id }: PaymentsProps) {
                     renderer={({ hours, minutes, seconds }) => (
                       <span>
                         {hours !== 0 && String(hours).padStart(2, '0') + ':'}
-                        {String(minutes).padStart(2, '0')}:
-                        {String(seconds).padStart(2, '0')}
+                        {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
                       </span>
                     )}
                   />
@@ -213,26 +179,18 @@ export default function Payament({ id }: PaymentsProps) {
           <CardContent className="space-y-3">
             <div className="py-4 text-center">
               <div>
-                {checkoutState === CheckoutState.AWAITING_DEPOSIT &&
-                selectedTokenData &&
-                selectedNetworkData ? (
+                {checkoutState === CheckoutState.AWAITING_DEPOSIT && selectedTokenData && selectedNetworkData ? (
                   // Show token amount with copy button when both token and network are selected
                   <>
                     <div className="flex items-center justify-center gap-3 text-3xl font-bold">
                       <span className="relative flex items-center gap-2">
-                        <span className="select-all">
-                          {paymentData?.depositDetails?.amount}
-                        </span>{' '}
+                        <span className="select-all">{paymentData?.depositDetails?.amount}</span>{' '}
                         {selectedTokenData.symbol}
-                        <CopyButton
-                          text={`${paymentData?.depositDetails?.amount} ${selectedTokenData.symbol}`}
-                        />
+                        <CopyButton text={`${paymentData?.depositDetails?.amount} ${selectedTokenData.symbol}`} />
                       </span>
                     </div>
                     <div className="mt-1 text-sm">
-                      <Badge variant="secondary">
-                        Network: {selectedNetworkData.displayName}
-                      </Badge>
+                      <Badge variant="secondary">Network: {selectedNetworkData.displayName}</Badge>
                     </div>
                   </>
                 ) : (
@@ -269,12 +227,8 @@ export default function Payament({ id }: PaymentsProps) {
                               className="h-6 w-6 rounded-full"
                             />
                             <div className="text-left">
-                              <div className="text-sm font-bold">
-                                {selectedTokenData.symbol}
-                              </div>
-                              <div className="text-xs">
-                                {selectedTokenData.symbol}
-                              </div>
+                              <div className="text-sm font-bold">{selectedTokenData.symbol}</div>
+                              <div className="text-xs">{selectedTokenData.symbol}</div>
                             </div>
                           </div>
                         ) : (
@@ -285,10 +239,7 @@ export default function Payament({ id }: PaymentsProps) {
                     </PopoverTrigger>
                     <PopoverContent className="w-96 p-0">
                       <Command>
-                        <CommandInput
-                          placeholder="Search cryptocurrency..."
-                          className="h-9"
-                        />
+                        <CommandInput placeholder="Search cryptocurrency..." className="h-9" />
                         <CommandList>
                           <CommandEmpty>No cryptocurrency found.</CommandEmpty>
                           <CommandGroup>
@@ -314,20 +265,13 @@ export default function Payament({ id }: PaymentsProps) {
                                     className="h-6 w-6 rounded-full"
                                   />
                                   <div className="flex-1">
-                                    <div className="text-sm font-bold">
-                                      {cannonicalToken.symbol}
-                                    </div>
-                                    <div className="text-xs">
-                                      {cannonicalToken.symbol}
-                                    </div>
+                                    <div className="text-sm font-bold">{cannonicalToken.symbol}</div>
+                                    <div className="text-xs">{cannonicalToken.symbol}</div>
                                   </div>
                                   <Check
                                     className={cn(
                                       'ml-auto h-4 w-4',
-                                      selectedTokenData?.id ===
-                                        cannonicalToken.id
-                                        ? 'opacity-100'
-                                        : 'opacity-0',
+                                      selectedTokenData?.id === cannonicalToken.id ? 'opacity-100' : 'opacity-0',
                                     )}
                                   />
                                 </div>
@@ -346,11 +290,7 @@ export default function Payament({ id }: PaymentsProps) {
                     open={activePopover === PopoverId.NETWORK}
                     onOpenChange={(open: boolean) => {
                       // Only allow opening if multiple networks available
-                      if (
-                        open &&
-                        availableNetworksIdsForSelectedToken.length <= 1
-                      )
-                        return;
+                      if (open && availableNetworksIdsForSelectedToken.length <= 1) return;
                       setActivePopover(open ? PopoverId.NETWORK : null);
                     }}
                   >
@@ -360,15 +300,10 @@ export default function Payament({ id }: PaymentsProps) {
                         role="combobox"
                         aria-expanded={activePopover === PopoverId.NETWORK}
                         className="mx-auto h-12 w-full max-w-md justify-between"
-                        disabled={
-                          !selectedTokenData ||
-                          availableNetworksIdsForSelectedToken.length <= 1
-                        }
+                        disabled={!selectedTokenData || availableNetworksIdsForSelectedToken.length <= 1}
                       >
                         {selectedNetworkData ? (
-                          <div className="flex items-center gap-3">
-                            {selectedNetworkData.displayName}
-                          </div>
+                          <div className="flex items-center gap-3">{selectedNetworkData.displayName}</div>
                         ) : (
                           'Select network...'
                         )}
@@ -380,53 +315,39 @@ export default function Payament({ id }: PaymentsProps) {
                     {availableNetworksIdsForSelectedToken.length > 1 && (
                       <PopoverContent className="w-96 p-0">
                         <Command>
-                          <CommandInput
-                            placeholder="Search network..."
-                            className="h-9"
-                          />
+                          <CommandInput placeholder="Search network..." className="h-9" />
                           <CommandList>
                             <CommandEmpty>No network found.</CommandEmpty>
                             <CommandGroup>
-                              {availableNetworksIdsForSelectedToken.map(
-                                (networkId) => {
-                                  const network = networks?.find(
-                                    (n) => n.id.toString() === networkId,
-                                  );
-                                  if (!network) return null;
-                                  return (
-                                    <CommandItem
-                                      key={network.id.toString()}
-                                      value={network.id.toString()}
-                                      onSelect={(currentValue: string) => {
-                                        if (
-                                          currentValue !==
-                                          selectedNetworkData?.id.toString()
-                                        ) {
-                                          setPaymentSelection({
-                                            ...paymentSelection,
-                                            selectedNetworkId:
-                                              currentValue as NetworkId,
-                                          });
-                                        }
-                                        setActivePopover(null);
-                                      }}
-                                    >
-                                      <div className="flex items-center gap-3">
-                                        {network.displayName}
-                                        <Check
-                                          className={cn(
-                                            'ml-auto h-4 w-4',
-                                            selectedNetworkData?.id ===
-                                              network.id
-                                              ? 'opacity-100'
-                                              : 'opacity-0',
-                                          )}
-                                        />
-                                      </div>
-                                    </CommandItem>
-                                  );
-                                },
-                              )}
+                              {availableNetworksIdsForSelectedToken.map((networkId) => {
+                                const network = networks?.find((n) => n.id.toString() === networkId);
+                                if (!network) return null;
+                                return (
+                                  <CommandItem
+                                    key={network.id.toString()}
+                                    value={network.id.toString()}
+                                    onSelect={(currentValue: string) => {
+                                      if (currentValue !== selectedNetworkData?.id.toString()) {
+                                        setPaymentSelection({
+                                          ...paymentSelection,
+                                          selectedNetworkId: currentValue as NetworkId,
+                                        });
+                                      }
+                                      setActivePopover(null);
+                                    }}
+                                  >
+                                    <div className="flex items-center gap-3">
+                                      {network.displayName}
+                                      <Check
+                                        className={cn(
+                                          'ml-auto h-4 w-4',
+                                          selectedNetworkData?.id === network.id ? 'opacity-100' : 'opacity-0',
+                                        )}
+                                      />
+                                    </div>
+                                  </CommandItem>
+                                );
+                              })}
                             </CommandGroup>
                           </CommandList>
                         </Command>
@@ -440,21 +361,16 @@ export default function Payament({ id }: PaymentsProps) {
                     handleDepositSelectionSubmit();
                   }}
                   disabled={disabled}
-                  className={`mx-auto w-full ${
-                    disabled ? 'cursor-not-allowed' : 'cursor-pointer'
-                  }`}
+                  className={`mx-auto w-full ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}
                 >
                   {buttonText}
                 </Button>
               </>
             )}
 
-            {checkoutState === CheckoutState.AWAITING_DEPOSIT &&
-              paymentData?.depositDetails?.address && (
-                <PaymentDetails
-                  walletAddress={paymentData?.depositDetails?.address}
-                />
-              )}
+            {checkoutState === CheckoutState.AWAITING_DEPOSIT && paymentData?.depositDetails?.address && (
+              <PaymentDetails walletAddress={paymentData?.depositDetails?.address} />
+            )}
 
             {checkoutState === CheckoutState.COMPLETED && <SuccessScreen />}
 
