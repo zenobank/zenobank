@@ -57,7 +57,7 @@ export default function Payament({ id }: PaymentsProps) {
     isLoading: isLoadingPaymentData,
   } = usePaymentControllerGetPaymentV1(id, {
     query: {
-      refetchInterval: ms('1s'),
+      refetchInterval: ms('3s'),
     },
   });
   const { data: { data: supportedTokens } = {} } = useAssetControllerGetSupportedTokensV1();
