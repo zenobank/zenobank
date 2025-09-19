@@ -27,10 +27,8 @@ export function ThemeProvider({
   storageKey = 'zenobank-pay-ui-theme',
   ...props
 }: ThemeProviderProps) {
-  // ❌ No leer localStorage aquí
   const [theme, _setTheme] = useState<Theme>(defaultTheme);
 
-  // Lee localStorage y aplica el tema SOLO en el cliente
   useEffect(() => {
     try {
       const stored = localStorage.getItem(storageKey) as Theme | null;
@@ -40,7 +38,6 @@ export function ThemeProvider({
     }
   }, [defaultTheme, storageKey]);
 
-  // Aplica la clase al <html> y escucha cambios del sistema SOLO en cliente
   useEffect(() => {
     const root = document.documentElement;
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
@@ -65,7 +62,7 @@ export function ThemeProvider({
     try {
       localStorage.setItem(storageKey, t);
     } catch {
-      // noop si storage no disponible
+      // noop if storage is not available
     }
     _setTheme(t);
   };
