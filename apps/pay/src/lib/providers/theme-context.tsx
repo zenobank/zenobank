@@ -27,41 +27,50 @@ export function ThemeProvider({
   storageKey = 'zenobank-pay-ui-theme',
   ...props
 }: ThemeProviderProps) {
-  const [theme, _setTheme] = useState<Theme>(() => (localStorage.getItem(storageKey) as Theme) || defaultTheme);
+  // ❌ No leer localStorage aquí
+  const [theme, _setTheme] = useState<Theme>(defaultTheme);
 
+  // Lee localStorage y aplica el tema SOLO en el cliente
   useEffect(() => {
-    const root = window.document.documentElement;
+    try {
+      const stored = localStorage.getItem(storageKey) as Theme | null;
+      _setTheme(stored ?? defaultTheme);
+    } catch {
+      _setTheme(defaultTheme);
+    }
+  }, [defaultTheme, storageKey]);
+
+  // Aplica la clase al <html> y escucha cambios del sistema SOLO en cliente
+  useEffect(() => {
+    const root = document.documentElement;
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
-    const applyTheme = (theme: Theme) => {
-      root.classList.remove('light', 'dark'); // Remove existing theme classes
+    const applyTheme = (t: Theme) => {
+      root.classList.remove('light', 'dark');
       const systemTheme = mediaQuery.matches ? 'dark' : 'light';
-      const effectiveTheme = theme === 'system' ? systemTheme : theme;
-      root.classList.add(effectiveTheme); // Add the new theme class
+      const effective = t === 'system' ? systemTheme : t;
+      root.classList.add(effective);
     };
 
     const handleChange = () => {
-      if (theme === 'system') {
-        applyTheme('system');
-      }
+      if (theme === 'system') applyTheme('system');
     };
 
     applyTheme(theme);
-
     mediaQuery.addEventListener('change', handleChange);
-
     return () => mediaQuery.removeEventListener('change', handleChange);
   }, [theme]);
 
-  const setTheme = (theme: Theme) => {
-    localStorage.setItem(storageKey, theme);
-    _setTheme(theme);
+  const setTheme = (t: Theme) => {
+    try {
+      localStorage.setItem(storageKey, t);
+    } catch {
+      // noop si storage no disponible
+    }
+    _setTheme(t);
   };
 
-  const value = {
-    theme,
-    setTheme,
-  };
+  const value = { theme, setTheme };
 
   return (
     <ThemeProviderContext.Provider {...props} value={value}>
@@ -73,8 +82,6 @@ export function ThemeProvider({
 // eslint-disable-next-line react-refresh/only-export-components
 export const useTheme = () => {
   const context = useContext(ThemeProviderContext);
-
   if (context === undefined) throw new Error('useTheme must be used within a ThemeProvider');
-
   return context;
 };
