@@ -4,7 +4,7 @@ import { Payment, PaymentStatus } from '@prisma/client';
 import { NetworkId } from 'src/networks/network.interface';
 import { Env, getEnv } from 'src/lib/utils/env';
 import { getPaymentUrl } from '../lib/utils';
-import ms from 'src/lib/utils/ms';
+import { ms } from 'src/lib/utils/ms';
 import { Expose, plainToInstance } from 'class-transformer';
 import {
   IsString,

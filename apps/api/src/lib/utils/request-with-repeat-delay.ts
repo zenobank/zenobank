@@ -1,4 +1,4 @@
-import ms from './ms';
+import { ms } from './ms';
 import { sleep } from './sleep';
 
 export async function requestWithRepeatDelay<T>(

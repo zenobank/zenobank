@@ -17,7 +17,7 @@ import { Queue } from 'bullmq';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { TransactionResponseDto } from './dto/transaction-response.dto';
 import { plainToInstance } from 'class-transformer';
-import ms from 'src/lib/utils/ms';
+import { ms } from 'src/lib/utils/ms';
 import { buildTxSchedulerId } from './lib/utils';
 
 @Injectable()

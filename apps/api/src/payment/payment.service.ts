@@ -15,7 +15,7 @@ import { UpdateDepositSelectionDto } from './dto/update-payment-selection.dto';
 import { TokenService } from 'src/currencies/token/token.service';
 import { NetworksService } from 'src/networks/networks.service';
 import { WalletService } from 'src/wallet/services/wallet.service';
-import ms from 'src/lib/utils/ms';
+import { ms } from 'src/lib/utils/ms';
 import { AlchemyService } from 'src/alchemy/alchemy.service';
 import { Payment, PaymentStatus } from '@prisma/client';
 import { NetworkId } from 'src/networks/network.interface';

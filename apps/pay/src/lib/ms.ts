@@ -41,10 +41,7 @@ type Unit =
 
 type UnitAnyCase = Unit | Uppercase<Unit> | Lowercase<Unit>;
 
-export type StringValue =
-  | `${number}`
-  | `${number}${UnitAnyCase}`
-  | `${number} ${UnitAnyCase}`;
+export type StringValue = `${number}` | `${number}${UnitAnyCase}` | `${number} ${UnitAnyCase}`;
 
 interface Options {
   /**
@@ -62,10 +59,7 @@ interface Options {
  */
 export function ms(value: StringValue, options?: Options): number;
 export function ms(value: number, options?: Options): string;
-export function ms(
-  value: StringValue | number,
-  options?: Options,
-): number | string {
+export function ms(value: StringValue | number, options?: Options): number | string {
   try {
     if (typeof value === 'string') {
       return parse(value);
@@ -90,9 +84,7 @@ export function ms(
  */
 export function parse(str: string): number {
   if (typeof str !== 'string' || str.length === 0 || str.length > 100) {
-    throw new Error(
-      'Value provided to ms.parse() must be a string with length between 1 and 99.',
-    );
+    throw new Error('Value provided to ms.parse() must be a string with length between 1 and 99.');
   }
   const match =
     /^(?<value>-?(?:\d+)?\.?\d+) *(?<type>milliseconds?|msecs?|ms|seconds?|secs?|s|minutes?|mins?|m|hours?|hrs?|h|days?|d|weeks?|w|years?|yrs?|y)?$/i.exec(
@@ -147,9 +139,7 @@ export function parse(str: string): number {
       return n;
     default:
       // This should never occur.
-      throw new Error(
-        `The unit ${type as string} was matched, but no matching case exists.`,
-      );
+      throw new Error(`The unit ${type as string} was matched, but no matching case exists.`);
   }
 }
 
@@ -221,12 +211,7 @@ export function format(ms: number, options?: Options): string {
 /**
  * Pluralization helper.
  */
-function plural(
-  ms: number,
-  msAbs: number,
-  n: number,
-  name: string,
-): StringValue {
+function plural(ms: number, msAbs: number, n: number, name: string): StringValue {
   const isPlural = msAbs >= n * 1.5;
   return `${Math.round(ms / n)} ${name}${isPlural ? 's' : ''}` as StringValue;
 }

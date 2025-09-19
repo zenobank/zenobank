@@ -36,8 +36,9 @@ import { CheckoutState } from '@/src/features/payments/types/state';
 import PaymentDetails from './components/DetailsScreen';
 import ExpiredScreen from './components/ExpiredScreen';
 import SuccessScreen from './components/SuccessScreen';
-import { getPaymentCheckoutState } from './hooks/usePaymentState';
+import { getPaymentCheckoutState } from './utils/payment-checkout-state';
 import { getCanonicalTokenOptions } from './utils/cannonical-token-options';
+import { ms } from '@/src/lib/ms';
 
 interface PaymentsProps {
   id: string;
@@ -54,7 +55,11 @@ export default function Payament({ id }: PaymentsProps) {
     data: { data: paymentData } = {},
     refetch: refetchPaymentData,
     isLoading: isLoadingPaymentData,
-  } = usePaymentControllerGetPaymentV1(id);
+  } = usePaymentControllerGetPaymentV1(id, {
+    query: {
+      refetchInterval: ms('1s'),
+    },
+  });
   const { data: { data: supportedTokens } = {} } = useAssetControllerGetSupportedTokensV1();
   const { data: { data: networks } = {} } = useNetworksControllerGetNetworksV1();
   const [isLoading, setIsLoading] = useState(false);
