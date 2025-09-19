@@ -5,7 +5,10 @@
   "exclude": ["node_modules"],
   "compilerOptions": {
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "@/lib/*": ["./src/lib/*"],
+      "@/hooks/*": ["./src/lib/hooks/*"],
+      "@/components/*": ["./src/components/*"]
     }
   }
 }
