@@ -193,7 +193,7 @@ export class PaymentService {
     const MIN_SUFFIX = 0.000001;
     const MAX_SUFFIX = 0.000999;
 
-    const MAX_DECIMALS = 4;
+    const MAX_DECIMALS = 6;
 
     for (let i = 0; i < maxRetries; i++) {
       const randomSuffix =

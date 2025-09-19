@@ -303,7 +303,10 @@ export default function Payament({ id }: PaymentsProps) {
                         disabled={!selectedTokenData || availableNetworksIdsForSelectedToken.length <= 1}
                       >
                         {selectedNetworkData ? (
-                          <div className="flex items-center gap-3">{selectedNetworkData.displayName}</div>
+                          <div className="">
+                            <span className="text-muted-foreground text-xs">Network: </span>
+                            <span className="">{selectedNetworkData.displayName}</span>
+                          </div>
                         ) : (
                           'Select network...'
                         )}
