@@ -1,0 +1,89 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Crytpo for WooCommerce 1.0.0\n"
+"Language: es_ES\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Domain: crypto-for-woocommerce\n"
+
+msgid "Crytpo Gateway"
+msgstr "Crytpo Gateway"
+
+msgid "Redirección a la pasarela externa para completar el pago."
+msgstr "Redirección a la pasarela externa para completar el pago."
+
+msgid "Crytpo (Tarjeta/Cripto)"
+msgstr "Crytpo (Tarjeta/Cripto)"
+
+msgid "Activar/Desactivar"
+msgstr "Activar/Desactivar"
+
+msgid "Activar Crytpo Gateway"
+msgstr "Activar Crytpo Gateway"
+
+msgid "Título"
+msgstr "Título"
+
+msgid "Texto que ve el cliente en el checkout."
+msgstr "Texto que ve el cliente en el checkout."
+
+msgid "Descripción"
+msgstr "Descripción"
+
+msgid "Serás redirigido a una página de pago segura."
+msgstr "Serás redirigido a una página de pago segura."
+
+msgid "Modo"
+msgstr "Modo"
+
+msgid "Test"
+msgstr "Test"
+
+msgid "Live"
+msgstr "Live"
+
+msgid "Endpoint Test"
+msgstr "Endpoint Test"
+
+msgid "Endpoint Live"
+msgstr "Endpoint Live"
+
+msgid "API Key Test"
+msgstr "API Key Test"
+
+msgid "API Key Live"
+msgstr "API Key Live"
+
+msgid "Webhook/Return Secret Test"
+msgstr "Webhook/Return Secret Test"
+
+msgid "Webhook/Return Secret Live"
+msgstr "Webhook/Return Secret Live"
+
+msgid "Debug log"
+msgstr "Debug log"
+
+msgid "Guardar logs en WooCommerce > Estado > Logs"
+msgstr "Guardar logs en WooCommerce > Estado > Logs"
+
+msgid "Error conectando con la pasarela."
+msgstr "Error conectando con la pasarela."
+
+msgid "No se pudo generar la URL de pago."
+msgstr "No se pudo generar la URL de pago."
+
+msgid "Esperando pago en Crytpo Gateway"
+msgstr "Esperando pago en Crytpo Gateway"
+
+msgid "Return inválido: firma incorrecta."
+msgstr "Return inválido: firma incorrecta."
+
+msgid "Pago confirmado en return URL."
+msgstr "Pago confirmado en return URL."
+
+msgid "Pago confirmado por webhook."
+msgstr "Pago confirmado por webhook."
+
+msgid "Pago fallido por webhook."
+msgstr "Pago fallido por webhook."
