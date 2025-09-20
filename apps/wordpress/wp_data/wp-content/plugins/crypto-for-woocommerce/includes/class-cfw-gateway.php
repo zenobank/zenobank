@@ -3,6 +3,10 @@ if (!defined('ABSPATH')) exit;
 
 class CFW_Gateway extends WC_Payment_Gateway
 {
+    private $api_key_live;
+    private $secret_live;
+    private $debug;
+    private $endpoint_live;
 
     public function __construct()
     {
@@ -21,6 +25,7 @@ class CFW_Gateway extends WC_Payment_Gateway
 
         $this->api_key_live  = $this->get_option('api_key_live', '');
         $this->secret_live   = $this->get_option('secret_live', '');
+        $this->endpoint_live = $this->get_option('endpoint_live', 'https://api.example.com');
         $this->debug         = $this->get_option('debug', 'no') === 'yes';
 
         add_action('woocommerce_update_options_payment_gateways_' . $this->id, [$this, 'process_admin_options']);
@@ -59,6 +64,10 @@ class CFW_Gateway extends WC_Payment_Gateway
 
             'api_key_live' => [
                 'title' => __('API Key Live', 'crypto-for-woocommerce'),
+                'type'  => 'password',
+            ],
+            'secret_live' => [
+                'title' => __('Secret Live', 'crypto-for-woocommerce'),
                 'type'  => 'password',
             ],
 
