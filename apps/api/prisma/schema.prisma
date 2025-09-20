@@ -68,8 +68,10 @@ model Payment {
   payAmount       String?
   payAmountFilled String  @default("0")
 
-  notifyUrl String?
-  paidAt    DateTime?
+  webhookUrl        String?
+  successUrl        String?
+  verificationToken String?
+  paidAt            DateTime?
 
   expiredAt DateTime?
   createdAt DateTime      @default(now())

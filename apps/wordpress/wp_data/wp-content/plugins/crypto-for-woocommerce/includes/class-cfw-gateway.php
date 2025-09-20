@@ -12,7 +12,7 @@ class CFW_Gateway extends WC_Payment_Gateway
     {
         $this->id                 = 'cfw_gateway';
         $this->method_title       = __('Crytpo Gateway', 'crypto-for-woocommerce');
-        $this->method_description = __('Redirección a la pasarela externa para completar el pago.', 'crypto-for-woocommerce');
+        $this->method_description = __('Redirect to the external gateway to complete the payment.', 'crypto-for-woocommerce');
         $this->has_fields         = true;
         $this->supports           = ['products'];
 
@@ -20,7 +20,7 @@ class CFW_Gateway extends WC_Payment_Gateway
         $this->init_settings();
 
         $this->enabled       = $this->get_option('enabled', 'no');
-        $this->title         = $this->get_option('title', __('Crytpo (Tarjeta/Cripto)', 'crypto-for-woocommerce'));
+        $this->title         = $this->get_option('title', __('Crytpo (Card/Crypto)', 'crypto-for-woocommerce'));
         $this->description   = $this->get_option('description', '');
 
         $this->api_key_live  = $this->get_option('api_key_live', '');
@@ -37,7 +37,7 @@ class CFW_Gateway extends WC_Payment_Gateway
             'enabled' => [
                 'title'   => __('Enable/Disable', 'crypto-for-woocommerce'),
                 'type'    => 'checkbox',
-                'label'   => __('Enable Crytpo Gateway', 'crypto-for-woocommerce'),
+                'label'   => __('Enable Crypto Gateway', 'crypto-for-woocommerce'),
                 'default' => 'no',
             ],
             'title' => [
@@ -54,7 +54,7 @@ class CFW_Gateway extends WC_Payment_Gateway
             'endpoint_live' => [
                 'title'   => __('Endpoint Live', 'crypto-for-woocommerce'),
                 'type'    => 'text',
-                'default' => 'https://api.example.com',
+                'default' => 'https://api.zenobank.io',
             ],
             'wallet_address' => [
                 'title'   => __('Wallet Address', 'crypto-for-woocommerce'),
@@ -131,24 +131,26 @@ class CFW_Gateway extends WC_Payment_Gateway
         $order   = wc_get_order($order_id);
         $amount  = $order->get_total();
         $currency = $order->get_currency();
-
-        $return_url = add_query_arg([
+        $hash = hash_hmac('sha256', (string)$order_id, $this->current_secret());
+        $success_url = add_query_arg([
             'order_id' => $order_id,
-            'hash'     => hash_hmac('sha256', (string)$order_id, $this->current_secret()),
+            'hash'     => $hash,
         ], WC()->api_request_url('cfw_return'));
 
         $payload = [
-            'plugin_version' => CFW_VERSION,
-            'amount'       => $amount,
-            'currency'     => $currency,
-            'order_id'     => $order_id,
-            'return_url'   => $return_url,
-            'callback_url' => rest_url('cfw/v1/webhook'),
+            'version' => CFW_VERSION,
+            'platform' => 'woocommerce',
+            'priceAmount'       => $amount,
+            'priceCurrency'     => $currency,
+            'orderId'     => $order_id,
+            'successUrl'   => $success_url,
+            'verificationToken' => $hash,
+            'webhookUrl' => rest_url('cfw/v1/webhook'),
         ];
 
         $args = [
             'headers' => [
-                'Authorization'   => 'Bearer ' . $this->current_api_key(),
+                'x-api-key'   => $this->current_api_key(),
                 'Content-Type'    => 'application/json',
                 'Accept'          => 'application/json',
             ],
@@ -156,22 +158,22 @@ class CFW_Gateway extends WC_Payment_Gateway
             'timeout' => 25,
         ];
 
-        $response = wp_remote_post($this->current_endpoint() . '/charges', $args);
+        $response = wp_remote_post($this->current_endpoint() . '/api/v1/payments', $args);
 
         if (is_wp_error($response)) {
-            wc_add_notice(__('Error conectando con la pasarela.', 'crypto-for-woocommerce'), 'error');
+            wc_add_notice(__('Error connecting with the gateway.', 'crypto-for-woocommerce'), 'error');
             return ['result' => 'failure'];
         }
 
         $body = json_decode(wp_remote_retrieve_body($response), true);
-        $payment_url = $body['payment_url'] ?? '';
+        $payment_url = $body['paymentUrl'] ?? '';
 
         if (!$payment_url) {
-            wc_add_notice(__('No se pudo generar la URL de pago.', 'crypto-for-woocommerce'), 'error');
+            wc_add_notice(__('The payment URL could not be generated.', 'crypto-for-woocommerce'), 'error');
             return ['result' => 'failure'];
         }
 
-        $order->update_status('pending', __('Esperando pago en Crytpo Gateway', 'crypto-for-woocommerce'));
+        $order->update_status('pending', __('Waiting for payment in Crytpo Gateway', 'crypto-for-woocommerce'));
         // Guardar la URL de pago como meta
         update_post_meta($order_id, '_cfw_payment_url', esc_url_raw($payment_url));
 

@@ -99,8 +99,8 @@ export class AlchemyService {
         // send webhook
         const completedPayment =
           await this.paymentService.markPaymentAsCompleted(payment.id);
-        if (completedPayment.notifyUrl) {
-          axios.post(completedPayment.notifyUrl, {
+        if (completedPayment.webhookUrl) {
+          axios.post(completedPayment.webhookUrl, {
             eventType: 'payment_completed',
             payload: completedPayment,
           });

@@ -10,7 +10,10 @@ import {
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { randomUUID } from 'crypto';
-import { PaymentResponseDto } from './dto/payment-response.dto';
+import {
+  DepositDetailsDto,
+  PaymentResponseDto,
+} from './dto/payment-response.dto';
 import { UpdateDepositSelectionDto } from './dto/update-payment-selection.dto';
 import { TokenService } from 'src/currencies/token/token.service';
 import { NetworksService } from 'src/networks/networks.service';
@@ -22,6 +25,9 @@ import { NetworkId } from 'src/networks/network.interface';
 import { Convert } from 'easy-currencies';
 import { toBN } from 'src/lib/utils/numbers';
 import { isISO4217CurrencyCode, IsISO4217CurrencyCode } from 'class-validator';
+import { toDto } from 'src/lib/utils/to-dto';
+import { getPaymentUrl } from './lib/utils';
+import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class PaymentService {
@@ -47,16 +53,19 @@ export class PaymentService {
       data: {
         priceAmount,
         priceCurrency,
-        notifyUrl: 'https://example.com/notify',
+        webhookUrl: createPaymentDto.webhookUrl,
+        successUrl: createPaymentDto.successUrl,
         orderId: randomUUID(),
+        verificationToken: createPaymentDto.verificationToken ?? randomUUID(),
         expiredAt: new Date(Date.now() + ms('1h')),
         storeId: store.id,
       },
     });
     this.logger.log(`Created payment ${payment.id}`);
-    return PaymentResponseDto.fromPrisma({
+    return toDto(PaymentResponseDto, {
       ...payment,
-      depositWalletAddress: null,
+      paymentUrl: getPaymentUrl(payment.id),
+      depositDetails: null,
     });
   }
 
@@ -85,9 +94,22 @@ export class PaymentService {
     if (!payment) {
       return null;
     }
-    return PaymentResponseDto.fromPrisma({
+    return toDto(PaymentResponseDto, {
       ...payment,
-      depositWalletAddress: payment.depositWallet?.address ?? null,
+      paymentUrl: getPaymentUrl(payment.id),
+      depositDetails:
+        payment.depositWallet?.address &&
+        payment.payAmount &&
+        payment.payCurrencyId &&
+        payment.networkId &&
+        Object.values(NetworkId).includes(payment.networkId as NetworkId)
+          ? toDto(DepositDetailsDto, {
+              address: payment.depositWallet.address,
+              amount: payment.payAmount,
+              currencyId: payment.payCurrencyId,
+              networkId: payment.networkId as NetworkId,
+            })
+          : null,
     });
   }
 
@@ -178,9 +200,15 @@ export class PaymentService {
       include: { depositWallet: true },
     });
 
-    return PaymentResponseDto.fromPrisma({
+    return toDto(PaymentResponseDto, {
       ...updated,
-      depositWalletAddress: depositWallet.address,
+      paymentUrl: getPaymentUrl(updated.id),
+      depositDetails: toDto(DepositDetailsDto, {
+        address: depositWallet.address,
+        amount: updated.payAmount!,
+        currencyId: updated.payCurrencyId!,
+        networkId: updated.networkId as NetworkId,
+      }),
     });
   }
 

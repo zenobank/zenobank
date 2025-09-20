@@ -254,11 +254,34 @@
           "priceCurrency": {
             "type": "string",
             "example": "USD"
+          },
+          "webhookUrl": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 2048,
+            "format": "uri",
+            "example": "https://example.com/webhook"
+          },
+          "successUrl": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 2048,
+            "format": "uri",
+            "example": "https://example.com/success"
+          },
+          "verificationToken": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 256,
+            "example": "123e4567-e89b-12d3-a456-426614174000"
           }
         },
         "required": [
           "priceAmount",
-          "priceCurrency"
+          "priceCurrency",
+          "webhookUrl",
+          "successUrl",
+          "verificationToken"
         ]
       },
       "PaymentStatus": {
@@ -319,11 +342,11 @@
             "type": "string",
             "example": "123e4567-e89b-12d3-a456-426614174000"
           },
-          "amount": {
+          "priceAmount": {
             "type": "string",
             "example": "100"
           },
-          "currency": {
+          "priceCurrency": {
             "type": "string",
             "example": "USD"
           },
@@ -358,23 +381,30 @@
             "type": "string",
             "format": "uri"
           },
-          "notifyUrl": {
+          "webhookUrl": {
             "type": "string",
             "nullable": true,
             "format": "uri",
-            "example": "https://example.com/notify"
+            "example": "https://example.com/webhook"
+          },
+          "successUrl": {
+            "type": "string",
+            "nullable": true,
+            "format": "uri",
+            "example": "https://example.com/success"
           }
         },
         "required": [
           "id",
-          "amount",
-          "currency",
+          "priceAmount",
+          "priceCurrency",
           "status",
           "createdAt",
           "expiredAt",
           "depositDetails",
           "paymentUrl",
-          "notifyUrl"
+          "webhookUrl",
+          "successUrl"
         ]
       },
       "UpdateDepositSelectionDto": {
@@ -519,10 +549,12 @@
         "properties": {
           "name": {
             "type": "string",
+            "maxLength": 256,
             "example": "My Store"
           },
           "domain": {
             "type": "string",
+            "maxLength": 256,
             "example": "my-store.com"
           },
           "walletAddress": {

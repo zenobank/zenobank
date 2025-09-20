@@ -76,7 +76,7 @@ export class PaymentResponseDto {
     example: '100',
     required: true,
   })
-  amount: string;
+  priceAmount: string;
 
   @Expose()
   @IsISO4217CurrencyCode()
@@ -85,7 +85,7 @@ export class PaymentResponseDto {
     example: 'USD',
     required: true,
   })
-  currency: string;
+  priceCurrency: string;
 
   @Expose()
   @IsEnum(PaymentStatus)
@@ -125,44 +125,16 @@ export class PaymentResponseDto {
   @Expose()
   @IsUrl()
   @ApiProperty({
-    example: 'https://example.com/notify',
+    example: 'https://example.com/webhook',
+    nullable: true,
   })
-  notifyUrl: string | null;
+  webhookUrl: string | null;
 
-  constructor(partial: Partial<PaymentResponseDto>) {
-    Object.assign(this, partial);
-  }
-
-  static fromPrisma(
-    payment: PaymentWithAddress & RequiredPaymentFields,
-  ): PaymentResponseDto {
-    const paymentUrl = getPaymentUrl(payment.id);
-    if (!paymentUrl) {
-      throw new Error('Payment URL could not be generated');
-    }
-
-    const dto = {
-      id: payment.id,
-      amount: payment.priceAmount,
-      currency: payment.priceCurrency,
-      status: payment.status,
-      createdAt: payment.createdAt,
-      expiredAt: payment.expiredAt,
-      notifyUrl: payment.notifyUrl,
-      paymentUrl,
-      depositDetails:
-        payment.depositWalletAddress &&
-        payment.payCurrencyId &&
-        payment.networkId
-          ? plainToInstance(DepositDetailsDto, {
-              address: payment.depositWalletAddress,
-              amount: payment.payAmount,
-              currencyId: payment.payCurrencyId,
-              networkId: payment.networkId,
-            })
-          : null,
-    } satisfies PaymentResponseDto;
-
-    return plainToInstance(PaymentResponseDto, dto);
-  }
+  @Expose()
+  @IsUrl()
+  @ApiProperty({
+    example: 'https://example.com/success',
+    nullable: true,
+  })
+  successUrl: string | null;
 }

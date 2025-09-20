@@ -6,6 +6,7 @@ import {
   IsNumberString,
   IsPositive,
   IsString,
+  MaxLength,
 } from 'class-validator';
 
 export class CreateStoreDto {
@@ -14,6 +15,7 @@ export class CreateStoreDto {
   @ApiProperty({
     example: 'My Store',
   })
+  @MaxLength(256)
   name: string;
 
   @IsNotEmpty()
@@ -21,6 +23,7 @@ export class CreateStoreDto {
   @ApiProperty({
     example: 'my-store.com',
   })
+  @MaxLength(256)
   domain: string;
 
   @IsNotEmpty()
