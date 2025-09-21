@@ -5,10 +5,8 @@
  * Description: Accept Crypto Payments with Ease
  * Version: 1.0.0
  * Author: Zeno Bank
- * Text Domain: crypto-for-woocommerce
- * Domain Path: /languages
  * Requires at least: 6.0
- * Requires PHP: 7.0
+ * Requires PHP: 7.4
  * License: GPL2
  */
 
@@ -20,14 +18,6 @@ define('CFW_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('CFW_VERSION', '1.0.0');
 define('CFW_API_ENDPOINT', 'https://api.zenobank.io/');
 
-// Load translations
-add_action('init', function () {
-    load_plugin_textdomain(
-        'crypto-for-woocommerce',
-        false,
-        dirname(plugin_basename(__FILE__)) . '/languages'
-    );
-});
 
 // Load WooCommerce classes and register gateway + endpoints
 add_action('plugins_loaded', function () {
@@ -98,13 +88,6 @@ add_action('before_woocommerce_init', function () {
 });
 
 
-// Force automatic updates in this plugin
-add_filter('auto_update_plugin', function ($update, $item) {
-    if (isset($item->slug) && $item->slug === 'crypto-for-woocommerce') {
-        return true; // Force the update of this plugin
-    }
-    return $update; // Normal behavior for the rest
-}, 10, 2);
 
 // Generate secrets automatically when the plugin is activated
 register_activation_hook(__FILE__, function () {

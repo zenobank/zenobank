@@ -11,8 +11,8 @@ class CFW_Gateway extends WC_Payment_Gateway
     public function __construct()
     {
         $this->id                 = 'cfw_gateway';
-        $this->method_title       = __('Crytpo Gateway', 'crypto-for-woocommerce');
-        $this->method_description = __('Redirect to the external gateway to complete the payment.', 'crypto-for-woocommerce');
+        $this->method_title       = esc_html__('Crytpo Gateway', 'crypto-for-woocommerce');
+        $this->method_description = esc_html__('Redirect to the external gateway to complete the payment.', 'crypto-for-woocommerce');
         $this->has_fields         = true;
         $this->supports           = ['products'];
 
@@ -21,7 +21,7 @@ class CFW_Gateway extends WC_Payment_Gateway
 
         $this->enabled       = $this->get_option('enabled', 'no');
         $this->title         = $this->get_option('title', __('Crypto Payment Gateway', 'crypto-for-woocommerce'));
-        $this->description   = $this->get_option('description', __('Pay securely with cryptocurrency or credit card. You will be redirected to our secure payment page to complete your transaction.', 'crypto-for-woocommerce'));
+        $this->description   = $this->get_option('description', esc_html__('Pay securely with cryptocurrency or credit card. You will be redirected to our secure payment page to complete your transaction.', 'crypto-for-woocommerce'));
 
         $this->api_key_live  = $this->get_option('api_key_live', '');
         $this->secret_live   = $this->get_option('secret_live', '');
@@ -60,10 +60,10 @@ class CFW_Gateway extends WC_Payment_Gateway
                 'type'        => 'text',
                 'placeholder' => __('0x000...000', 'crypto-for-woocommerce'),
                 'description' => sprintf(
-                    __('Wallet address to receive payments. <br><br>
-        <strong>Don’t have a wallet?</strong> Download the MetaMask extension (%1$s | %2$s), create your wallet, and start receiving payments.', 'crypto-for-woocommerce'),
-                    '<a href="' . esc_url('https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn') . '" target="_blank">Chrome</a>',
-                    '<a href="' . esc_url('https://addons.mozilla.org/firefox/addon/ether-metamask/') . '" target="_blank">Firefox</a>'
+                    // translators: 1: Link to MetaMask Chrome extension, 2: Link to MetaMask Firefox add-on.
+                    __('Wallet address to receive payments. <br><br><strong>Don’t have a wallet?</strong> Download the MetaMask extension (%1$s | %2$s), create your wallet, and start receiving payments.', 'crypto-for-woocommerce'),
+                    '<a href="' . esc_url('https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn') . '" target="_blank" rel="noreferrer noopener">Chrome</a>',
+                    '<a href="' . esc_url('https://addons.mozilla.org/firefox/addon/ether-metamask/') . '" target="_blank" rel="noreferrer noopener">Firefox</a>'
                 ),
             ];
         } else {
@@ -72,7 +72,11 @@ class CFW_Gateway extends WC_Payment_Gateway
             $this->form_fields['wallet_info'] = [
                 'title' => __('Configured Wallet', 'crypto-for-woocommerce'),
                 'type'  => 'title',
-                'description' => sprintf(__('Wallet Address: %s', 'crypto-for-woocommerce'), $wallet_address),
+                'description' => sprintf(
+                    // translators: %s: configured wallet address.
+                    __('Wallet Address: %s', 'crypto-for-woocommerce'),
+                    $wallet_address
+                ),
             ];
         }
     }
@@ -91,7 +95,7 @@ class CFW_Gateway extends WC_Payment_Gateway
         $test_mode        = (bool) $this->test_mode;
 
         if (empty($title)) {
-            $errors[] = __('The "Title" field is required.', 'crypto-for-woocommerce');
+            $errors[] = esc_html__('The "Title" field is required.', 'crypto-for-woocommerce');
         }
 
         if (!empty($wallet_address) && empty($current_api_key)) {
@@ -103,17 +107,17 @@ class CFW_Gateway extends WC_Payment_Gateway
 
                 WC_Admin_Settings::add_message(__('Store registered successfully! API Key has been automatically configured.', 'crypto-for-woocommerce'));
             } else {
-                $errors[] = __('Failed to register store with the provided wallet address. Please check the wallet address and try again.', 'crypto-for-woocommerce');
+                $errors[] = esc_html__('Failed to register store with the provided wallet address. Please check the wallet address and try again.', 'crypto-for-woocommerce');
             }
         }
 
         if ($enabled) {
             if (empty($wallet_address) && empty($current_api_key)) {
-                $errors[] = __('You cannot enable this payment method without a Wallet Address or an API Key.', 'crypto-for-woocommerce');
+                $errors[] = esc_html__('You cannot enable this payment method without a Wallet Address or an API Key.', 'crypto-for-woocommerce');
             }
 
             if (!$test_mode && empty($current_api_key)) {
-                $errors[] = __('You must configure the Live API Key when not in test mode.', 'crypto-for-woocommerce');
+                $errors[] = esc_html__('You must configure the Live API Key when not in test mode.', 'crypto-for-woocommerce');
             }
         }
 
@@ -251,7 +255,7 @@ class CFW_Gateway extends WC_Payment_Gateway
         $response = wp_remote_post($this->current_endpoint() . '/api/v1/payments', $args);
 
         if (is_wp_error($response)) {
-            wc_add_notice(__('Error connecting with the gateway.', 'crypto-for-woocommerce'), 'error');
+            wc_add_notice(esc_html__('Error connecting with the gateway.', 'crypto-for-woocommerce'), 'error');
             return ['result' => 'failure'];
         }
 
@@ -263,7 +267,7 @@ class CFW_Gateway extends WC_Payment_Gateway
             return ['result' => 'failure'];
         }
 
-        $order->update_status('pending', __('Waiting for payment in Crytpo Gateway', 'crypto-for-woocommerce'));
+        $order->update_status('pending', esc_html__('Waiting for payment in Crytpo Gateway', 'crypto-for-woocommerce'));
         // Save payment URL as meta
         update_post_meta($order_id, '_cfw_payment_url', esc_url_raw($payment_url));
 
@@ -275,7 +279,7 @@ class CFW_Gateway extends WC_Payment_Gateway
     {
         // Verify nonce for security
         if (!isset($_GET['_wpnonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_GET['_wpnonce'])), 'cfw_return_nonce')) {
-            wp_die(__('Security check failed. Please try again.', 'crypto-for-woocommerce'));
+            wp_die(esc_html__('Security check failed. Please try again.', 'crypto-for-woocommerce'));
         }
 
         $order_id = (int)sanitize_text_field(wp_unslash($_GET['order_id'] ?? 0));
@@ -295,13 +299,13 @@ class CFW_Gateway extends WC_Payment_Gateway
 
         $expected = hash_hmac('sha256', (string)$order_id, $gw->current_secret());
         if (!hash_equals($expected, $hash)) {
-            $order->add_order_note(__('Invalid return: incorrect signature.', 'crypto-for-woocommerce'));
+            $order->add_order_note(esc_html__('Invalid return: incorrect signature.', 'crypto-for-woocommerce'));
             wp_safe_redirect($order->get_checkout_payment_url());
             exit;
         }
 
         $order->payment_complete();
-        $order->add_order_note(__('Payment confirmed in return URL.', 'crypto-for-woocommerce'));
+        $order->add_order_note(esc_html__('Payment confirmed in return URL.', 'crypto-for-woocommerce'));
         wp_safe_redirect($gw->get_return_url($order));
         exit;
     }
