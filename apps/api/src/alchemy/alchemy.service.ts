@@ -23,6 +23,7 @@ import {
   NETWORK_TO_ALCHEMY_SDK,
 } from './lib/alchemy.network-map';
 import axios from 'axios';
+import { ms } from 'src/lib/utils/ms';
 
 @Injectable()
 export class AlchemyService {
@@ -83,14 +84,7 @@ export class AlchemyService {
         this.logger.error('Invalid token amount', { activity });
         continue;
       }
-      console.log('tokenAmount', tokenAmount);
-      console.log('tokenId', tokenId);
-      console.log('network', network);
-      console.log('activity.toAddress', activity.toAddress);
-      console.log(
-        'activity.rawContract?.address',
-        activity.rawContract?.address,
-      );
+
       const payment = await this.db.payment.findFirst({
         where: {
           payAmount: tokenAmount.toString(),
@@ -104,15 +98,10 @@ export class AlchemyService {
         },
       });
       if (payment) {
-        // send webhook
-        const completedPayment =
-          await this.paymentService.markPaymentAsCompleted(payment.id);
-        if (completedPayment.webhookUrl) {
-          axios.post(completedPayment.webhookUrl, {
-            eventType: 'payment_completed',
-            payload: completedPayment,
-          });
-        }
+        await this.paymentService.markPaymentAsProcessing(payment.id);
+        setTimeout(() => {
+          this.paymentService.markPaymentAsCompleted(payment.id);
+        }, ms('30s'));
       } else {
         this.logger.warn(
           `Payment not found ${JSON.stringify({

@@ -28,6 +28,7 @@ import { isISO4217CurrencyCode, IsISO4217CurrencyCode } from 'class-validator';
 import { toDto } from 'src/lib/utils/to-dto';
 import { getPaymentUrl } from './lib/utils';
 import { plainToInstance } from 'class-transformer';
+import axios from 'axios';
 
 @Injectable()
 export class PaymentService {
@@ -81,6 +82,23 @@ export class PaymentService {
     });
     this.logger.log(`Marked payment ${id} as completed`);
 
+    const completedPayment = await this.getPayment(id);
+    if (!completedPayment) {
+      throw new NotFoundException('Payment not found');
+    }
+    if (completedPayment?.webhookUrl) {
+      axios.post(completedPayment.webhookUrl, {
+        eventType: 'payment_completed',
+        payload: completedPayment,
+      });
+    }
+    return completedPayment;
+  }
+  async markPaymentAsProcessing(id: string): Promise<PaymentResponseDto> {
+    await this.db.payment.update({
+      where: { id },
+      data: { status: PaymentStatus.PROCESSING },
+    });
     return (await this.getPayment(id))!;
   }
 
@@ -236,7 +254,7 @@ export class PaymentService {
       );
 
       // 🔑 forzamos a 6 decimales como string
-      const candidateStr = candidate.toFixed(MAX_DECIMALS);
+      const candidateStr = candidate.decimalPlaces(MAX_DECIMALS).toString();
 
       const exists = await this.db.payment.findFirst({
         where: {

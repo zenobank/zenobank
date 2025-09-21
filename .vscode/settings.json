@@ -1,8 +1,15 @@
 {
+  "eslint.useFlatConfig": true,
   "eslint.workingDirectories": [
     {
       "mode": "auto"
     }
+  ],
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
   ],
   "editor.accessibilitySupport": "off",
   "editor.formatOnSave": true,
@@ -16,7 +23,6 @@
   "[json]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "eslint.validate": ["typescript"],
   "prettier.requireConfig": true,
   "[php]": {
     "editor.defaultFormatter": "bmewburn.vscode-intelephense-client"

@@ -288,6 +288,7 @@
         "type": "string",
         "enum": [
           "PENDING",
+          "PROCESSING",
           "UNDER_PAYMENT",
           "COMPLETED",
           "EXPIRED",

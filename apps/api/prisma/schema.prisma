@@ -46,6 +46,7 @@ model Wallet {
 
 enum PaymentStatus {
   PENDING
+  PROCESSING
   UNDER_PAYMENT
   COMPLETED
   EXPIRED

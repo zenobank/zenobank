@@ -1,44 +1,37 @@
 'use client';
-import { useState, useEffect, useMemo } from 'react';
-import { ChevronsUpDown, Check, TimerIcon } from 'lucide-react';
-import Countdown from 'react-countdown';
-import { toast } from 'sonner';
+import { Badge } from '@/src/components/ui/badge';
+import { Button } from '@/src/components/ui/button';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/src/components/ui/card';
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/src/components/ui/command';
+import { CopyButton } from '@/src/components/ui/copy-button';
+import { Popover, PopoverContent, PopoverTrigger } from '@/src/components/ui/popover';
+import { CheckoutSelection } from '@/src/features/payments/types/selection';
+import { CheckoutState } from '@/src/features/payments/types/state';
+import { ms } from '@/src/lib/ms';
 import {
   useAssetControllerGetSupportedTokensV1,
   useNetworksControllerGetNetworksV1,
   usePaymentControllerGetPaymentV1,
   usePaymentControllerUpdatePaymentDepositSelectionV1,
 } from '@/src/lib/requests/api-client/aPIDocs';
-import {
-  NetworkId,
-  PaymentResponseDto,
-  PaymentStatus,
-  TokenResponseDto,
-  NetworkResponseDto,
-} from '@/src/lib/requests/api-client/model';
+import { NetworkId, TokenResponseDto } from '@/src/lib/requests/api-client/model';
 import { cn } from '@/src/lib/utils';
-import { Badge } from '@/src/components/ui/badge';
-import { Button } from '@/src/components/ui/button';
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/src/components/ui/card';
-import {
-  Command,
-  CommandInput,
-  CommandList,
-  CommandEmpty,
-  CommandGroup,
-  CommandItem,
-} from '@/src/components/ui/command';
-import { CopyButton } from '@/src/components/ui/copy-button';
-import { PopoverContent, PopoverTrigger, Popover } from '@/src/components/ui/popover';
-import { Separator } from '@/src/components/ui/separator';
-import { CheckoutSelection } from '@/src/features/payments/types/selection';
-import { CheckoutState } from '@/src/features/payments/types/state';
+import { Check, ChevronsUpDown, TimerIcon } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import Countdown from 'react-countdown';
+import { toast } from 'sonner';
+import Image from 'next/image';
 import PaymentDetails from './components/DetailsScreen';
 import ExpiredScreen from './components/ExpiredScreen';
 import SuccessScreen from './components/SuccessScreen';
 import { getPaymentCheckoutState } from './utils/payment-checkout-state';
-import { getCanonicalTokenOptions } from './utils/cannonical-token-options';
-import { ms } from '@/src/lib/ms';
 
 interface PaymentsProps {
   id: string;
@@ -51,11 +44,7 @@ enum PopoverId {
 
 export default function Payament({ id }: PaymentsProps) {
   const { mutateAsync: updatePaymentDepositSelection } = usePaymentControllerUpdatePaymentDepositSelectionV1();
-  const {
-    data: { data: paymentData } = {},
-    refetch: refetchPaymentData,
-    isLoading: isLoadingPaymentData,
-  } = usePaymentControllerGetPaymentV1(id, {
+  const { data: { data: paymentData } = {}, refetch: refetchPaymentData } = usePaymentControllerGetPaymentV1(id, {
     query: {
       refetchInterval: ms('3s'),
     },
@@ -66,67 +55,54 @@ export default function Payament({ id }: PaymentsProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [activePopover, setActivePopover] = useState<PopoverId | null>(null);
 
-  const [paymentSelection, setPaymentSelection] = useState<CheckoutSelection>({
-    selectedTokenId: paymentData?.depositDetails?.currencyId || null,
-    selectedNetworkId: paymentData?.depositDetails?.networkId || null,
-  });
+  const [selectedTokenId, setSelectedTokenId] = useState<string | null>(null);
+
+  const selectedTokenData: TokenResponseDto | null = useMemo(() => {
+    return supportedTokens?.find((t) => t.id === selectedTokenId) || null;
+  }, [supportedTokens, selectedTokenId]);
+
+  const selectedNetworkId = useMemo(() => {
+    return selectedTokenData?.networkId || null;
+  }, [selectedTokenData]);
 
   useEffect(() => {
     if (paymentData?.depositDetails) {
-      setPaymentSelection({
-        selectedTokenId: paymentData?.depositDetails?.currencyId || null,
-        selectedNetworkId: paymentData?.depositDetails?.networkId || null,
-      });
+      setSelectedTokenId(paymentData?.depositDetails?.currencyId || null);
     }
   }, [paymentData?.depositDetails]);
-
-  console.log('paymentSelection', paymentSelection);
 
   const checkoutState = useMemo(() => {
     if (!paymentData) return CheckoutState.AWAITING_DEPOSIT;
     return getPaymentCheckoutState(paymentData);
-  }, [paymentData, isLoadingPaymentData]);
+  }, [paymentData]);
 
-  const cannonicalTokenOptions = useMemo(() => getCanonicalTokenOptions(supportedTokens), [supportedTokens]);
   const availableNetworksIdsForSelectedToken: NetworkId[] = useMemo(() => {
-    const networksIds =
-      cannonicalTokenOptions.find((cannonicalToken) => cannonicalToken.id === paymentSelection.selectedTokenId)
-        ?.networks || [];
+    const tokens = supportedTokens?.filter((t) => t.canonicalTokenId === selectedTokenData?.canonicalTokenId);
 
-    return networksIds;
-  }, [cannonicalTokenOptions, paymentSelection.selectedTokenId]);
+    return tokens?.map((t) => t.networkId) || [];
+  }, [supportedTokens, selectedTokenData?.canonicalTokenId]);
 
-  const selectedTokenData: TokenResponseDto | null = useMemo(() => {
-    return supportedTokens?.find((t) => t.id === paymentSelection.selectedTokenId) || null;
-  }, [supportedTokens, paymentSelection.selectedTokenId]);
+  console.log('!!availableNetworksIdsForSelectedToken', availableNetworksIdsForSelectedToken);
+  console.log('selectedTokenData?.id', selectedTokenData?.id);
 
   // Calculate token amount and USD conversion
 
   const selectedNetworkData = useMemo(() => {
-    if (!paymentSelection.selectedNetworkId) return null;
-    return networks?.find((n) => n.id.toString() === paymentSelection.selectedNetworkId);
-  }, [paymentSelection.selectedNetworkId, networks]);
+    if (!selectedNetworkId) return null;
+    return networks?.find((n) => n.id.toString() === selectedNetworkId);
+  }, [selectedNetworkId, networks]);
 
   // Auto-select network if only one is available
   useEffect(() => {
-    if (paymentSelection.selectedTokenId && availableNetworksIdsForSelectedToken.length === 1) {
-      setPaymentSelection((prev) => ({
-        ...prev,
-        selectedNetworkId: availableNetworksIdsForSelectedToken[0] as NetworkId,
-      }));
+    if (selectedTokenId && availableNetworksIdsForSelectedToken.length === 1) {
+      const token = supportedTokens?.find(
+        (t) =>
+          t.canonicalTokenId === selectedTokenData?.canonicalTokenId &&
+          t.networkId === availableNetworksIdsForSelectedToken[0],
+      );
+      setSelectedTokenId(token?.id || null);
     }
-  }, [paymentSelection.selectedTokenId, cannonicalTokenOptions]);
-
-  // Auto-open network selector when token is selected (only if multiple networks available)
-  useEffect(() => {
-    if (
-      paymentSelection.selectedTokenId &&
-      !paymentSelection.selectedNetworkId &&
-      availableNetworksIdsForSelectedToken.length > 1
-    ) {
-      setActivePopover(PopoverId.NETWORK);
-    }
-  }, [paymentSelection.selectedTokenId, paymentSelection.selectedNetworkId, availableNetworksIdsForSelectedToken]);
+  }, [selectedTokenId, availableNetworksIdsForSelectedToken, supportedTokens, selectedTokenData]);
 
   const [disabled, buttonText] = useMemo(() => {
     if (isLoading) {
@@ -143,16 +119,15 @@ export default function Payament({ id }: PaymentsProps) {
 
   const handleDepositSelectionSubmit = async () => {
     if (disabled || !paymentData?.id) return;
-    const { selectedTokenId: selectedToken, selectedNetworkId: selectedNetwork } = paymentSelection;
 
-    if (!selectedToken || !selectedNetwork) return;
+    if (!selectedTokenId || !selectedNetworkId) return;
     setIsLoading(true);
     try {
       await updatePaymentDepositSelection({
         id: paymentData.id,
         data: {
-          tokenId: selectedToken,
-          networkId: selectedNetwork,
+          tokenId: selectedTokenId,
+          networkId: selectedNetworkId,
         },
       });
       await refetchPaymentData();
@@ -174,7 +149,7 @@ export default function Payament({ id }: PaymentsProps) {
               <div className="flex items-center">
                 <CardTitle className="text-lg">Send Payment</CardTitle>
               </div>
-              {paymentData?.expiredAt && (
+              {paymentData?.expiredAt && checkoutState === CheckoutState.AWAITING_DEPOSIT && (
                 <Badge variant="secondary">
                   <TimerIcon />
                   <Countdown
@@ -238,7 +213,9 @@ export default function Payament({ id }: PaymentsProps) {
                       >
                         {selectedTokenData ? (
                           <div className="flex items-center gap-3">
-                            <img
+                            <Image
+                              width={24}
+                              height={24}
                               src={`/images/tokens/${selectedTokenData.canonicalTokenId.toLowerCase()}.png`}
                               alt={selectedTokenData.symbol}
                               className="h-6 w-6 rounded-full"
@@ -260,40 +237,43 @@ export default function Payament({ id }: PaymentsProps) {
                         <CommandList>
                           <CommandEmpty>No cryptocurrency found.</CommandEmpty>
                           <CommandGroup>
-                            {cannonicalTokenOptions?.map((cannonicalToken) => (
-                              <CommandItem
-                                key={cannonicalToken.id}
-                                value={cannonicalToken.id}
-                                onSelect={(currentValue: string) => {
-                                  if (currentValue !== selectedTokenData?.id) {
-                                    setPaymentSelection({
-                                      ...paymentSelection,
-                                      selectedTokenId: currentValue,
-                                      selectedNetworkId: null,
-                                    });
-                                  }
-                                  setActivePopover(null);
-                                }}
-                              >
-                                <div className="flex w-full items-center gap-3">
-                                  <img
-                                    src={cannonicalToken.imageUrl}
-                                    alt={cannonicalToken.symbol}
-                                    className="h-6 w-6 rounded-full"
-                                  />
-                                  <div className="flex-1">
-                                    <div className="text-sm font-bold">{cannonicalToken.symbol}</div>
-                                    <div className="text-xs">{cannonicalToken.symbol}</div>
+                            {supportedTokens
+                              ?.filter(
+                                (t, i, arr) => i === arr.findIndex((u) => u.canonicalTokenId === t.canonicalTokenId),
+                              )
+                              ?.map((supportedToken) => (
+                                <CommandItem
+                                  key={supportedToken.id}
+                                  value={supportedToken.id}
+                                  onSelect={(currentValue: string) => {
+                                    const token = supportedTokens?.find((t) => t.id === currentValue);
+                                    if (token) {
+                                      setSelectedTokenId(token.id);
+                                    }
+                                    setActivePopover(null);
+                                  }}
+                                >
+                                  <div className="flex w-full items-center gap-3">
+                                    <Image
+                                      width={24}
+                                      height={24}
+                                      src={`/images/tokens/${supportedToken.canonicalTokenId.toLowerCase()}.png`}
+                                      alt={supportedToken.symbol}
+                                      className="h-6 w-6 rounded-full"
+                                    />
+                                    <div className="flex-1">
+                                      <div className="text-sm font-bold">{supportedToken.symbol}</div>
+                                      <div className="text-xs">{supportedToken.symbol}</div>
+                                    </div>
+                                    <Check
+                                      className={cn(
+                                        'ml-auto h-4 w-4',
+                                        selectedTokenData?.id === supportedToken.id ? 'opacity-100' : 'opacity-0',
+                                      )}
+                                    />
                                   </div>
-                                  <Check
-                                    className={cn(
-                                      'ml-auto h-4 w-4',
-                                      selectedTokenData?.id === cannonicalToken.id ? 'opacity-100' : 'opacity-0',
-                                    )}
-                                  />
-                                </div>
-                              </CommandItem>
-                            ))}
+                                </CommandItem>
+                              ))}
                           </CommandGroup>
                         </CommandList>
                       </Command>
@@ -348,10 +328,14 @@ export default function Payament({ id }: PaymentsProps) {
                                     value={network.id.toString()}
                                     onSelect={(currentValue: string) => {
                                       if (currentValue !== selectedNetworkData?.id.toString()) {
-                                        setPaymentSelection({
-                                          ...paymentSelection,
-                                          selectedNetworkId: currentValue as NetworkId,
-                                        });
+                                        const token = supportedTokens?.find(
+                                          (t) =>
+                                            t.canonicalTokenId === selectedTokenData?.canonicalTokenId &&
+                                            t.networkId === currentValue,
+                                        );
+                                        if (token) {
+                                          setSelectedTokenId(token.id);
+                                        }
                                       }
                                       setActivePopover(null);
                                     }}
@@ -413,7 +397,7 @@ const Footer = () => {
     <div className="mt-6 text-center">
       <p className="text-xs">
         Powered by{' '}
-        <a href="https://zenobank.io" target="_blank">
+        <a href="https://zenobank.io" target="_blank" rel="noreferrer">
           <span className="underline">Zenobank</span>
         </a>
       </p>

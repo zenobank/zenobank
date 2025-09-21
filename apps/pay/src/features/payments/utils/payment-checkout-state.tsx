@@ -1,4 +1,3 @@
-import { useMemo } from 'react';
 import { isAfter } from 'date-fns';
 import { PaymentResponseDto, PaymentStatus } from '@/src/lib/requests/api-client/model';
 import { CheckoutState } from '@/src/features/payments/types/state';
