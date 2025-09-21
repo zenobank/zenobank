@@ -6,7 +6,6 @@
  * Version: 1.0.0
  * Author: Zeno Bank
  * Text Domain: crypto-for-woocommerce
- * Domain Path: /languages
  * Requires at least: 6.0
  * Requires PHP: 7.0
  * License: GPL2
