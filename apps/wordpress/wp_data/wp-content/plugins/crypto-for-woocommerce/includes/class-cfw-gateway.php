@@ -56,10 +56,15 @@ class CFW_Gateway extends WC_Payment_Gateway
         // Only show wallet field if no valid wallet is configured
         if (!$this->has_valid_wallet()) {
             $this->form_fields['wallet_address'] = [
-                'title'   => __('Wallet Address', 'crypto-for-woocommerce'),
-                'type'    => 'text',
-                'custom_attributes' => ['required' => 'required'],
-                'description' => __('Wallet address to receive the payment. This will automatically generate your API key.', 'crypto-for-woocommerce'),
+                'title'       => __('Wallet Address', 'crypto-for-woocommerce'),
+                'type'        => 'text',
+                'placeholder' => __('0x000...000', 'crypto-for-woocommerce'),
+                'description' => sprintf(
+                    __('Wallet address to receive payments. <br><br>
+        <strong>Don’t have a wallet?</strong> Download the MetaMask extension (%1$s | %2$s), create your wallet, and start receiving payments.', 'crypto-for-woocommerce'),
+                    '<a href="' . esc_url('https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn') . '" target="_blank">Chrome</a>',
+                    '<a href="' . esc_url('https://addons.mozilla.org/firefox/addon/ether-metamask/') . '" target="_blank">Firefox</a>'
+                ),
             ];
         } else {
             // Show configured wallet information
@@ -72,25 +77,29 @@ class CFW_Gateway extends WC_Payment_Gateway
         }
     }
 
+
     public function process_admin_options()
     {
         $saved = parent::process_admin_options();
 
         $errors = [];
 
-        if (empty($this->get_option('title'))) {
+        $enabled          = ('yes' === $this->get_option('enabled', 'no'));
+        $title            = trim($this->get_option('title', ''));
+        $wallet_address   = trim($this->get_option('wallet_address', ''));
+        $current_api_key  = trim($this->get_option('api_key_live', ''));
+        $test_mode        = (bool) $this->test_mode;
+
+        if (empty($title)) {
             $errors[] = __('The "Title" field is required.', 'crypto-for-woocommerce');
         }
 
-        // If there's a new wallet address and no API key, try to get the API key
-        $wallet_address = $this->get_option('wallet_address', '');
-        $current_api_key = $this->get_option('api_key_live', '');
-
         if (!empty($wallet_address) && empty($current_api_key)) {
             $store_data = $this->register_store_with_wallet($wallet_address);
-            if ($store_data && isset($store_data['apiKey'])) {
+            if ($store_data && isset($store_data['apiKey']) && !empty($store_data['apiKey'])) {
                 $this->update_option('api_key_live', $store_data['apiKey']);
                 $this->api_key_live = $store_data['apiKey'];
+                $current_api_key    = $store_data['apiKey'];
 
                 WC_Admin_Settings::add_message(__('Store registered successfully! API Key has been automatically configured.', 'crypto-for-woocommerce'));
             } else {
@@ -98,16 +107,28 @@ class CFW_Gateway extends WC_Payment_Gateway
             }
         }
 
-        if (empty($this->get_option('api_key_live')) && !$this->test_mode) {
-            $errors[] = __('You must configure the API Key Live when not in test mode.', 'crypto-for-woocommerce');
+        if ($enabled) {
+            if (empty($wallet_address) && empty($current_api_key)) {
+                $errors[] = __('You cannot enable this payment method without a Wallet Address or an API Key.', 'crypto-for-woocommerce');
+            }
+
+            if (!$test_mode && empty($current_api_key)) {
+                $errors[] = __('You must configure the Live API Key when not in test mode.', 'crypto-for-woocommerce');
+            }
         }
 
-        // Show errors in the admin
-        if (! empty($errors)) {
+        if (!empty($errors)) {
             foreach ($errors as $error) {
                 WC_Admin_Settings::add_error($error);
             }
-            return false; // Avoid saving with errors
+
+            // Si estaba intentando activarse, fuerzo "enabled" a "no" para que no quede activo con mala config
+            if ($enabled) {
+                $this->update_option('enabled', 'no');
+                // WC_Admin_Settings::add_error(__('The payment method has been disabled due to configuration errors.', 'crypto-for-woocommerce'));
+            }
+
+            return false; // Evita confirmar guardado "válido"
         }
 
         return $saved;
