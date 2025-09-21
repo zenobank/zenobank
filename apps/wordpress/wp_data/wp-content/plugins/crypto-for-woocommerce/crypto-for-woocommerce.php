@@ -2,7 +2,7 @@
 
 /**
  * Plugin Name: Zeno Crypto Payment Gateway
- * Description: Pasarela de pago que redirige a una API externa para completar pagos. Return + Webhook incluidos.
+ * Description: Accept Crypto Payments with Ease
  * Version: 1.0.0
  * Author: Zeno Bank
  * Text Domain: crypto-for-woocommerce
@@ -132,3 +132,13 @@ register_activation_hook(__FILE__, function () {
 
     update_option($option_key, $settings);
 });
+
+add_filter('plugin_action_links_' . plugin_basename(__FILE__), 'zeno_gateway_action_links');
+
+function zeno_gateway_action_links($links)
+{
+    $settings_link = '<a href="' . admin_url('admin.php?page=wc-settings&tab=checkout&section=cfw_gateway') . '">'
+        . __('Settings', 'crypto-for-woocommerce') . '</a>';
+    array_unshift($links, $settings_link);
+    return $links;
+}
