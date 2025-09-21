@@ -122,13 +122,12 @@ class CFW_Gateway extends WC_Payment_Gateway
                 WC_Admin_Settings::add_error($error);
             }
 
-            // Si estaba intentando activarse, fuerzo "enabled" a "no" para que no quede activo con mala config
+            // If it was trying to be enabled, force "enabled" to "no" so it doesn't remain active with bad config
             if ($enabled) {
                 $this->update_option('enabled', 'no');
-                // WC_Admin_Settings::add_error(__('The payment method has been disabled due to configuration errors.', 'crypto-for-woocommerce'));
             }
 
-            return false; // Evita confirmar guardado "válido"
+            return false; // Prevent confirming as a "valid" save
         }
 
         return $saved;
