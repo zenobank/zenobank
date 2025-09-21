@@ -201,7 +201,7 @@ export default function Payament({ id }: PaymentsProps) {
                 ) : (
                   // Show currency amount when no token/network selected yet
                   <div className="flex items-center justify-center gap-3 text-3xl font-bold">
-                    {paymentData?.currency} {paymentData?.amount}
+                    {paymentData?.priceCurrency} {paymentData?.priceAmount}
                   </div>
                 )}
               </div>

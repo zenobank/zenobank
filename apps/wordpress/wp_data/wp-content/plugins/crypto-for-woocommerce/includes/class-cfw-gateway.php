@@ -6,7 +6,7 @@ class CFW_Gateway extends WC_Payment_Gateway
     private $api_key_live;
     private $secret_live;
     private $debug;
-    private $endpoint_live;
+    private $test_mode;
 
     public function __construct()
     {
@@ -20,12 +20,12 @@ class CFW_Gateway extends WC_Payment_Gateway
         $this->init_settings();
 
         $this->enabled       = $this->get_option('enabled', 'no');
-        $this->title         = $this->get_option('title', __('Crytpo (Card/Crypto)', 'crypto-for-woocommerce'));
-        $this->description   = $this->get_option('description', '');
+        $this->title         = $this->get_option('title', __('Crypto Payment Gateway', 'crypto-for-woocommerce'));
+        $this->description   = $this->get_option('description', __('Pay securely with cryptocurrency or credit card. You will be redirected to our secure payment page to complete your transaction.', 'crypto-for-woocommerce'));
 
         $this->api_key_live  = $this->get_option('api_key_live', '');
         $this->secret_live   = $this->get_option('secret_live', '');
-        $this->endpoint_live = $this->get_option('endpoint_live', 'https://api.example.com');
+        $this->test_mode     = true; // Always enabled by default
         $this->debug         = $this->get_option('debug', 'no') === 'yes';
 
         add_action('woocommerce_update_options_payment_gateways_' . $this->id, [$this, 'process_admin_options']);
@@ -44,51 +44,63 @@ class CFW_Gateway extends WC_Payment_Gateway
                 'title'       => __('Title', 'crypto-for-woocommerce'),
                 'type'        => 'text',
                 'description' => __('Text that the customer sees in the checkout.', 'crypto-for-woocommerce'),
-                'default'     => __('Crytpo (Card/Crypto)', 'crypto-for-woocommerce'),
+                'default'     => __('Crypto Payment Gateway', 'crypto-for-woocommerce'),
             ],
             'description' => [
                 'title'       => __('Description', 'crypto-for-woocommerce'),
                 'type'        => 'textarea',
-                'default'     => __('You will be redirected to a secure payment page.', 'crypto-for-woocommerce'),
+                'default'     => __('Pay securely with cryptocurrency ', 'crypto-for-woocommerce'),
             ],
-            'endpoint_live' => [
-                'title'   => __('Endpoint Live', 'crypto-for-woocommerce'),
-                'type'    => 'text',
-                'default' => 'https://api.zenobank.io',
-            ],
-            'wallet_address' => [
+        ];
+
+        // Only show wallet field if no valid wallet is configured
+        if (!$this->has_valid_wallet()) {
+            $this->form_fields['wallet_address'] = [
                 'title'   => __('Wallet Address', 'crypto-for-woocommerce'),
                 'type'    => 'text',
-                'description' => __('Wallet address to receive the payment.', 'crypto-for-woocommerce'),
-            ],
-
-            'api_key_live' => [
-                'title' => __('API Key Live', 'crypto-for-woocommerce'),
-                'type'  => 'password',
-            ],
-            'secret_live' => [
-                'title' => __('Secret Live', 'crypto-for-woocommerce'),
-                'type'  => 'password',
-            ],
-
-        ];
+                'custom_attributes' => ['required' => 'required'],
+                'description' => __('Wallet address to receive the payment. This will automatically generate your API key.', 'crypto-for-woocommerce'),
+            ];
+        } else {
+            // Show configured wallet information
+            $wallet_address = $this->get_option('wallet_address', '');
+            $this->form_fields['wallet_info'] = [
+                'title' => __('Configured Wallet', 'crypto-for-woocommerce'),
+                'type'  => 'title',
+                'description' => sprintf(__('Wallet Address: %s', 'crypto-for-woocommerce'), $wallet_address),
+            ];
+        }
     }
 
     public function process_admin_options()
     {
         $saved = parent::process_admin_options();
 
-        // Validar campos obligatorios
         $errors = [];
 
         if (empty($this->get_option('title'))) {
             $errors[] = __('The "Title" field is required.', 'crypto-for-woocommerce');
         }
 
-        if (empty($this->get_option('api_key_live')) && $this->get_option('mode') === 'live') {
-            $errors[] = __('You must configure the API Key Live when the mode is Live.', 'crypto-for-woocommerce');
+        // If there's a new wallet address and no API key, try to get the API key
+        $wallet_address = $this->get_option('wallet_address', '');
+        $current_api_key = $this->get_option('api_key_live', '');
+
+        if (!empty($wallet_address) && empty($current_api_key)) {
+            $store_data = $this->register_store_with_wallet($wallet_address);
+            if ($store_data && isset($store_data['apiKey'])) {
+                $this->update_option('api_key_live', $store_data['apiKey']);
+                $this->api_key_live = $store_data['apiKey'];
+
+                WC_Admin_Settings::add_message(__('Store registered successfully! API Key has been automatically configured.', 'crypto-for-woocommerce'));
+            } else {
+                $errors[] = __('Failed to register store with the provided wallet address. Please check the wallet address and try again.', 'crypto-for-woocommerce');
+            }
         }
 
+        if (empty($this->get_option('api_key_live')) && !$this->test_mode) {
+            $errors[] = __('You must configure the API Key Live when not in test mode.', 'crypto-for-woocommerce');
+        }
 
         // Show errors in the admin
         if (! empty($errors)) {
@@ -115,7 +127,7 @@ class CFW_Gateway extends WC_Payment_Gateway
 
     private function current_endpoint(): string
     {
-        return $this->endpoint_live;
+        return CFW_API_ENDPOINT;
     }
     private function current_api_key(): string
     {
@@ -124,6 +136,53 @@ class CFW_Gateway extends WC_Payment_Gateway
     private function current_secret(): string
     {
         return $this->secret_live;
+    }
+
+    private function register_store_with_wallet($wallet_address, $store_name = null, $domain = null)
+    {
+        if (empty($wallet_address)) {
+            return false;
+        }
+
+        $store_name = $store_name ?: get_bloginfo('name');
+        $domain = $domain ?: $_SERVER['HTTP_HOST'] ?? 'localhost';
+
+        $payload = [
+            'name' => $store_name,
+            'domain' => $domain,
+            'walletAddress' => $wallet_address
+        ];
+
+        $args = [
+            'headers' => [
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ],
+            'body' => wp_json_encode($payload),
+            'timeout' => 25,
+        ];
+
+        $response = wp_remote_post($this->current_endpoint() . '/api/v1/users/store', $args);
+
+        if (is_wp_error($response)) {
+            return false;
+        }
+
+        $body = json_decode(wp_remote_retrieve_body($response), true);
+
+        if (isset($body['apiKey']) && !empty($body['apiKey'])) {
+            return $body;
+        }
+
+        return false;
+    }
+
+    private function has_valid_wallet(): bool
+    {
+        $wallet_address = $this->get_option('wallet_address', '');
+        $api_key = $this->get_option('api_key_live', '');
+
+        return !empty($wallet_address) && !empty($api_key);
     }
 
     public function process_payment($order_id)
@@ -174,7 +233,7 @@ class CFW_Gateway extends WC_Payment_Gateway
         }
 
         $order->update_status('pending', __('Waiting for payment in Crytpo Gateway', 'crypto-for-woocommerce'));
-        // Guardar la URL de pago como meta
+        // Save payment URL as meta
         update_post_meta($order_id, '_cfw_payment_url', esc_url_raw($payment_url));
 
 
@@ -200,13 +259,13 @@ class CFW_Gateway extends WC_Payment_Gateway
 
         $expected = hash_hmac('sha256', (string)$order_id, $gw->current_secret());
         if (!hash_equals($expected, $hash)) {
-            $order->add_order_note(__('Return inválido: firma incorrecta.', 'crypto-for-woocommerce'));
+            $order->add_order_note(__('Invalid return: incorrect signature.', 'crypto-for-woocommerce'));
             wp_safe_redirect($order->get_checkout_payment_url());
             exit;
         }
 
         $order->payment_complete();
-        $order->add_order_note(__('Pago confirmado en return URL.', 'crypto-for-woocommerce'));
+        $order->add_order_note(__('Payment confirmed in return URL.', 'crypto-for-woocommerce'));
         wp_safe_redirect($gw->get_return_url($order));
         exit;
     }
