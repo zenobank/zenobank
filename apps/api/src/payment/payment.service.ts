@@ -56,7 +56,7 @@ export class PaymentService {
         priceCurrency,
         webhookUrl: createPaymentDto.webhookUrl,
         successUrl: createPaymentDto.successUrl,
-        orderId: randomUUID(),
+        orderId: createPaymentDto.orderId ?? randomUUID(),
         verificationToken: createPaymentDto.verificationToken ?? randomUUID(),
         expiredAt: new Date(Date.now() + ms('1h')),
         storeId: store.id,
@@ -88,7 +88,7 @@ export class PaymentService {
     }
     if (completedPayment?.webhookUrl) {
       axios.post(completedPayment.webhookUrl, {
-        eventType: 'payment_completed',
+        eventType: 'payment.completed',
         payload: completedPayment,
       });
     }

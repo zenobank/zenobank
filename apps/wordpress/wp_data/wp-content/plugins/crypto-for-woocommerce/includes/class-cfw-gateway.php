@@ -206,26 +206,36 @@ class CFW_Gateway extends WC_Payment_Gateway
         return !empty($wallet_address) && !empty($api_key);
     }
 
+    public function generate_verification_token($order_id)
+    {
+        return hash_hmac('sha256', (string)$order_id, $this->current_secret());
+    }
+
     public function process_payment($order_id)
     {
         $order   = wc_get_order($order_id);
         $amount  = $order->get_total();
         $currency = $order->get_currency();
-        $hash = hash_hmac('sha256', (string)$order_id, $this->current_secret());
+        $verification_token = $this->generate_verification_token($order_id);
         $success_url = add_query_arg([
             'order_id' => $order_id,
-            'hash'     => $hash,
+            'verification_token'     => $verification_token,
         ], WC()->api_request_url('cfw_return'));
+
+        $webhook_url = add_query_arg([
+            'order_id' => $order_id,
+            'verification_token'     => $verification_token,
+        ], rest_url('cfw/v1/webhook'));
 
         $payload = [
             'version' => CFW_VERSION,
             'platform' => 'woocommerce',
             'priceAmount'       => $amount,
             'priceCurrency'     => $currency,
-            'orderId'     => $order_id,
+            'orderId'     => (string) $order_id,
             'successUrl'   => $success_url,
-            'verificationToken' => $hash,
-            'webhookUrl' => rest_url('cfw/v1/webhook'),
+            'verificationToken' => $verification_token,
+            'webhookUrl' => $webhook_url,
         ];
 
         $args = [

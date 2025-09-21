@@ -55,7 +55,7 @@ enum PaymentStatus {
 
 model Payment {
   id      String @id @default(cuid())
-  orderId String @unique
+  orderId String
 
   title       String?
   description String?

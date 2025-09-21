@@ -274,6 +274,11 @@
             "nullable": true,
             "maxLength": 256,
             "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          "orderId": {
+            "type": "string",
+            "nullable": true,
+            "example": "765"
           }
         },
         "required": [
@@ -281,7 +286,8 @@
           "priceCurrency",
           "webhookUrl",
           "successUrl",
-          "verificationToken"
+          "verificationToken",
+          "orderId"
         ]
       },
       "PaymentStatus": {

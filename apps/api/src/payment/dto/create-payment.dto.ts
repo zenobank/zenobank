@@ -53,4 +53,12 @@ export class CreatePaymentDto {
     nullable: true,
   })
   verificationToken: string | null;
+
+  @IsOptional()
+  @IsString()
+  @ApiProperty({
+    example: '765',
+    nullable: true,
+  })
+  orderId: string | null;
 }
