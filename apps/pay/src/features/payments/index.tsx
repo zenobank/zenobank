@@ -61,6 +61,7 @@ export default function Payament({ id }: PaymentsProps) {
     },
   });
   const { data: { data: supportedTokens } = {} } = useAssetControllerGetSupportedTokensV1();
+
   const { data: { data: networks } = {} } = useNetworksControllerGetNetworksV1();
   const [isLoading, setIsLoading] = useState(false);
   const [activePopover, setActivePopover] = useState<PopoverId | null>(null);
@@ -69,6 +70,17 @@ export default function Payament({ id }: PaymentsProps) {
     selectedTokenId: paymentData?.depositDetails?.currencyId || null,
     selectedNetworkId: paymentData?.depositDetails?.networkId || null,
   });
+
+  useEffect(() => {
+    if (paymentData?.depositDetails) {
+      setPaymentSelection({
+        selectedTokenId: paymentData?.depositDetails?.currencyId || null,
+        selectedNetworkId: paymentData?.depositDetails?.networkId || null,
+      });
+    }
+  }, [paymentData?.depositDetails]);
+
+  console.log('paymentSelection', paymentSelection);
 
   const checkoutState = useMemo(() => {
     if (!paymentData) return CheckoutState.AWAITING_DEPOSIT;

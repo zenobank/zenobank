@@ -36,6 +36,7 @@ export class AlchemyService {
   ) {}
 
   async processAddressActivityWebhook(body: AddressActivityWebhookResponse) {
+    this.logger.log('Processing address activity webhook', { body });
     if (body.type !== AlchemyWebhookType.ADDRESS_ACTIVITY) {
       this.logger.warn(
         `Webhook type is not address activity body.type: ${body.type}`,
@@ -82,7 +83,14 @@ export class AlchemyService {
         this.logger.error('Invalid token amount', { activity });
         continue;
       }
-
+      console.log('tokenAmount', tokenAmount);
+      console.log('tokenId', tokenId);
+      console.log('network', network);
+      console.log('activity.toAddress', activity.toAddress);
+      console.log(
+        'activity.rawContract?.address',
+        activity.rawContract?.address,
+      );
       const payment = await this.db.payment.findFirst({
         where: {
           payAmount: tokenAmount.toString(),

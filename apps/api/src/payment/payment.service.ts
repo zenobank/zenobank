@@ -145,6 +145,9 @@ export class PaymentService {
         'Can not change deposit details, please create a new payment',
       );
     }
+    if (token.networkId !== network.id) {
+      throw new BadRequestException('Token and network do not match');
+    }
     if (currentDepositDetails.status !== PaymentStatus.PENDING) {
       throw new BadRequestException(
         'Can not change deposit details, payment is not pending',
