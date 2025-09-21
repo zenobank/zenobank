@@ -16,7 +16,7 @@ define('CFW_PLUGIN_FILE', __FILE__);
 define('CFW_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('CFW_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('CFW_VERSION', '1.0.0');
-define('CFW_API_ENDPOINT', 'https://api.zenobank.io/');
+define('CFW_API_ENDPOINT', 'https://dkfjadskfjaercl.loca.lt');
 
 
 // Load WooCommerce classes and register gateway + endpoints
@@ -75,14 +75,25 @@ add_filter('woocommerce_available_payment_gateways', function ($gateways) {
     return $gateways;
 }, 20);
 
-add_action('before_woocommerce_init', function () {
+add_action('woocommerce_blocks_loaded', function () {
     if (class_exists('\Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType')) {
         require_once CFW_PLUGIN_DIR . 'includes/class-cfw-blocks.php';
+
         add_action(
             'woocommerce_blocks_payment_method_type_registration',
             function (Automattic\WooCommerce\Blocks\Payments\PaymentMethodRegistry $payment_method_registry) {
                 $payment_method_registry->register(new CFW_Blocks_Gateway());
             }
+        );
+    }
+});
+
+add_action('before_woocommerce_init', function () {
+    if (class_exists(\Automattic\WooCommerce\Utilities\FeaturesUtil::class)) {
+        \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility(
+            'cart_checkout_blocks',
+            __FILE__,
+            true
         );
     }
 });

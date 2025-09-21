@@ -1,0 +1,26 @@
+{
+  "name": "crypto-for-woocommerce",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "pnpm run start:hot",
+    "start": "wp-scripts start",
+    "start:hot": "wp-scripts start --hot",
+    "build": "wp-scripts build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@wordpress/element": "^6.31.0",
+    "@wordpress/html-entities": "^4.31.0",
+    "@wordpress/i18n": "^6.4.0",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
+  },
+  "devDependencies": {
+    "@woocommerce/dependency-extraction-webpack-plugin": "^4.0.0",
+    "@wordpress/scripts": "^30.24.0"
+  }
+}
