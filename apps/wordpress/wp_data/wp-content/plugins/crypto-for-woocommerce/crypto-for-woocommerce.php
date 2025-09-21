@@ -6,6 +6,7 @@
  * Version: 1.0.0
  * Author: Zeno Bank
  * Text Domain: crypto-for-woocommerce
+ * Domain Path: /languages
  * Requires at least: 6.0
  * Requires PHP: 7.0
  * License: GPL2
@@ -96,17 +97,6 @@ add_action('before_woocommerce_init', function () {
     }
 });
 
-
-// // Plugin Update Checker (PUC)
-// if (file_exists(CFW_PLUGIN_DIR . 'plugin-update-checker/plugin-update-checker.php')) {
-//     require CFW_PLUGIN_DIR . 'plugin-update-checker/plugin-update-checker.php';
-//     $cfw_update_checker = Puc_v4_Factory::buildUpdateChecker(
-//         'https://github.com/tu-usuario/crypto-for-woocommerce',
-//         __FILE__,
-//         'crypto-for-woocommerce'
-//     );
-//     $cfw_update_checker->setBranch('main');
-// }
 
 // Force automatic updates in this plugin
 add_filter('auto_update_plugin', function ($update, $item) {

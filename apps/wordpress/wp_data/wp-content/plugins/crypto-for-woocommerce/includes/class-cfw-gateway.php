@@ -165,7 +165,7 @@ class CFW_Gateway extends WC_Payment_Gateway
         }
 
         $store_name = $store_name ?: get_bloginfo('name');
-        $domain = $domain ?: $_SERVER['HTTP_HOST'] ?? 'localhost';
+        $domain = $domain ?: sanitize_text_field(wp_unslash($_SERVER['HTTP_HOST'] ?? 'localhost'));
 
         $payload = [
             'name' => $store_name,
@@ -219,6 +219,7 @@ class CFW_Gateway extends WC_Payment_Gateway
         $success_url = add_query_arg([
             'order_id' => $order_id,
             'verification_token'     => $verification_token,
+            '_wpnonce' => wp_create_nonce('cfw_return_nonce'),
         ], WC()->api_request_url('cfw_return'));
 
         $webhook_url = add_query_arg([
@@ -272,8 +273,13 @@ class CFW_Gateway extends WC_Payment_Gateway
 
     public static function handle_return()
     {
-        $order_id = (int)($_GET['order_id'] ?? 0);
-        $hash     = isset($_GET['hash']) ? sanitize_text_field($_GET['hash']) : '';
+        // Verify nonce for security
+        if (!isset($_GET['_wpnonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_GET['_wpnonce'])), 'cfw_return_nonce')) {
+            wp_die(__('Security check failed. Please try again.', 'crypto-for-woocommerce'));
+        }
+
+        $order_id = (int)sanitize_text_field(wp_unslash($_GET['order_id'] ?? 0));
+        $hash     = isset($_GET['hash']) ? sanitize_text_field(wp_unslash($_GET['hash'])) : '';
 
         if (!$order_id || !($order = wc_get_order($order_id))) {
             wp_safe_redirect(wc_get_page_permalink('shop'));
