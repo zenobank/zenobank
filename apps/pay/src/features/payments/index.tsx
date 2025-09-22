@@ -12,7 +12,6 @@ import {
 } from '@/src/components/ui/command';
 import { CopyButton } from '@/src/components/ui/copy-button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/src/components/ui/popover';
-import { CheckoutSelection } from '@/src/features/payments/types/selection';
 import { CheckoutState } from '@/src/features/payments/types/state';
 import { ms } from '@/src/lib/ms';
 import {
