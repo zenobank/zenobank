@@ -1,3 +1,5 @@
+<img width="422" height="86.3" alt="logo black" src="https://github.com/user-attachments/assets/113a8851-4272-40e2-8ac0-56e0343327e2" />
+
 # Zeno Bank: Open-source Crypto Payment Gateway
 
 An **open-source crypto payment gateway** you can **self-host** or use in the cloud.
