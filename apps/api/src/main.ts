@@ -2,7 +2,6 @@ import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ClassSerializerInterceptor, VersioningType } from '@nestjs/common';
-import { ALCHEMY_WEBHOOK_RECEIVER_PATH } from './alchemy/lib/alchemy.constants';
 import { Request, Response, NextFunction } from 'express';
 import * as fs from 'fs';
 

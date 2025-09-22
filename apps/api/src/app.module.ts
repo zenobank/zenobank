@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-
 import { WalletModule } from './wallet/wallet.module';
 import { ConfigModule } from '@nestjs/config';
 import { Env, getEnv, validateEnvConfig } from './lib/utils/env';
@@ -7,13 +6,10 @@ import { PrismaModule } from './prisma/prisma.module';
 import { BullModule } from '@nestjs/bullmq';
 import { TransactionsModule } from './transactions/transactions.module';
 import { BlockchainModule } from './blockchain/blockchain.module';
-import { PaymentController } from './payments/payment.controller';
 import { PaymentsModule } from './payments/payment.module';
 import { AlchemyModule } from './alchemy/alchemy.module';
 import { NetworksModule } from './networks/networks.module';
 import { WebhooksModule } from './webhooks/webhooks.module';
-import { SVIX_CLIENT } from './webhooks/webhooks.constants';
-import { Svix } from 'svix';
 import { SvixModule } from './webhooks/svix.module';
 import { UsersModule } from './users/users.module';
 
