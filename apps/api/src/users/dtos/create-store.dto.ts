@@ -1,10 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Transform } from 'class-transformer/types/decorators';
 import {
   IsEthereumAddress,
-  IsISO4217CurrencyCode,
   IsNotEmpty,
-  IsNumberString,
-  IsPositive,
   IsString,
   MaxLength,
 } from 'class-validator';
@@ -31,5 +29,6 @@ export class CreateStoreDto {
   @ApiProperty({
     example: '0xc429e068b65b3462f0e422b3ea388a7a37b23bff',
   })
+  @Transform(({ value }) => value?.toLowerCase())
   walletAddress: string;
 }

@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Transform } from 'class-transformer/types/decorators';
 import {
   IsISO4217CurrencyCode,
   IsNotEmpty,
@@ -24,6 +25,7 @@ export class CreatePaymentDto {
   @ApiProperty({
     example: 'USD',
   })
+  @Transform(({ value }) => value?.toUpperCase())
   priceCurrency: string;
 
   // optional
