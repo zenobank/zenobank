@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Transform } from 'class-transformer/types/decorators';
+import { Transform } from 'class-transformer';
 import {
   IsISO4217CurrencyCode,
   IsNotEmpty,
