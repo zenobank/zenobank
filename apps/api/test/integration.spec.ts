@@ -24,7 +24,7 @@ describe('Integration Tests', () => {
   });
 
   afterAll(async () => {
-    await module.close();
+    // await module.close();
   });
 
   describe('PaymentController Integration Tests', () => {
@@ -33,10 +33,17 @@ describe('Integration Tests', () => {
       const createPaymentDto: CreatePaymentDto = {
         priceAmount: '100',
         priceCurrency: 'USD',
+        webhookUrl: 'https://example.com/webhook',
+        successUrl: 'https://example.com/success',
+        verificationToken: '123e4567-e89b-12d3-a456-426614174000',
+        orderId: '765',
       };
 
       // Act
-      const result = await paymentController.createPayment(createPaymentDto);
+      const result = await paymentController.createPayment(
+        createPaymentDto,
+        'test',
+      );
 
       // Assert - Verificar que el resultado tiene todas las variables requeridas
       expect(result).toBeDefined();
@@ -47,11 +54,11 @@ describe('Integration Tests', () => {
       expect(typeof result.id).toBe('string');
       expect(result.id.length).toBeGreaterThan(0);
 
-      expect(result.amount).toBeDefined();
-      expect(result.amount).toBe('100');
+      expect(result.priceAmount).toBeDefined();
+      expect(result.priceAmount).toBe('100');
 
-      expect(result.currency).toBeDefined();
-      expect(result.currency).toBe('USD');
+      expect(result.priceCurrency).toBeDefined();
+      expect(result.priceCurrency).toBe('USD');
 
       expect(result.status).toBeDefined();
       expect(typeof result.status).toBe('string');
@@ -66,8 +73,8 @@ describe('Integration Tests', () => {
       expect(typeof result.paymentUrl).toBe('string');
       expect(result.paymentUrl.length).toBeGreaterThan(0);
 
-      expect(result.notifyUrl).toBeDefined();
-      expect(typeof result.notifyUrl).toBe('string');
+      expect(result.webhookUrl).toBeDefined();
+      expect(typeof result.webhookUrl).toBe('string');
 
       // Verificar depositDetails si existe
       if (result.depositDetails) {
@@ -91,6 +98,10 @@ describe('Integration Tests', () => {
       const createPaymentDto: CreatePaymentDto = {
         priceAmount: '50',
         priceCurrency: 'EUR',
+        webhookUrl: 'https://example.com/webhook',
+        successUrl: 'https://example.com/success',
+        verificationToken: '123e4567-e89b-12d3-a456-426614174000',
+        orderId: '765',
       };
 
       // Act - Crear payment
@@ -107,8 +118,8 @@ describe('Integration Tests', () => {
       // Assert
       expect(retrievedPayment).toBeDefined();
       expect(retrievedPayment.id).toBe(createdPayment.id);
-      expect(retrievedPayment.amount).toBe(createdPayment.amount);
-      expect(retrievedPayment.currency).toBe(createdPayment.currency);
+      expect(retrievedPayment.priceAmount).toBe(createdPayment.priceAmount);
+      expect(retrievedPayment.priceCurrency).toBe(createdPayment.priceCurrency);
       expect(retrievedPayment.status).toBe(createdPayment.status);
     });
   });
