@@ -352,6 +352,9 @@ importers:
       eslint-config-prettier:
         specifier: ^10.1.1
         version: 10.1.1(eslint@9.31.0(jiti@2.5.1))
+      eslint-plugin-cypress:
+        specifier: ^5.1.1
+        version: 5.1.1(eslint@9.31.0(jiti@2.5.1))
       eslint-plugin-only-warn:
         specifier: ^1.1.0
         version: 1.1.0
@@ -4184,6 +4187,11 @@ packages:
     hasBin: true
     peerDependencies:
       eslint: '>=7.0.0'
+
+  eslint-plugin-cypress@5.1.1:
+    resolution: {integrity: sha512-LxTmZf1LLh9EklZBVvKNEZj71X9tCJnlYDviAJGsOgEVc6jz+tBODSpm02CS/9eJOfRqGsmVyvIw7LHXQ13RaA==}
+    peerDependencies:
+      eslint: '>=9'
 
   eslint-plugin-only-warn@1.1.0:
     resolution: {integrity: sha512-2tktqUAT+Q3hCAU0iSf4xAN1k9zOpjK5WO8104mB0rT/dGhOa09582HN5HlbxNbPRZ0THV7nLGvzugcNOSjzfA==}
@@ -11983,6 +11991,11 @@ snapshots:
   eslint-config-prettier@9.1.2(eslint@8.57.1):
     dependencies:
       eslint: 8.57.1
+
+  eslint-plugin-cypress@5.1.1(eslint@9.31.0(jiti@2.5.1)):
+    dependencies:
+      eslint: 9.31.0(jiti@2.5.1)
+      globals: 16.3.0
 
   eslint-plugin-only-warn@1.1.0: {}
 

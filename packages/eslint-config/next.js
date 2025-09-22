@@ -5,13 +5,14 @@ import pluginReactHooks from 'eslint-plugin-react-hooks';
 import pluginReact from 'eslint-plugin-react';
 import globals from 'globals';
 import pluginNext from '@next/eslint-plugin-next';
+import pluginCypress from 'eslint-plugin-cypress';
 import { config as baseConfig } from './base.js';
 
 /**
- * A custom ESLint configuration for libraries that use Next.js.
+ * A custom ESLint configuration for libraries that use Next.js + Cypress.
  *
  * @type {import("eslint").Linter.Config[]}
- * */
+ */
 const nextJsConfig = [
   ...baseConfig,
   js.configs.recommended,
@@ -47,5 +48,20 @@ const nextJsConfig = [
       'react-hooks/exhaustive-deps': ['warn'],
     },
   },
+  {
+    files: ['cypress/**/*.js', 'cypress/**/*.ts'],
+    plugins: {
+      cypress: pluginCypress,
+    },
+    languageOptions: {
+      globals: {
+        ...pluginCypress.environments.globals.globals,
+      },
+    },
+    rules: {
+      ...pluginCypress.configs.recommended.rules,
+    },
+  },
 ];
+
 export default nextJsConfig;
