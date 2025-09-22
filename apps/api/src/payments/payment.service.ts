@@ -37,9 +37,7 @@ export class PaymentService {
     private readonly db: PrismaService,
     private readonly tokenService: TokenService,
     private readonly networksService: NetworksService,
-
-    @Inject(forwardRef(() => AlchemyService))
-    private readonly alchemyService: AlchemyService,
+    private readonly walletService: WalletService,
   ) {}
 
   async createPayment(
@@ -185,7 +183,7 @@ export class PaymentService {
       );
       throw new NotFoundException('Deposit wallet not found');
     }
-    await this.alchemyService.suscribeAddressToWebhook({
+    await this.walletService.subscribeToAddressActivity({
       address: depositWallet.address,
       network: network.id,
     });

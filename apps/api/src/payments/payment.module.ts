@@ -13,7 +13,7 @@ import { AlchemyModule } from 'src/alchemy/alchemy.module';
     AssetModule,
     NetworksModule,
     forwardRef(() => WalletModule),
-    forwardRef(() => AlchemyModule),
+    AlchemyModule,
   ],
   controllers: [PaymentController],
   providers: [PaymentService],

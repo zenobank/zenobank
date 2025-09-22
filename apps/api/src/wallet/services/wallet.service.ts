@@ -70,7 +70,7 @@ export class WalletService {
 
     await Promise.all(
       wallets.map((wallet) =>
-        this.alchemyService.suscribeAddressToWebhook({
+        this.subscribeToAddressActivity({
           address: wallet.address,
           network: wallet.networkId as NetworkId,
         }),
@@ -78,5 +78,25 @@ export class WalletService {
     );
 
     return wallets;
+  }
+  async subscribeToAddressActivity({
+    address,
+    network,
+  }: {
+    address: string;
+    network: NetworkId;
+  }) {
+    const webhook = await this.alchemyService.getWebhook(network);
+    if (!webhook) {
+      throw new Error(
+        `Webhook not found for network ${network}. Address: ${address}`,
+      );
+    }
+    await this.alchemyService.addAddressToWebhook({
+      webhookId: webhook.id,
+      address: address,
+    });
+
+    return webhook;
   }
 }
