@@ -36,11 +36,3 @@ cd zenobank
 pnpm install
 pnpm dev
 ```
-
-## 💸 How Do We Make Money?
-
-Zenobank, both **self-hosted** and the **cloud version**, is free to use with **0% fees**. All payments go **directly to your wallet**.
-
-In the future, we'll likely charge for **premium features**, **team plans**, or **optional add-ons**, but we don't have specifics yet.
-
-We'll always keep a **generous free tier** and share updates with full transparency as things evolve.
