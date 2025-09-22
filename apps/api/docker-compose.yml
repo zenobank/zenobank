@@ -14,7 +14,7 @@ services:
 
   redis:
     image: redis:6.2
-    command: redis-server --requirepass K3yjZLFW2QqPwfjufefG
+    command: redis-server
     ports:
       - '6380:6379'
     volumes:
