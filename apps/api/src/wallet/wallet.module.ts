@@ -1,4 +1,4 @@
-import { forwardRef, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { WalletService } from './services/wallet.service';
 import { WalletFactory } from './wallet.factory';
 
@@ -7,7 +7,7 @@ import { PrismaModule } from 'src/prisma/prisma.module';
 import { AlchemyModule } from 'src/alchemy/alchemy.module';
 
 @Module({
-  imports: [PrismaModule, forwardRef(() => AlchemyModule)],
+  imports: [PrismaModule, AlchemyModule],
   controllers: [WalletController],
   providers: [WalletService, WalletFactory],
   exports: [WalletService, WalletFactory],

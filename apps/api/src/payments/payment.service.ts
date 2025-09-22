@@ -1,7 +1,5 @@
 import {
   BadRequestException,
-  forwardRef,
-  Inject,
   Injectable,
   InternalServerErrorException,
   Logger,
@@ -19,15 +17,13 @@ import { TokenService } from 'src/currencies/token/token.service';
 import { NetworksService } from 'src/networks/networks.service';
 import { WalletService } from 'src/wallet/services/wallet.service';
 import { ms } from 'src/lib/utils/ms';
-import { AlchemyService } from 'src/alchemy/alchemy.service';
-import { Payment, PaymentStatus } from '@prisma/client';
+import { PaymentStatus } from '@prisma/client';
 import { NetworkId } from 'src/networks/network.interface';
 import { Convert } from 'easy-currencies';
 import { toBN } from 'src/lib/utils/numbers';
-import { isISO4217CurrencyCode, IsISO4217CurrencyCode } from 'class-validator';
+import { isISO4217CurrencyCode } from 'class-validator';
 import { toDto } from 'src/lib/utils/to-dto';
 import { getPaymentUrl } from './lib/utils';
-import { plainToInstance } from 'class-transformer';
 import axios from 'axios';
 
 @Injectable()

@@ -16,7 +16,6 @@ export class WalletService {
 
   constructor(
     private readonly db: PrismaService,
-    @Inject(forwardRef(() => AlchemyService))
     private readonly alchemyService: AlchemyService,
   ) {}
 
