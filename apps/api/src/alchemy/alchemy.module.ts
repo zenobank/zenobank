@@ -4,7 +4,7 @@ import { ALCHEMY_SDK } from './lib/alchemy.constants';
 import { Alchemy } from 'alchemy-sdk';
 import { Env, getEnv } from 'src/lib/utils/env';
 import { PrismaModule } from 'src/prisma/prisma.module';
-import { PaymentsModule } from 'src/payment/payment.module';
+import { PaymentsModule } from 'src/payments/payment.module';
 import { SvixModule } from 'src/webhooks/svix.module';
 @Module({
   providers: [

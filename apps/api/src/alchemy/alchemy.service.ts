@@ -15,7 +15,7 @@ import {
 import { Env, getEnv } from 'src/lib/utils/env';
 import { AddressActivityWebhookResponse } from './lib/alchemy.interface';
 import { isNumber } from 'class-validator';
-import { PaymentService } from 'src/payment/payment.service';
+import { PaymentService } from 'src/payments/payment.service';
 import { Svix } from 'svix';
 import { SVIX_CLIENT } from 'src/webhooks/webhooks.constants';
 import {
