@@ -5,6 +5,8 @@ export interface TxIdentifier {
   networkId: NetworkId;
 }
 
+export interface TransactionConfirmationJob extends TxIdentifier {}
+
 export interface TransactionRecordInput {
   networkId: NetworkId;
   txData: {

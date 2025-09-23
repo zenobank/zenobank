@@ -3,7 +3,7 @@ import {
   SweepWalletFundsJobData,
   TransactionRecordInput,
   TxIdentifier,
-} from './lib/types';
+} from './lib/transactions.interface';
 import { TokenService } from 'src/currencies/token/token.service';
 import { TokenGasService } from 'src/currencies/token/tokens-gas.service';
 import { isNativeToken, nativeTokenAddress } from 'src/currencies/lib/utils';
@@ -11,14 +11,14 @@ import { privateKeyToAccount } from 'viem/accounts';
 import { client, walletClient } from 'src/lib/utils/client';
 import { erc20Abi } from 'viem';
 import { Env, getEnv } from 'src/lib/utils/env';
-import { TX_CONFIRMATION_QUEUE_NAME } from './lib/constants';
+import { TX_CONFIRMATION_QUEUE_NAME } from './lib/transactions.constants';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { TransactionResponseDto } from './dto/transaction-response.dto';
 import { plainToInstance } from 'class-transformer';
 import { ms } from 'src/lib/utils/ms';
-import { buildTxSchedulerId } from './lib/utils';
+import { buildTxSchedulerId } from './lib/transactions.utils';
 
 @Injectable()
 export class TransactionsService {
@@ -30,22 +30,6 @@ export class TransactionsService {
     @InjectQueue(TX_CONFIRMATION_QUEUE_NAME)
     private readonly txConfirmationQueue: Queue<TxIdentifier>,
   ) {}
-
-  async recordTransaction({
-    txData,
-    networkId,
-  }: TransactionRecordInput): Promise<TransactionResponseDto> {
-    const tx = await this.db.transaction.create({
-      data: {
-        hash: txData.hash,
-        networkId: networkId,
-        fromAddress: txData.fromAddress,
-        toAddress: txData.toAddress,
-        title: txData.title,
-      },
-    });
-    return plainToInstance(TransactionResponseDto, tx);
-  }
 
   /**
    * Requires the transaction to already exist in DB.

@@ -1,10 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TransactionsService } from './transactions.service';
 import { BullModule } from '@nestjs/bullmq';
-import {
-  SWEEP_WALLET_FUNDS_QUEUE_NAME,
-  TX_CONFIRMATION_QUEUE_NAME,
-} from './lib/constants';
+import { TX_CONFIRMATION_QUEUE_NAME } from './lib/transactions.constants';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { TransactionsProcessor } from './transaction-processor.worker';
 import { AssetModule } from 'src/currencies/currency.module';
@@ -17,9 +14,6 @@ import { TransactionsController } from './transactions.controller';
     BlockchainModule,
     BullModule.registerQueue({
       name: TX_CONFIRMATION_QUEUE_NAME,
-    }),
-    BullModule.registerQueue({
-      name: SWEEP_WALLET_FUNDS_QUEUE_NAME,
     }),
 
     PrismaModule,

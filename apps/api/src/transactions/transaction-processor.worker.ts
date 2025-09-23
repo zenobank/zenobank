@@ -1,15 +1,15 @@
 import { InjectQueue, Processor, WorkerHost } from '@nestjs/bullmq';
 import { Job, Queue } from 'bullmq';
-import { TX_CONFIRMATION_QUEUE_NAME } from './lib/constants';
+import { TX_CONFIRMATION_QUEUE_NAME } from './lib/transactions.constants';
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 import { BlockchainAdapterFactory } from 'src/blockchain/adapters/blockchain-adapter.factory';
-import { TxIdentifier } from './lib/types';
+import { TxIdentifier } from './lib/transactions.interface';
 import { Prisma, TransactionStatus } from '@prisma/client';
 import { now } from 'src/lib/utils/now';
 import { OnChainTxStatus } from 'src/blockchain/lib/types';
-import { buildTxSchedulerId } from './lib/utils';
+import { buildTxSchedulerId } from './lib/transactions.utils';
 
 @Processor(TX_CONFIRMATION_QUEUE_NAME)
 @Injectable()
