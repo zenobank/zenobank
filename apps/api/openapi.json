@@ -419,20 +419,11 @@
         "properties": {
           "tokenId": {
             "type": "string",
-            "example": "USDC_BASE"
-          },
-          "networkId": {
-            "example": "ETHEREUM_MAINNET",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/NetworkId"
-              }
-            ]
+            "example": "USDC_BASE_MAINNET"
           }
         },
         "required": [
-          "tokenId",
-          "networkId"
+          "tokenId"
         ]
       },
       "TokenResponseDto": {

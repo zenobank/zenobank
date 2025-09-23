@@ -129,20 +129,24 @@ export class PaymentService {
     paymentId: string,
     dto: UpdateDepositSelectionDto,
   ): Promise<PaymentResponseDto> {
-    const { tokenId: newTokenId, networkId: newNetworkId } = dto;
+    const { tokenId: newTokenId } = dto;
 
-    const [token, network, currentDepositDetails] = await Promise.all([
+    const [token, currentDepositDetails] = await Promise.all([
       this.tokenService.getToken(newTokenId),
-      this.networksService.getNetwork(newNetworkId),
       this.db.payment.findUnique({
         where: { id: paymentId },
       }),
     ]);
     if (!token) {
-      throw new NotFoundException('Token not found');
+      throw new BadRequestException(`Token not found. Token ID: ${newTokenId}`);
     }
+    const network = await this.networksService.getNetwork(
+      token.networkId as NetworkId,
+    );
     if (!network) {
-      throw new NotFoundException('Network not found');
+      throw new NotFoundException(
+        `Network not found. Network ID: ${token.networkId}`,
+      );
     }
 
     if (!currentDepositDetails) {
@@ -171,7 +175,9 @@ export class PaymentService {
         storeId: currentDepositDetails.storeId,
       },
     });
-
+    this.logger.log(
+      `Found ${wallets.length} wallets for store ${currentDepositDetails.storeId}. Wallets: ${wallets.map((w) => w.id).join(', ')}`,
+    );
     const depositWallet = wallets.find((w) => w.networkId === network.id);
     if (!depositWallet) {
       this.logger.error(
@@ -179,10 +185,6 @@ export class PaymentService {
       );
       throw new NotFoundException('Deposit wallet not found');
     }
-    await this.walletService.subscribeToAddressActivity({
-      address: depositWallet.address,
-      network: network.id,
-    });
 
     // we only support usd stablecoins. So we convert the amount to usd and we always assume that 1 USD = 1 stable coin (USDT, USDC, etc.)
     let tokenAmount = currentDepositDetails.priceAmount;

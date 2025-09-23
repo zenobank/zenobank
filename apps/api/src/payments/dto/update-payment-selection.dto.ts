@@ -6,15 +6,7 @@ import { IsEnum, IsString } from 'class-validator';
 export class UpdateDepositSelectionDto {
   @IsString()
   @ApiProperty({
-    example: 'USDC_BASE',
+    example: 'USDC_BASE_MAINNET',
   })
   tokenId: Token['id'];
-
-  @IsEnum(NetworkId)
-  @ApiProperty({
-    enum: NetworkId,
-    enumName: 'NetworkId',
-    example: NetworkId.ETHEREUM_MAINNET,
-  })
-  networkId: NetworkId;
 }
