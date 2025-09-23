@@ -94,15 +94,14 @@ describe('Payment E2E Tests', () => {
 
     // Check that amount is displayed and is between 99.9 and 100.1
     cy.get('body').should('contain.text', 'USDC');
-    cy.get('body').then(($body) => {
-      const text = $body.text();
-      // Look for pattern like "100.000592 USDC" or similar
-      const amountMatch = text.match(/(\d+\.\d+)\s*USDC/);
-      expect(amountMatch).to.not.be.null;
-      const amount = parseFloat(amountMatch[1]);
-      expect(amount).to.be.at.least(99.9);
-      expect(amount).to.be.at.most(100.1);
-    });
+    cy.get('[data-testid="currency-amount"]')
+      .should('be.visible')
+      .then(($amountElement) => {
+        const amountText = $amountElement.text();
+        const amount = parseFloat(amountText);
+        expect(amount).to.be.at.least(99.9);
+        expect(amount).to.be.at.most(100.1);
+      });
 
     // Check that Network: [NETWORK_NAME] is visible and matches the previous step
     cy.contains('Network:').should('be.visible');

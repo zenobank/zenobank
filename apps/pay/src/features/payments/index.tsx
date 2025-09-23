@@ -149,7 +149,7 @@ export default function Payament({ id }: PaymentsProps) {
                 <CardTitle className="text-lg">Send Payment</CardTitle>
               </div>
               {paymentData?.expiredAt && checkoutState === CheckoutState.AWAITING_DEPOSIT && (
-                <Badge variant="secondary">
+                <Badge variant="secondary" data-testid="countdown">
                   <TimerIcon />
                   <Countdown
                     date={new Date(paymentData.expiredAt)}
@@ -175,7 +175,9 @@ export default function Payament({ id }: PaymentsProps) {
                   <>
                     <div className="flex items-center justify-center gap-3 text-3xl font-bold">
                       <span className="relative flex items-center gap-2">
-                        <span className="select-all">{paymentData?.depositDetails?.amount}</span>{' '}
+                        <span data-testid="currency-amount" className="select-all">
+                          {paymentData?.depositDetails?.amount}
+                        </span>{' '}
                         {selectedTokenData.symbol}
                         <CopyButton text={`${paymentData?.depositDetails?.amount} ${selectedTokenData.symbol}`} />
                       </span>
