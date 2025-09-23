@@ -126,7 +126,6 @@ export default function Payament({ id }: PaymentsProps) {
         id: paymentData.id,
         data: {
           tokenId: selectedTokenId,
-          networkId: selectedNetworkId,
         },
       });
       await refetchPaymentData();
