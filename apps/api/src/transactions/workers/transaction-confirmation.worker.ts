@@ -22,7 +22,6 @@ export class TransactionConfirmationWorker extends WorkerHost {
   async process(job: Job<TransactionConfirmationJob>) {
     const { paymentId } = job.data;
     const payment = await this.paymentService.getPayment(paymentId);
-
     if (!payment) {
       throw new Error('Payment not found. Payment ID: ' + paymentId);
     }
@@ -34,12 +33,6 @@ export class TransactionConfirmationWorker extends WorkerHost {
         'Payment transaction hash not found. Payment ID: ' + paymentId,
       );
     }
-    const network = await this.networksService.getNetwork(
-      payment.depositDetails.networkId,
-    );
-    if (!network) {
-      throw new Error('network not available');
-    }
     const blockchain = this.blockchainAdapterFactory.getAdapter(
       payment.depositDetails?.networkId,
     );
@@ -47,12 +40,20 @@ export class TransactionConfirmationWorker extends WorkerHost {
     const txStatus = await blockchain.getTransactionStatus(
       payment.transactionHash,
     );
+    const network = await this.networksService.getNetwork(
+      payment.depositDetails.networkId,
+    );
+    if (!network) {
+      throw new Error('network not available');
+    }
+    await job.moveToDelayed(Date.now() + network.confirmationRetryDelay);
 
     if (txStatus.status !== 'success') {
+      // tengo que sumar mas 1 el payemte
       await job.moveToDelayed(Date.now() + network.confirmationRetryDelay);
       return;
     }
-    if (network.maxConfirmationAttempts)
+    if (network.confirmationRetryDelay)
       if (txStatus.confirmations < network.maxConfirmationAttempts) {
         // tengo qeu sumar mas 1 de el payment
         await job.moveToDelayed(Date.now() + ms('1s'));

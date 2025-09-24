@@ -14,7 +14,7 @@ import { TokenService } from 'src/currencies/token/token.service';
 import { NetworksService } from 'src/networks/networks.service';
 import { WalletService } from 'src/wallet/services/wallet.service';
 import { ms } from 'src/lib/utils/ms';
-import { Payment, PaymentStatus } from '@prisma/client';
+import { PaymentStatus } from '@prisma/client';
 import { SupportedNetworksId } from 'src/networks/network.interface';
 import { Convert } from 'easy-currencies';
 import { toBN } from 'src/lib/utils/numbers';
@@ -37,7 +37,7 @@ export class PaymentService {
   async createPayment(
     createPaymentDto: CreatePaymentDto,
     apiKey: string,
-  ): Promise<Payment> {
+  ): Promise<PaymentResponseDto> {
     const { priceAmount, priceCurrency } = createPaymentDto;
     const store = await this.db.store.findUniqueOrThrow({
       where: { apiKey },
@@ -53,14 +53,20 @@ export class PaymentService {
         expiredAt: new Date(Date.now() + ms('1h')),
         storeId: store.id,
       },
-      include: {
-        depositWallet: true,
-      },
     });
     this.logger.log(`Created payment ${payment.id}`);
-    return payment;
+    return toDto(PaymentResponseDto, {
+      ...payment,
+      paymentUrl: getPaymentUrl(payment.id),
+      depositDetails: null,
+    });
   }
 
+  async getPaymentOrThrow(id: string): Promise<PaymentResponseDto> {
+    const payment = await this.getPayment(id);
+    if (!payment) throw new NotFoundException('Payment not found');
+    return payment;
+  }
   async markPaymentAsCompleted(id: string): Promise<PaymentResponseDto> {
     await this.db.payment.update({
       where: { id },
@@ -89,16 +95,7 @@ export class PaymentService {
     return (await this.getPayment(id))!;
   }
 
-  async incrementConfirmationAttempts(paymentId: string): Promise<number> {
-    const updated = await this.db.payment.update({
-      where: { id: paymentId },
-      data: { confirmationAttempts: { increment: 1 } },
-      select: { confirmationAttempts: true },
-    });
-    return updated.confirmationAttempts;
-  }
-
-  async getPayment(id: string): Promise<Payment | null> {
+  async getPayment(id: string): Promise<PaymentResponseDto | null> {
     const payment = await this.db.payment.findUnique({
       where: { id },
       include: {
@@ -108,7 +105,6 @@ export class PaymentService {
     if (!payment) {
       return null;
     }
-    retur;
     return toDto(PaymentResponseDto, {
       ...payment,
       paymentUrl: getPaymentUrl(payment.id),

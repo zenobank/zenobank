@@ -3,24 +3,28 @@ import { SupportedNetworksId } from 'src/networks/network.interface';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { NetworkResponseDto } from './dto/network-response.dto';
 import { toDto } from 'src/lib/utils/to-dto';
-import { Network } from '@prisma/client';
 
 @Injectable()
 export class NetworksService {
   constructor(private readonly db: PrismaService) {}
 
-  async getNetworks(): Promise<Network[]> {
+  async getNetworks(): Promise<NetworkResponseDto[]> {
     const networks = await this.db.network.findMany();
-    return networks;
+    const networksDto = networks.map((network) =>
+      toDto(NetworkResponseDto, network),
+    );
+    return networksDto;
   }
 
-  async getNetwork(id: SupportedNetworksId): Promise<Network | null> {
+  async getNetwork(
+    id: SupportedNetworksId,
+  ): Promise<NetworkResponseDto | null> {
     const network = await this.db.network.findUnique({
       where: { id },
     });
     if (!network) {
       return null;
     }
-    return network;
+    return toDto(NetworkResponseDto, network);
   }
 }
