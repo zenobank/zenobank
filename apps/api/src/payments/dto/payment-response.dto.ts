@@ -9,6 +9,7 @@ import {
   IsDate,
   IsUrl,
   IsNotEmpty,
+  IsNumber,
 } from 'class-validator';
 import { DepositDetailsDto } from './payment-deposit-response.dto';
 
@@ -94,4 +95,9 @@ export class PaymentResponseDto {
   @Expose()
   @IsString()
   transactionHash: string | null;
+
+  @Expose()
+  @IsNumber()
+  @ApiProperty({ example: 0 })
+  confirmationAttempts: number;
 }

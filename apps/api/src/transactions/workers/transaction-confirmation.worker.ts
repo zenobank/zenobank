@@ -1,5 +1,5 @@
 import { Processor, WorkerHost } from '@nestjs/bullmq';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { BlockchainFactory } from 'src/blockchain/adapters/blockchain-adapter.factory';
 import { TX_CONFIRMATION_QUEUE_NAME } from '../lib/transactions.constants';
 import { TransactionConfirmationJob } from '../lib/transactions.interface';
@@ -11,6 +11,7 @@ import { ms } from 'src/lib/utils/ms';
 @Injectable()
 @Processor(TX_CONFIRMATION_QUEUE_NAME)
 export class TransactionConfirmationWorker extends WorkerHost {
+  private readonly logger = new Logger(TransactionConfirmationWorker.name);
   constructor(
     private readonly blockchainAdapterFactory: BlockchainFactory,
     private readonly paymentService: PaymentService,
@@ -46,19 +47,22 @@ export class TransactionConfirmationWorker extends WorkerHost {
     if (!network) {
       throw new Error('network not available');
     }
-    await job.moveToDelayed(Date.now() + network.confirmationRetryDelay);
+    if (payment.confirmationAttempts >= network.maxConfirmationAttempts) {
+      this.logger.warn(
+        `Max confirmation attempts reached for payment ${paymentId}`,
+      );
+    }
 
     if (txStatus.status !== 'success') {
-      // tengo que sumar mas 1 el payemte
+      await this.paymentService.incrementConfirmationAttempts(paymentId);
       await job.moveToDelayed(Date.now() + network.confirmationRetryDelay);
       return;
     }
-    if (network.confirmationRetryDelay)
-      if (txStatus.confirmations < network.maxConfirmationAttempts) {
-        // tengo qeu sumar mas 1 de el payment
-        await job.moveToDelayed(Date.now() + ms('1s'));
-        return;
-      }
+    if (txStatus.confirmations < network.maxConfirmationAttempts) {
+      await this.paymentService.incrementConfirmationAttempts(paymentId);
+      await job.moveToDelayed(Date.now() + ms('1s'));
+      return;
+    }
     this.paymentService.markPaymentAsCompleted(paymentId);
   }
 }

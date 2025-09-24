@@ -61,6 +61,14 @@ export class PaymentService {
       depositDetails: null,
     });
   }
+  async incrementConfirmationAttempts(paymentId: string): Promise<number> {
+    const updated = await this.db.payment.update({
+      where: { id: paymentId },
+      data: { confirmationAttempts: { increment: 1 } },
+      select: { confirmationAttempts: true },
+    });
+    return updated.confirmationAttempts;
+  }
 
   async getPaymentOrThrow(id: string): Promise<PaymentResponseDto> {
     const payment = await this.getPayment(id);
