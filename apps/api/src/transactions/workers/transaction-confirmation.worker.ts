@@ -60,7 +60,7 @@ export class TransactionConfirmationWorker extends WorkerHost {
     }
     if (txStatus.confirmations < network.maxConfirmationAttempts) {
       await this.paymentService.incrementConfirmationAttempts(paymentId);
-      await job.moveToDelayed(Date.now() + ms('1s'));
+      await job.moveToDelayed(Date.now() + network.confirmationRetryDelay);
       return;
     }
     this.paymentService.markPaymentAsCompleted(paymentId);
