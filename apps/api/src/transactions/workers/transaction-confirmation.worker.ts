@@ -7,6 +7,7 @@ import { Job } from 'bullmq';
 import { PaymentService } from 'src/payments/payment.service';
 import { NetworksService } from 'src/networks/networks.service';
 import { ms } from 'src/lib/utils/ms';
+import { PaymentStatus } from '@prisma/client';
 
 @Injectable()
 @Processor(TX_CONFIRMATION_QUEUE_NAME)
@@ -26,6 +27,7 @@ export class TransactionConfirmationWorker extends WorkerHost {
     if (!payment) {
       throw new Error('Payment not found. Payment ID: ' + paymentId);
     }
+
     if (!payment.depositDetails?.networkId) {
       throw new Error('Payment network ID not found. Payment ID: ' + paymentId);
     }
@@ -33,6 +35,13 @@ export class TransactionConfirmationWorker extends WorkerHost {
       throw new Error(
         'Payment transaction hash not found. Payment ID: ' + paymentId,
       );
+    }
+    if (payment.status !== PaymentStatus.PROCESSING) {
+      this.logger.error(
+        `Payment is not processing but was sent to the worker. Payment ID: ${paymentId}`,
+        await this.paymentService.markPaymentAsCancelled(paymentId),
+      );
+      return;
     }
     const blockchain = this.blockchainAdapterFactory.getAdapter(
       payment.depositDetails?.networkId,
@@ -51,6 +60,8 @@ export class TransactionConfirmationWorker extends WorkerHost {
       this.logger.warn(
         `Max confirmation attempts reached for payment ${paymentId}`,
       );
+      await this.paymentService.markPaymentAsCancelled(paymentId);
+      return;
     }
 
     if (txStatus.status !== 'success') {
@@ -58,11 +69,11 @@ export class TransactionConfirmationWorker extends WorkerHost {
       await job.moveToDelayed(Date.now() + network.confirmationRetryDelay);
       return;
     }
-    if (txStatus.confirmations < network.maxConfirmationAttempts) {
+    if (txStatus.confirmations < network.minBlockConfirmations) {
       await this.paymentService.incrementConfirmationAttempts(paymentId);
       await job.moveToDelayed(Date.now() + network.confirmationRetryDelay);
       return;
     }
-    this.paymentService.markPaymentAsCompleted(paymentId);
+    await this.paymentService.markPaymentAsCompleted(paymentId);
   }
 }

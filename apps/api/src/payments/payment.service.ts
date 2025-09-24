@@ -75,6 +75,7 @@ export class PaymentService {
     if (!payment) throw new NotFoundException('Payment not found');
     return payment;
   }
+
   async markPaymentAsCompleted(id: string): Promise<PaymentResponseDto> {
     await this.db.payment.update({
       where: { id },
@@ -235,6 +236,13 @@ export class PaymentService {
         currencyId: updated.payCurrencyId!,
         networkId: updated.networkId as SupportedNetworksId,
       }),
+    });
+  }
+
+  async markPaymentAsCancelled(id: string): Promise<void> {
+    await this.db.payment.update({
+      where: { id },
+      data: { status: PaymentStatus.CANCELLED },
     });
   }
 

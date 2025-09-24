@@ -93,8 +93,15 @@ export class AlchemyService {
           status: PaymentStatus.PENDING,
         },
       });
+      if (payment?.expiredAt && payment.expiredAt < new Date()) {
+        this.logger.warn(`Payment received but expired ${payment.id}`);
+        await this.db.payment.update({
+          where: { id: payment.id },
+          data: { status: PaymentStatus.EXPIRED },
+        });
+        continue;
+      }
       if (payment) {
-        // TODO: EMIT AN EVENT
         await this.paymentService.initiatePaymentProcessing(payment.id);
       } else {
         this.logger.warn(
