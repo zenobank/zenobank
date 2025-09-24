@@ -23,6 +23,10 @@ import { toDto } from 'src/lib/utils/to-dto';
 import { getPaymentUrl } from './lib/utils';
 import axios from 'axios';
 import { DepositDetailsDto } from './dto/payment-deposit-response.dto';
+import { InjectQueue } from '@nestjs/bullmq';
+import { TX_CONFIRMATION_QUEUE_NAME } from 'src/transactions/lib/transactions.constants';
+import { TransactionConfirmationJob } from 'src/transactions/lib/transactions.interface';
+import { Queue } from 'bullmq';
 
 @Injectable()
 export class PaymentService {
@@ -32,6 +36,8 @@ export class PaymentService {
     private readonly tokenService: TokenService,
     private readonly networksService: NetworksService,
     private readonly walletService: WalletService,
+    @InjectQueue(TX_CONFIRMATION_QUEUE_NAME)
+    private readonly txConfirmationQueue: Queue<TransactionConfirmationJob>,
   ) {}
 
   async createPayment(
@@ -90,17 +96,20 @@ export class PaymentService {
     if (completedPayment?.webhookUrl) {
       axios.post(completedPayment.webhookUrl, {
         eventType: 'payment.completed',
-        payload: completedPayment,
+        payload: completedPayment satisfies PaymentResponseDto,
       });
     }
     return completedPayment;
   }
+
   async initiatePaymentProcessing(id: string): Promise<PaymentResponseDto> {
     await this.db.payment.update({
       where: { id },
       data: { status: PaymentStatus.PROCESSING },
     });
-    // TODO initate job to process the payment
+    this.txConfirmationQueue.add(TX_CONFIRMATION_QUEUE_NAME, {
+      paymentId: id,
+    });
     return (await this.getPayment(id))!;
   }
 

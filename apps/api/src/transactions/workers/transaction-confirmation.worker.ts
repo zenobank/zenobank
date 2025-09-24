@@ -6,7 +6,6 @@ import { TransactionConfirmationJob } from '../lib/transactions.interface';
 import { Job } from 'bullmq';
 import { PaymentService } from 'src/payments/payment.service';
 import { NetworksService } from 'src/networks/networks.service';
-import { ms } from 'src/lib/utils/ms';
 import { PaymentStatus } from '@prisma/client';
 
 @Injectable()
