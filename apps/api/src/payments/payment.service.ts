@@ -8,23 +8,21 @@ import {
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { randomUUID } from 'crypto';
-import {
-  DepositDetailsDto,
-  PaymentResponseDto,
-} from './dto/payment-response.dto';
+import { PaymentResponseDto } from './dto/payment-response.dto';
 import { UpdateDepositSelectionDto } from './dto/update-payment-selection.dto';
 import { TokenService } from 'src/currencies/token/token.service';
 import { NetworksService } from 'src/networks/networks.service';
 import { WalletService } from 'src/wallet/services/wallet.service';
 import { ms } from 'src/lib/utils/ms';
 import { PaymentStatus } from '@prisma/client';
-import { NetworkId } from 'src/networks/network.interface';
+import { SupportedNetworksId } from 'src/networks/network.interface';
 import { Convert } from 'easy-currencies';
 import { toBN } from 'src/lib/utils/numbers';
 import { isISO4217CurrencyCode } from 'class-validator';
 import { toDto } from 'src/lib/utils/to-dto';
 import { getPaymentUrl } from './lib/utils';
 import axios from 'axios';
+import { DepositDetailsDto } from './dto/payment-deposit-response.dto';
 
 @Injectable()
 export class PaymentService {
@@ -88,11 +86,12 @@ export class PaymentService {
     }
     return completedPayment;
   }
-  async markPaymentAsProcessing(id: string): Promise<PaymentResponseDto> {
+  async initiatePaymentProcessing(id: string): Promise<PaymentResponseDto> {
     await this.db.payment.update({
       where: { id },
       data: { status: PaymentStatus.PROCESSING },
     });
+    // TODO initate job to process the payment
     return (await this.getPayment(id))!;
   }
 
@@ -114,12 +113,14 @@ export class PaymentService {
         payment.payAmount &&
         payment.payCurrencyId &&
         payment.networkId &&
-        Object.values(NetworkId).includes(payment.networkId as NetworkId)
+        Object.values(SupportedNetworksId).includes(
+          payment.networkId as SupportedNetworksId,
+        )
           ? toDto(DepositDetailsDto, {
               address: payment.depositWallet.address,
               amount: payment.payAmount,
               currencyId: payment.payCurrencyId,
-              networkId: payment.networkId as NetworkId,
+              networkId: payment.networkId as SupportedNetworksId,
             })
           : null,
     });
@@ -141,7 +142,7 @@ export class PaymentService {
       throw new BadRequestException(`Token not found. Token ID: ${newTokenId}`);
     }
     const network = await this.networksService.getNetwork(
-      token.networkId as NetworkId,
+      token.networkId as SupportedNetworksId,
     );
     if (!network) {
       throw new NotFoundException(
@@ -224,7 +225,7 @@ export class PaymentService {
         address: depositWallet.address,
         amount: updated.payAmount!,
         currencyId: updated.payCurrencyId!,
-        networkId: updated.networkId as NetworkId,
+        networkId: updated.networkId as SupportedNetworksId,
       }),
     });
   }
@@ -232,7 +233,7 @@ export class PaymentService {
   private async generateUniqueTokenAmount(
     baseAmount: string,
     payCurrencyId: string,
-    networkId: NetworkId,
+    networkId: string,
     maxRetries = 20,
   ): Promise<string> {
     const MIN_SUFFIX = 0.000001;

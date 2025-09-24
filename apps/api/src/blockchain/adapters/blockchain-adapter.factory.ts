@@ -1,19 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { BlockchainAdapter } from './blockchain-adapter.interface';
 import { EvmAdapter } from './evm.adapter';
-import { NetworkId } from 'src/networks/network.interface';
+import { SupportedNetworksId } from 'src/networks/network.interface';
 
 @Injectable()
-export class BlockchainAdapterFactory {
+export class BlockchainFactory {
   constructor() {}
 
-  getAdapter(networkId: NetworkId): BlockchainAdapter {
+  getAdapter(networkId: SupportedNetworksId): BlockchainAdapter {
     switch (networkId) {
-      case NetworkId.ETHEREUM_MAINNET:
-      case NetworkId.BASE_MAINNET:
-      case NetworkId.ARBITRUM_MAINNET:
-      case NetworkId.ETHEREUM_HOLESKY:
-      case NetworkId.ETHEREUM_SEPOLIA:
+      case SupportedNetworksId.ETHEREUM_MAINNET:
+      case SupportedNetworksId.BASE_MAINNET:
+      case SupportedNetworksId.ARBITRUM_MAINNET:
+      case SupportedNetworksId.ETHEREUM_HOLESKY:
+      case SupportedNetworksId.ETHEREUM_SEPOLIA:
         return new EvmAdapter(networkId);
       default:
         const _exhaustiveCheck: never = networkId;

@@ -3,14 +3,14 @@ import { publicClients } from 'src/lib/contants/client';
 import { parsePercent } from 'src/lib/utils/percent';
 import { PublicClient, encodeFunctionData, erc20Abi } from 'viem';
 import { isNativeToken } from '../lib/utils';
-import { NetworkId } from 'src/networks/network.interface';
+import { SupportedNetworksId } from 'src/networks/network.interface';
 
 @Injectable()
 export class TokenGasService {
   async estimateTokenTransferGasCost(
     transferArgs: { sender: string; destination: string },
     amountsToTransfer: { [key: string]: bigint },
-    network: NetworkId,
+    network: SupportedNetworksId,
     extraGasMarginPerc = parsePercent('50%'),
   ): Promise<bigint> {
     const client = publicClients[network];
@@ -30,7 +30,7 @@ export class TokenGasService {
   private async estimateTokenTransferGasUnits(
     transferArgs: { sender: string; destination: string },
     amountsToTransfer: { [key: string]: bigint },
-    network: NetworkId,
+    network: SupportedNetworksId,
     extraGasMarginPerc = parsePercent('50%'),
   ): Promise<bigint> {
     const client = publicClients[network];

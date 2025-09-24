@@ -1,19 +1,19 @@
 import { Injectable } from '@nestjs/common';
-import { NetworkId } from 'src/networks/network.interface';
+import { SupportedNetworksId } from 'src/networks/network.interface';
 import { generatePrivateKey, privateKeyToAddress } from 'viem/accounts';
 
 @Injectable()
 export class WalletFactory {
-  generate(networkId: NetworkId): {
+  generate(networkId: SupportedNetworksId): {
     address: string;
     privateKey: string;
   } {
     switch (networkId) {
-      case NetworkId.ARBITRUM_MAINNET:
-      case NetworkId.BASE_MAINNET:
-      case NetworkId.ETHEREUM_HOLESKY:
-      case NetworkId.ETHEREUM_MAINNET:
-      case NetworkId.ETHEREUM_SEPOLIA:
+      case SupportedNetworksId.ARBITRUM_MAINNET:
+      case SupportedNetworksId.BASE_MAINNET:
+      case SupportedNetworksId.ETHEREUM_HOLESKY:
+      case SupportedNetworksId.ETHEREUM_MAINNET:
+      case SupportedNetworksId.ETHEREUM_SEPOLIA:
         return this.generateEvmAddress();
 
       default:

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { toDto } from 'src/lib/utils/to-dto';
 import { toEnumValue } from 'src/lib/utils/to-enum';
-import { NetworkId } from 'src/networks/network.interface';
+import { SupportedNetworksId } from 'src/networks/network.interface';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { WalletService } from 'src/wallet/services/wallet.service';
 
@@ -52,7 +52,7 @@ export class UsersService {
       ...store,
       wallets: store.wallets.map((wallet) => ({
         id: wallet.id,
-        network: toEnumValue(NetworkId, wallet.network.id),
+        network: toEnumValue(SupportedNetworksId, wallet.network.id),
         address: wallet.address,
         label: wallet.label,
       })),

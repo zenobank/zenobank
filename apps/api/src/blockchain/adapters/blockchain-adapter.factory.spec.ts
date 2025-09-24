@@ -1,16 +1,16 @@
-import { BlockchainAdapterFactory } from './blockchain-adapter.factory';
-import { NetworkId } from 'src/networks/network.interface';
+import { BlockchainFactory } from './blockchain-adapter.factory';
+import { SupportedNetworksId } from 'src/networks/network.interface';
 
 describe('BlockchainAdapterFactory', () => {
-  let factory: BlockchainAdapterFactory;
+  let factory: BlockchainFactory;
 
   beforeEach(() => {
-    factory = new BlockchainAdapterFactory();
+    factory = new BlockchainFactory();
   });
 
   it('should handle all defined networks in getAdapter()', () => {
-    const allNetworks = Object.values(NetworkId);
-    const unhandled: NetworkId[] = [];
+    const allNetworks = Object.values(SupportedNetworksId);
+    const unhandled: SupportedNetworksId[] = [];
 
     for (const network of allNetworks) {
       try {

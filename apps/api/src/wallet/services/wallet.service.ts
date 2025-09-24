@@ -1,6 +1,6 @@
 import { Injectable, Logger, ConflictException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { NetworkId } from 'src/networks/network.interface';
+import { SupportedNetworksId } from 'src/networks/network.interface';
 import { AlchemyService } from 'src/alchemy/alchemy.service';
 import { Wallet, NetworkType } from '@prisma/client';
 
@@ -65,7 +65,7 @@ export class WalletService {
       wallets.map((wallet) =>
         this.subscribeToAddressActivity({
           address: wallet.address,
-          network: wallet.networkId as NetworkId,
+          network: wallet.networkId as SupportedNetworksId,
         }),
       ),
     );
@@ -77,7 +77,7 @@ export class WalletService {
     network,
   }: {
     address: string;
-    network: NetworkId;
+    network: SupportedNetworksId;
   }) {
     const webhook = await this.alchemyService.getWebhook(network);
     if (!webhook) {

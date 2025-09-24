@@ -6,13 +6,13 @@ import {
   WalletClient,
 } from 'viem';
 import { publicClients } from 'src/lib/contants/client';
-import { NetworkId } from 'src/networks/network.interface';
+import { SupportedNetworksId } from 'src/networks/network.interface';
 
-export function client(networkId: NetworkId): PublicClient {
+export function client(networkId: SupportedNetworksId): PublicClient {
   return publicClients[networkId];
 }
 export function walletClient(
-  networkId: NetworkId,
+  networkId: SupportedNetworksId,
   account: Account,
 ): WalletClient {
   const publicClient = client(networkId);

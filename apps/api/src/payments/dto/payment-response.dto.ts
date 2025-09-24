@@ -1,63 +1,16 @@
 // dto/payment-response.dto.ts
 import { ApiProperty } from '@nestjs/swagger';
-import { Payment, PaymentStatus } from '@prisma/client';
-import { NetworkId } from 'src/networks/network.interface';
-import { Env, getEnv } from 'src/lib/utils/env';
-import { getPaymentUrl } from '../lib/utils';
-import { ms } from 'src/lib/utils/ms';
-import { Expose, plainToInstance } from 'class-transformer';
+import { PaymentStatus } from '@prisma/client';
+import { Expose } from 'class-transformer';
 import {
   IsString,
-  IsEthereumAddress,
   IsEnum,
   IsISO4217CurrencyCode,
   IsDate,
   IsUrl,
   IsNotEmpty,
 } from 'class-validator';
-
-type PaymentWithAddress = Payment & {
-  depositWalletAddress: string | null;
-};
-
-// Tipo más estricto que requiere campos críticos
-type RequiredPaymentFields = {
-  id: string;
-  priceAmount: string;
-  priceCurrency: string;
-};
-
-export class DepositDetailsDto {
-  @Expose()
-  @IsEthereumAddress()
-  @ApiProperty({
-    example: '0x1234567890123456789012345678901234567890',
-  })
-  address: string;
-
-  @Expose()
-  @IsString()
-  @ApiProperty({
-    example: 'USDC_ARBITRUM',
-  })
-  currencyId: string;
-
-  @Expose()
-  @IsString()
-  @ApiProperty({
-    example: '100',
-  })
-  amount: string;
-
-  @Expose()
-  @IsEnum(NetworkId)
-  @ApiProperty({
-    example: NetworkId.ARBITRUM_MAINNET,
-    enum: NetworkId,
-    enumName: 'NetworkId',
-  })
-  networkId: NetworkId;
-}
+import { DepositDetailsDto } from './payment-deposit-response.dto';
 
 export class PaymentResponseDto {
   @Expose()
@@ -137,4 +90,8 @@ export class PaymentResponseDto {
     nullable: true,
   })
   successUrl: string | null;
+
+  @Expose()
+  @IsString()
+  transactionHash: string | null;
 }

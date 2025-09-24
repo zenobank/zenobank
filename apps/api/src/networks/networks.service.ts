@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { NetworkId } from 'src/networks/network.interface';
+import { SupportedNetworksId } from 'src/networks/network.interface';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { NetworkResponseDto } from './dto/network-response.dto';
-import { plainToInstance } from 'class-transformer';
+import { toDto } from 'src/lib/utils/to-dto';
 
 @Injectable()
 export class NetworksService {
@@ -10,13 +10,21 @@ export class NetworksService {
 
   async getNetworks(): Promise<NetworkResponseDto[]> {
     const networks = await this.db.network.findMany();
-    return plainToInstance(NetworkResponseDto, networks);
+    const networksDto = networks.map((network) =>
+      toDto(NetworkResponseDto, network),
+    );
+    return networksDto;
   }
 
-  async getNetwork(id: NetworkId): Promise<NetworkResponseDto | null> {
+  async getNetwork(
+    id: SupportedNetworksId,
+  ): Promise<NetworkResponseDto | null> {
     const network = await this.db.network.findUnique({
       where: { id },
     });
-    return plainToInstance(NetworkResponseDto, network);
+    if (!network) {
+      return null;
+    }
+    return toDto(NetworkResponseDto, network);
   }
 }

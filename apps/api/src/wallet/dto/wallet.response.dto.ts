@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
-import { NetworkId } from 'src/networks/network.interface';
+import { SupportedNetworksId } from 'src/networks/network.interface';
 
 export class WalletResponseDto {
   @Expose()
@@ -20,10 +20,10 @@ export class WalletResponseDto {
   @Expose()
   @ApiProperty({
     description: 'Wallet network',
-    example: NetworkId.ETHEREUM_MAINNET,
-    enum: NetworkId,
+    example: SupportedNetworksId.ETHEREUM_MAINNET,
+    enum: SupportedNetworksId,
   })
-  network: NetworkId;
+  network: SupportedNetworksId;
 
   @Expose()
   @ApiProperty({

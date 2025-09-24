@@ -1,10 +1,10 @@
 import { BlockchainAdapter } from './blockchain-adapter.interface';
 import { client } from 'src/lib/utils/client';
-import { NetworkId } from 'src/networks/network.interface';
+import { SupportedNetworksId } from 'src/networks/network.interface';
 import { OnChainTxStatus } from '../lib/types';
 
 export class EvmAdapter implements BlockchainAdapter {
-  constructor(private readonly networkId: NetworkId) {}
+  constructor(private readonly networkId: SupportedNetworksId) {}
 
   async getTransactionStatus(txHash: string): Promise<OnChainTxStatus> {
     const [txReceipt, latestBlock] = await Promise.all([

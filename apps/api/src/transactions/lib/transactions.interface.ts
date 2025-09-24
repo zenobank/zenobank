@@ -1,14 +1,16 @@
-import { NetworkId } from 'src/networks/network.interface';
+import { SupportedNetworksId } from 'src/networks/network.interface';
 
 export interface TxIdentifier {
   hash: string;
-  networkId: NetworkId;
+  networkId: SupportedNetworksId;
 }
 
-export interface TransactionConfirmationJob extends TxIdentifier {}
+export interface TransactionConfirmationJob {
+  paymentId: string;
+}
 
 export interface TransactionRecordInput {
-  networkId: NetworkId;
+  networkId: SupportedNetworksId;
   txData: {
     hash: string;
     title: string;
@@ -19,5 +21,5 @@ export interface TransactionRecordInput {
 
 export interface SweepWalletFundsJobData {
   sourceWalletAddress: string;
-  networkId: NetworkId;
+  networkId: SupportedNetworksId;
 }

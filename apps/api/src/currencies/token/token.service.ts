@@ -6,9 +6,9 @@ import { erc20Abi } from 'viem';
 import { isNativeToken, nativeTokenAddress } from '../lib/utils';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Token } from '@prisma/client';
-import { NetworkId } from 'src/networks/network.interface';
-import { plainToInstance } from 'class-transformer';
+import { SupportedNetworksId } from 'src/networks/network.interface';
 import { TokenResponseDto } from '../dto/token-response.dto';
+import { toDto } from 'src/lib/utils/to-dto';
 
 @Injectable()
 export class TokenService {
@@ -17,7 +17,8 @@ export class TokenService {
 
   async getSupportedTokens(): Promise<TokenResponseDto[]> {
     const tokens = await this.db.token.findMany({});
-    return plainToInstance(TokenResponseDto, tokens);
+    const tokensDto = tokens.map((token) => toDto(TokenResponseDto, token));
+    return tokensDto;
   }
 
   async getToken(id: string): Promise<Token | null> {
@@ -27,7 +28,7 @@ export class TokenService {
     return token;
   }
 
-  async getNetworkTokens(networkId: NetworkId): Promise<Token[]> {
+  async getNetworkTokens(networkId: SupportedNetworksId): Promise<Token[]> {
     const tokens = await this.db.token.findMany({
       where: {
         networkId,
@@ -37,14 +38,14 @@ export class TokenService {
   }
 
   async getTokenBalance(
-    networkId: NetworkId,
+    networkId: SupportedNetworksId,
     { owner, token }: { owner: string; token: string },
   ): Promise<bigint> {
     const balances = await this.getTokenBalances(networkId, owner, [token]);
     return balances[token.toLowerCase()] ?? 0n;
   }
   async getNativeTokenBalance(
-    networkId: NetworkId,
+    networkId: SupportedNetworksId,
     owner: string,
   ): Promise<bigint> {
     return await this.getTokenBalance(networkId, {
@@ -54,7 +55,7 @@ export class TokenService {
   }
 
   async getTokenBalances(
-    networkId: NetworkId,
+    networkId: SupportedNetworksId,
     owner: string,
     tokens: string[],
   ): Promise<{ [key: string]: bigint }> {

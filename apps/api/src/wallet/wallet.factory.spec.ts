@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { WalletFactory } from './wallet.factory';
-import { NetworkId } from 'src/networks/network.interface';
+import { SupportedNetworksId } from 'src/networks/network.interface';
 
 describe('WalletFactory', () => {
   let walletFactory: WalletFactory;
@@ -11,7 +11,7 @@ describe('WalletFactory', () => {
 
   describe('network coverage - DYNAMIC CHECK', () => {
     it('should handle ALL networks from Prisma enum - no network forgotten!', () => {
-      const allNetworksFromPrisma = Object.values(NetworkId);
+      const allNetworksFromPrisma = Object.values(SupportedNetworksId);
 
       allNetworksFromPrisma.forEach((networkId) => {
         expect(() => walletFactory.generate(networkId)).not.toThrow();

@@ -1,5 +1,6 @@
 import { PrismaClient, NetworkType, TokenStandard } from '@prisma/client';
-import { NetworkId } from 'src/networks/network.interface';
+import { ms } from 'src/lib/utils/ms';
+import { SupportedNetworksId } from 'src/networks/network.interface';
 
 const prisma = new PrismaClient();
 
@@ -7,31 +8,34 @@ async function seedNetworks() {
   await prisma.network.createMany({
     data: [
       {
-        id: NetworkId.ETHEREUM_MAINNET,
+        id: SupportedNetworksId.ETHEREUM_MAINNET,
         networkType: NetworkType.EVM,
         name: 'Ethereum Mainnet',
         displayName: 'Ethereum',
         isTestnet: false,
-        depositConfirmations: 12,
-        avgBlockTime: 12,
+        minBlockConfirmations: 8,
+        maxConfirmationAttempts: ms('1h') / ms('3s'),
+        confirmationRetryDelay: ms('3s'),
       },
       {
-        id: NetworkId.BASE_MAINNET,
+        id: SupportedNetworksId.BASE_MAINNET,
         networkType: NetworkType.EVM,
         name: 'Base Mainnet',
         displayName: 'Base',
         isTestnet: false,
-        depositConfirmations: 12,
-        avgBlockTime: 12,
+        minBlockConfirmations: 12,
+        maxConfirmationAttempts: ms('1h') / ms('3s'),
+        confirmationRetryDelay: ms('3s'),
       },
       {
-        id: NetworkId.ARBITRUM_MAINNET,
+        id: SupportedNetworksId.ARBITRUM_MAINNET,
         networkType: NetworkType.EVM,
         name: 'Arbitrum Mainnet',
         displayName: 'Arbitrum',
         isTestnet: false,
-        depositConfirmations: 12,
-        avgBlockTime: 12,
+        minBlockConfirmations: 12,
+        maxConfirmationAttempts: ms('1h') / ms('3s'),
+        confirmationRetryDelay: ms('3s'),
       },
       // {
       //   id: NetworkId.ETHEREUM_HOLESKY,
@@ -62,7 +66,7 @@ async function seedTokensOnNetworks() {
     data: [
       {
         id: 'USDC_ETHEREUM_MAINNET',
-        networkId: NetworkId.ETHEREUM_MAINNET,
+        networkId: SupportedNetworksId.ETHEREUM_MAINNET,
         symbol: 'USDC',
         canonicalTokenId: 'USDC',
         standard: TokenStandard.ERC20,
@@ -72,7 +76,7 @@ async function seedTokensOnNetworks() {
       },
       {
         id: 'USDC_BASE_MAINNET',
-        networkId: NetworkId.BASE_MAINNET,
+        networkId: SupportedNetworksId.BASE_MAINNET,
         symbol: 'USDC',
         canonicalTokenId: 'USDC',
         standard: TokenStandard.ERC20,
@@ -82,7 +86,7 @@ async function seedTokensOnNetworks() {
       },
       {
         id: 'USDC_ARBITRUM_MAINNET',
-        networkId: NetworkId.ARBITRUM_MAINNET,
+        networkId: SupportedNetworksId.ARBITRUM_MAINNET,
         symbol: 'USDC',
         canonicalTokenId: 'USDC',
         standard: TokenStandard.ERC20,
@@ -92,7 +96,7 @@ async function seedTokensOnNetworks() {
       },
       {
         id: 'USDT_ETHEREUM_MAINNET',
-        networkId: NetworkId.ETHEREUM_MAINNET,
+        networkId: SupportedNetworksId.ETHEREUM_MAINNET,
         symbol: 'USDT',
         canonicalTokenId: 'USDT',
         standard: TokenStandard.ERC20,

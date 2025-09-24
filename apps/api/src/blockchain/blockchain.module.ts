@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { BlockchainService } from './blockchain.service';
-import { BlockchainAdapterFactory } from './adapters/blockchain-adapter.factory';
+import { BlockchainFactory } from './adapters/blockchain-adapter.factory';
 
 @Module({
-  providers: [BlockchainAdapterFactory],
-  exports: [BlockchainAdapterFactory],
+  providers: [BlockchainFactory],
+  exports: [BlockchainFactory],
 })
 export class BlockchainModule {}

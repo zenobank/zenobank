@@ -82,11 +82,12 @@ model Payment {
   payCurrencyId String?
   payCurrency   Token?  @relation(fields: [payCurrencyId], references: [id])
 
+  confirmationAttempts Int @default(0)
+
   networkId String?
   network   Network? @relation(fields: [networkId], references: [id])
 
-  transactionId String?      @unique
-  transaction   Transaction? @relation(name: "PaymentTx", fields: [transactionId], references: [id])
+  transactionHash String?
 
   depositWalletId String?
   depositWallet   Wallet? @relation(name: "DepositWallet", fields: [depositWalletId], references: [id])
@@ -109,11 +110,11 @@ model Network {
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
 
-  depositConfirmations Int
-  avgBlockTime         Int
+  minBlockConfirmations   Int @default(3)
+  maxConfirmationAttempts Int @default(100)
+  confirmationRetryDelay  Int @default(1000) // in ms
 
   tokens           Token[]
-  transactions     Transaction[]
   wallets          Wallet[]
   Payment          Payment[]
   activityWebhooks ActivityWebhook[]
@@ -134,8 +135,7 @@ model Token {
   network   Network  @relation(fields: [networkId], references: [id])
   networkId String
 
-  transactions Transaction[]
-  payments     Payment[]
+  Payment Payment[]
 
   @@unique([networkId, address])
   @@index([canonicalTokenId])
@@ -151,33 +151,6 @@ enum TransactionStatus {
   PENDING
   CONFIRMED
   FAILED
-}
-
-model Transaction {
-  id   String @id @default(uuid())
-  hash String
-
-  fromAddress String
-  toAddress   String
-
-  title       String
-  description String?
-
-  networkId String
-  network   Network @relation(fields: [networkId], references: [id])
-
-  confirmations Int               @default(0)
-  status        TransactionStatus @default(PENDING)
-  firstSeenAt   DateTime          @default(now())
-  confirmedAt   DateTime?
-
-  payment Payment? @relation(name: "PaymentTx")
-  Token   Token?   @relation(fields: [tokenId], references: [id])
-  tokenId String?
-
-  @@unique([networkId, hash])
-  @@index([fromAddress])
-  @@index([toAddress])
 }
 
 // model TransactionTransfer {

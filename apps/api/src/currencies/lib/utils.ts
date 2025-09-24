@@ -1,11 +1,14 @@
-import { NetworkId } from 'src/networks/network.interface';
+import { SupportedNetworksId } from 'src/networks/network.interface';
 
-export function isNativeToken(tokenAddress: string, network: NetworkId) {
+export function isNativeToken(
+  tokenAddress: string,
+  network: SupportedNetworksId,
+) {
   throw new Error('Not implemented');
   return (
     tokenAddress.toLowerCase() === '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
   );
 }
-export function nativeTokenAddress(networkId: NetworkId): string {
+export function nativeTokenAddress(networkId: SupportedNetworksId): string {
   return '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
 }

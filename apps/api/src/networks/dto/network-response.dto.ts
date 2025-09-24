@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Network, NetworkType } from '@prisma/client';
-import { NetworkId } from 'src/networks/network.interface';
+import { SupportedNetworksId } from 'src/networks/network.interface';
 import { Expose } from 'class-transformer';
-import { IsBoolean, IsEnum, IsString } from 'class-validator';
+import { IsBoolean, IsEnum, IsNumber, IsString } from 'class-validator';
 
 export class NetworkResponseDto {
   @Expose()
@@ -10,7 +10,7 @@ export class NetworkResponseDto {
   @ApiProperty({
     example: 'ETHEREUM_MAINNET',
   })
-  id: NetworkId;
+  id: string;
 
   @Expose()
   @IsString()
@@ -34,4 +34,19 @@ export class NetworkResponseDto {
   @IsBoolean()
   @ApiProperty({ example: false })
   isTestnet: boolean;
+
+  @Expose()
+  @IsNumber()
+  @ApiProperty({ example: 3 })
+  minBlockConfirmations: number;
+
+  @Expose()
+  @IsNumber()
+  @ApiProperty({ example: 100 })
+  maxConfirmationAttempts;
+
+  @Expose()
+  @IsNumber()
+  @ApiProperty({ example: 1000 })
+  confirmationRetryDelay;
 }

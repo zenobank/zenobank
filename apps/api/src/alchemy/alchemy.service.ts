@@ -4,7 +4,7 @@ import {
   PaymentStatus,
   WebhookProvider,
 } from '@prisma/client';
-import { NetworkId } from 'src/networks/network.interface';
+import { SupportedNetworksId } from 'src/networks/network.interface';
 import { Alchemy, WebhookType as AlchemyWebhookType } from 'alchemy-sdk';
 import { PrismaService } from 'src/prisma/prisma.service';
 import {
@@ -29,8 +29,7 @@ export class AlchemyService {
   constructor(
     private readonly db: PrismaService,
     @Inject(ALCHEMY_SDK) private readonly alchemy: Alchemy,
-    // @Inject(forwardRef(() => PaymentService))
-    // private readonly paymentService: PaymentService,
+    private readonly paymentService: PaymentService,
   ) {}
 
   async processAddressActivityWebhook(body: AddressActivityWebhookResponse) {
@@ -96,10 +95,7 @@ export class AlchemyService {
       });
       if (payment) {
         // TODO: EMIT AN EVENT
-        // await this.paymentService.markPaymentAsProcessing(payment.id);
-        // setTimeout(() => {
-        //   this.paymentService.markPaymentAsCompleted(payment.id);
-        // }, ms('30s'));
+        await this.paymentService.initiatePaymentProcessing(payment.id);
       } else {
         this.logger.warn(
           `Payment not found ${JSON.stringify({
@@ -115,7 +111,7 @@ export class AlchemyService {
 
     return { received: true };
   }
-  async getWebhook(network: NetworkId): Promise<ActivityWebhook> {
+  async getWebhook(network: SupportedNetworksId): Promise<ActivityWebhook> {
     let webhook = await this.findWebhookWithSpace(network);
     if (!webhook) {
       this.logger.log(
@@ -131,7 +127,7 @@ export class AlchemyService {
   }
 
   async findWebhookWithSpace(
-    network: NetworkId,
+    network: SupportedNetworksId,
   ): Promise<ActivityWebhook | null> {
     const webhooks = await this.db.activityWebhook.findMany({
       where: {
@@ -192,7 +188,7 @@ export class AlchemyService {
 
   // required to create the webhook for with at least one address
   async createWebhook(
-    network: NetworkId,
+    network: SupportedNetworksId,
     address: string,
   ): Promise<ActivityWebhook> {
     const alchemyWebhook = await this.alchemy.notify.createWebhook(

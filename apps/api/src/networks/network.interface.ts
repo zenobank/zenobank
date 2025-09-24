@@ -1,4 +1,4 @@
-export enum NetworkId {
+export enum SupportedNetworksId {
   ETHEREUM_MAINNET = 'ETHEREUM_MAINNET',
   BASE_MAINNET = 'BASE_MAINNET',
   ARBITRUM_MAINNET = 'ARBITRUM_MAINNET',

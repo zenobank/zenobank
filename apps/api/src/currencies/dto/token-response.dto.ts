@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { TokenStandard } from '@prisma/client';
-import { NetworkId } from 'src/networks/network.interface';
+import { SupportedNetworksId } from 'src/networks/network.interface';
 import { Expose } from 'class-transformer';
 import { IsBoolean, IsEnum, IsInt, IsString, Min } from 'class-validator';
 
@@ -42,7 +42,8 @@ export class TokenResponseDto {
   isDeprecated!: boolean;
 
   @Expose()
-  @IsEnum(NetworkId)
-  @ApiProperty({ enum: NetworkId, example: NetworkId.ETHEREUM_MAINNET })
-  networkId: NetworkId;
+  @ApiProperty({
+    example: SupportedNetworksId.ETHEREUM_MAINNET,
+  })
+  networkId: string;
 }

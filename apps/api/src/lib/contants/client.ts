@@ -1,38 +1,38 @@
 import { Account, createPublicClient, PublicClient } from 'viem';
 import { arbitrum, base, holesky, mainnet, sepolia } from 'viem/chains';
 import { http } from 'viem';
-import { NetworkId } from 'src/networks/network.interface';
+import { SupportedNetworksId } from 'src/networks/network.interface';
 
-export const publicClients: Record<NetworkId, PublicClient> = {
-  [NetworkId.ETHEREUM_MAINNET]: createPublicClient({
+export const publicClients: Record<SupportedNetworksId, PublicClient> = {
+  [SupportedNetworksId.ETHEREUM_MAINNET]: createPublicClient({
     chain: mainnet,
     transport: http(),
     batch: {
       multicall: true,
     },
   }) as PublicClient,
-  [NetworkId.BASE_MAINNET]: createPublicClient({
+  [SupportedNetworksId.BASE_MAINNET]: createPublicClient({
     chain: base,
     transport: http(),
     batch: {
       multicall: true,
     },
   }) as PublicClient,
-  [NetworkId.ARBITRUM_MAINNET]: createPublicClient({
+  [SupportedNetworksId.ARBITRUM_MAINNET]: createPublicClient({
     chain: arbitrum,
     transport: http(),
     batch: {
       multicall: true,
     },
   }) as PublicClient,
-  [NetworkId.ETHEREUM_HOLESKY]: createPublicClient({
+  [SupportedNetworksId.ETHEREUM_HOLESKY]: createPublicClient({
     chain: holesky,
     transport: http(),
     batch: {
       multicall: true,
     },
   }) as PublicClient,
-  [NetworkId.ETHEREUM_SEPOLIA]: createPublicClient({
+  [SupportedNetworksId.ETHEREUM_SEPOLIA]: createPublicClient({
     chain: sepolia,
     transport: http(),
     batch: {
