@@ -14,16 +14,6 @@ import NotFoundError from '@/features/errors/not-found-error'
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient
 }>()({
-  beforeLoad: ({ location }) => {
-    const isPaymentRoute =
-      location.pathname.startsWith('/payments/') &&
-      location.pathname !== '/payments/' &&
-      location.pathname.split('/').length === 3
-
-    if (!isPaymentRoute) {
-      throw redirect({ href: import.meta.env.VITE_MAIN_DOMAIN_URL })
-    }
-  },
   component: () => {
     return (
       <>
