@@ -400,6 +400,7 @@ const Footer = () => {
         <a href="https://zenobank.io" target="_blank" rel="noreferrer">
           <span className="underline">Zenobank</span>
         </a>
+        - Open Source Crypto Payment Gateway
       </p>
     </div>
   );
