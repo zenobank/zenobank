@@ -12,7 +12,6 @@ import { PaymentResponseDto } from './dto/payment-response.dto';
 import { UpdateDepositSelectionDto } from './dto/update-payment-selection.dto';
 import { TokenService } from 'src/currencies/token/token.service';
 import { NetworksService } from 'src/networks/networks.service';
-import { WalletService } from 'src/wallet/services/wallet.service';
 import { ms } from 'src/lib/utils/ms';
 import { PaymentStatus } from '@prisma/client';
 import { SupportedNetworksId } from 'src/networks/network.interface';
@@ -23,10 +22,6 @@ import { toDto } from 'src/lib/utils/to-dto';
 import { getPaymentUrl } from './lib/utils';
 import axios from 'axios';
 import { DepositDetailsDto } from './dto/payment-deposit-response.dto';
-import { InjectQueue } from '@nestjs/bullmq';
-import { TX_CONFIRMATION_QUEUE_NAME } from 'src/transactions/lib/transactions.constants';
-import { TransactionConfirmationJob } from 'src/transactions/lib/transactions.interface';
-import { Queue } from 'bullmq';
 
 @Injectable()
 export class PaymentService {
@@ -35,9 +30,6 @@ export class PaymentService {
     private readonly db: PrismaService,
     private readonly tokenService: TokenService,
     private readonly networksService: NetworksService,
-    private readonly walletService: WalletService,
-    @InjectQueue(TX_CONFIRMATION_QUEUE_NAME)
-    private readonly txConfirmationQueue: Queue<TransactionConfirmationJob>,
   ) {}
 
   async createPayment(
@@ -100,17 +92,6 @@ export class PaymentService {
       });
     }
     return completedPayment;
-  }
-
-  async initiatePaymentProcessing(id: string): Promise<PaymentResponseDto> {
-    await this.db.payment.update({
-      where: { id },
-      data: { status: PaymentStatus.PROCESSING },
-    });
-    this.txConfirmationQueue.add(TX_CONFIRMATION_QUEUE_NAME, {
-      paymentId: id,
-    });
-    return (await this.getPayment(id))!;
   }
 
   async getPayment(id: string): Promise<PaymentResponseDto | null> {

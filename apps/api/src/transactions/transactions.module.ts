@@ -8,15 +8,7 @@ import { BlockchainModule } from 'src/blockchain/blockchain.module';
 import { TransactionsController } from './transactions.controller';
 
 @Module({
-  imports: [
-    AssetModule,
-    BlockchainModule,
-    BullModule.registerQueue({
-      name: TX_CONFIRMATION_QUEUE_NAME,
-    }),
-
-    PrismaModule,
-  ],
+  imports: [AssetModule, BlockchainModule, PrismaModule],
   providers: [TransactionsService],
   controllers: [TransactionsController],
 })
