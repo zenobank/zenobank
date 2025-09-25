@@ -10,7 +10,6 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import {
   ALCHEMY_MAX_ACTIVITY_WEBHOOK_SIZE,
   ALCHEMY_SDK,
-  ALCHEMY_WEBHOOK_RECEIVER_PATH,
 } from './lib/alchemy.constants';
 import { Env, getEnv } from 'src/lib/utils/env';
 import { AddressActivityWebhookResponse } from './lib/alchemy.interface';
@@ -20,8 +19,8 @@ import {
   ALCHEMY_WEBHOOK_TO_NETWORK_MAP,
   NETWORK_TO_ALCHEMY_SDK,
 } from './lib/alchemy.network-map';
-import { ms } from 'src/lib/utils/ms';
 import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts';
+import { WEBHOOKS_PATHS } from 'src/webhooks/webhooks.constants';
 
 @Injectable()
 export class AlchemyService {
@@ -200,7 +199,7 @@ export class AlchemyService {
     address: string,
   ): Promise<ActivityWebhook> {
     const alchemyWebhook = await this.alchemy.notify.createWebhook(
-      getEnv(Env.API_BASE_URL) + ALCHEMY_WEBHOOK_RECEIVER_PATH,
+      getEnv(Env.API_BASE_URL) + WEBHOOKS_PATHS.ALCHEMY,
       AlchemyWebhookType.ADDRESS_ACTIVITY,
       {
         network: NETWORK_TO_ALCHEMY_SDK[network],

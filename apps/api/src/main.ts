@@ -5,6 +5,8 @@ import { ClassSerializerInterceptor, VersioningType } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 import * as fs from 'fs';
 
+import { WEBHOOKS_PATHS } from './webhooks/webhooks.constants';
+import * as express from 'express';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
@@ -40,7 +42,7 @@ async function bootstrap() {
 
   SwaggerModule.setup('docs', app, document);
   // alchemy webhook validation
-  // app.use(ALCHEMY_WEBHOOK_RECEIVER_PATH, express.raw({ type: '*/*' }));
+  app.use(WEBHOOKS_PATHS.ALCHEMY, express.raw({ type: '*/*' }));
   app.use((req: Request, res: Response, next: NextFunction) => {
     res.removeHeader('X-Powered-By');
     next();
