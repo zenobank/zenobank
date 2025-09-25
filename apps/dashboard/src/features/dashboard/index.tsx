@@ -59,7 +59,7 @@ export default function Dashboard() {
               <Card>
                 <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
                   <CardTitle className='text-sm font-medium'>
-                    Total Revenue
+                    Total Balance
                   </CardTitle>
                   <svg
                     xmlns='http://www.w3.org/2000/svg'
@@ -76,9 +76,6 @@ export default function Dashboard() {
                 </CardHeader>
                 <CardContent>
                   <div className='text-2xl font-bold'>$45,231.89</div>
-                  <p className='text-muted-foreground text-xs'>
-                    +20.1% from last month
-                  </p>
                 </CardContent>
               </Card>
               <Card>
@@ -159,25 +156,17 @@ export default function Dashboard() {
               </Card>
             </div>
             <div className='grid grid-cols-1 gap-4 lg:grid-cols-7'>
-              <Card className='col-span-1 lg:col-span-4'>
+              {/* <Card className='col-span-1 lg:col-span-3'>
                 <CardHeader>
-                  <CardTitle>Overview</CardTitle>
-                </CardHeader>
-                <CardContent className='pl-2'>
-                  <Overview />
-                </CardContent>
-              </Card>
-              <Card className='col-span-1 lg:col-span-3'>
-                <CardHeader>
-                  <CardTitle>Recent Sales</CardTitle>
+                  <CardTitle>Recent Transactions</CardTitle>
                   <CardDescription>
-                    You made 265 sales this month.
+                    You made 265 transactions this month.
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <RecentSales />
                 </CardContent>
-              </Card>
+              </Card> */}
             </div>
           </TabsContent>
         </Tabs>
