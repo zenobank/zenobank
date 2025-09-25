@@ -395,12 +395,12 @@ export default function Payament({ id }: PaymentsProps) {
 const Footer = () => {
   return (
     <div className="mt-6 text-center">
-      <p className="text-xs">
+      <p className="text-xs font-normal">Open Source Crypto Payment Gateway</p>
+      <p className="text-xs font-light italic">
         Powered by{' '}
         <a href="https://zenobank.io" target="_blank" rel="noreferrer">
-          <span className="underline">Zenobank</span>
+          <span className="font-semibold underline">Zenobank</span>
         </a>
-        - Open Source Crypto Payment Gateway
       </p>
     </div>
   );
