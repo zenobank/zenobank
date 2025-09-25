@@ -1,5 +1,5 @@
 import { Body, Controller, Post } from '@nestjs/common';
-import { WalletService } from './services/wallet.service';
+import { WalletService } from './wallet.service';
 import { CreateWalletDto } from './dto/create-wallet.dto';
 import { Env } from 'src/lib/utils/env';
 import { getEnv } from 'src/lib/utils/env';

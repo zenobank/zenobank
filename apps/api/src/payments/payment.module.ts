@@ -4,10 +4,9 @@ import { PaymentController } from './payment.controller';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { AssetModule } from 'src/currencies/currency.module';
 import { NetworksModule } from 'src/networks/networks.module';
-import { WalletModule } from 'src/wallet/wallet.module';
 
 @Module({
-  imports: [PrismaModule, AssetModule, NetworksModule, WalletModule],
+  imports: [PrismaModule, AssetModule, NetworksModule],
   controllers: [PaymentController],
   providers: [PaymentService],
   exports: [PaymentService],

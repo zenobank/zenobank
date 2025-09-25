@@ -399,6 +399,14 @@
             "nullable": true,
             "format": "uri",
             "example": "https://example.com/success"
+          },
+          "confirmationAttempts": {
+            "type": "number",
+            "example": 0
+          },
+          "transactionHash": {
+            "type": "string",
+            "nullable": true
           }
         },
         "required": [
@@ -411,7 +419,9 @@
           "depositDetails",
           "paymentUrl",
           "webhookUrl",
-          "successUrl"
+          "successUrl",
+          "confirmationAttempts",
+          "transactionHash"
         ]
       },
       "UpdateDepositSelectionDto": {
@@ -466,13 +476,6 @@
             "example": false
           },
           "networkId": {
-            "enum": [
-              "ETHEREUM_MAINNET",
-              "BASE_MAINNET",
-              "ARBITRUM_MAINNET",
-              "ETHEREUM_HOLESKY",
-              "ETHEREUM_SEPOLIA"
-            ],
             "type": "string",
             "example": "ETHEREUM_MAINNET"
           }
@@ -492,13 +495,6 @@
         "type": "object",
         "properties": {
           "id": {
-            "enum": [
-              "ETHEREUM_MAINNET",
-              "BASE_MAINNET",
-              "ARBITRUM_MAINNET",
-              "ETHEREUM_HOLESKY",
-              "ETHEREUM_SEPOLIA"
-            ],
             "type": "string",
             "example": "ETHEREUM_MAINNET"
           },
@@ -521,6 +517,18 @@
           "isTestnet": {
             "type": "boolean",
             "example": false
+          },
+          "minBlockConfirmations": {
+            "type": "number",
+            "example": 3
+          },
+          "maxConfirmationAttempts": {
+            "type": "object",
+            "example": 100
+          },
+          "confirmationRetryDelay": {
+            "type": "object",
+            "example": 1000
           }
         },
         "required": [
@@ -528,7 +536,10 @@
           "name",
           "displayName",
           "networkType",
-          "isTestnet"
+          "isTestnet",
+          "minBlockConfirmations",
+          "maxConfirmationAttempts",
+          "confirmationRetryDelay"
         ]
       },
       "CreateWalletDto": {
