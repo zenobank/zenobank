@@ -102,7 +102,8 @@ export class AlchemyService {
         continue;
       }
       if (payment) {
-        await this.paymentService.initiatePaymentProcessing(payment.id);
+        await this.paymentService.markPaymentAsCompleted(payment.id);
+        // await this.paymentService.initiatePaymentProcessing(payment.id);
       } else {
         this.logger.warn(
           `Payment not found ${JSON.stringify({
