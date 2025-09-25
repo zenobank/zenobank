@@ -12,6 +12,16 @@ enum NetworkType {
   SOLANA
 }
 
+model User {
+  id          String   @id @default(uuid())
+  email       String   @unique
+  password    String
+  clerkUserId String   @unique
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  stores      Store[]
+}
+
 model Store {
   id        String    @id @default(uuid())
   name      String
@@ -21,6 +31,8 @@ model Store {
   updatedAt DateTime  @updatedAt
   Payment   Payment[]
   apiKey    String    @unique @default(cuid())
+  User      User?     @relation(fields: [userId], references: [id])
+  userId    String?
 }
 
 model Wallet {

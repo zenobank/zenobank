@@ -24,6 +24,7 @@
     "db:seed": "pnpm ts-node -r tsconfig-paths/register prisma/seed.ts"
   },
   "dependencies": {
+    "@clerk/backend": "^2.15.0",
     "@nestjs/bullmq": "^11.0.3",
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^4.0.2",

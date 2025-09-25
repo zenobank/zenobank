@@ -31,6 +31,14 @@ export class Env {
   static readonly SVIX_API_KEY = 'SVIX_API_KEY';
   @IsString()
   SVIX_API_KEY: string;
+
+  static readonly CLERK_PUBLISHABLE_KEY = 'CLERK_PUBLISHABLE_KEY';
+  @IsString()
+  CLERK_PUBLISHABLE_KEY: string;
+
+  static readonly CLERK_SECRET_KEY = 'CLERK_SECRET_KEY';
+  @IsString()
+  CLERK_SECRET_KEY: string;
 }
 
 export function validateEnvConfig(config: Record<string, unknown>) {

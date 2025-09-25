@@ -12,6 +12,7 @@ import { NetworksModule } from './networks/networks.module';
 import { WebhooksModule } from './webhooks/webhooks.module';
 import { SvixModule } from './webhooks/svix.module';
 import { UsersModule } from './users/users.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { UsersModule } from './users/users.module';
     WebhooksModule,
     SvixModule,
     UsersModule,
+    AuthModule,
   ],
   controllers: [],
   providers: [],
