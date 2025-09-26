@@ -1,36 +1,23 @@
 import { useEffect } from 'react'
 import { useAuth, UserButton } from '@clerk/clerk-react'
+import { Copy, Edit3 } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent } from '@/components/ui/tabs'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
 import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
+import Transactions from '../transactions'
+import { columns } from '../transactions/components/users-columns'
+import { UsersTable } from '../transactions/components/users-table'
+import TransactionsProvider from '../transactions/context/transactions-context'
+import { userListSchema } from '../transactions/data/schema'
+import { users } from '../transactions/data/users'
 
 export default function Dashboard() {
-  const { getToken } = useAuth()
+  const userList = userListSchema.parse(users)
 
-  async function callWallet() {
-    const token = await getToken()
-
-    const res = await fetch('http://localhost:3001/api/v1/wallet/pr', {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer333 ${token}`,
-        'Content-Type': 'application/json',
-      },
-    })
-
-    if (!res.ok) {
-      throw new Error('Request failed')
-    }
-
-    const data = await res.json()
-    console.log('!!!', data)
-  }
-  useEffect(() => {
-    callWallet()
-  }, [callWallet])
   return (
     <>
       {/* ===== Top Heading ===== */}
@@ -50,166 +37,90 @@ export default function Dashboard() {
             <Button>Download</Button>
           </div> */}
         </div>
-        <Tabs
-          orientation='vertical'
-          defaultValue='overview'
-          className='space-y-4'
-        >
+        <div className='max-w-2xl space-y-6'>
           <p className='text-muted-foreground'>
-            Here&apos;s a list of your tasks for this month!
+            Your wallet information and balance
           </p>
-          {/* <div className='w-full overflow-x-auto pb-2'>
-            <TabsList>
-              <TabsTrigger value='overview'>Overview</TabsTrigger>
-              <TabsTrigger value='analytics' disabled>
-                Balances
-              </TabsTrigger>
-            </TabsList>
-          </div> */}
-          <TabsContent value='overview' className='space-y-4'>
-            <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-4'>
-              <Card>
-                <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-                  <CardTitle className='text-sm font-medium'>
-                    Total Balance
-                  </CardTitle>
-                  <svg
-                    xmlns='http://www.w3.org/2000/svg'
-                    viewBox='0 0 24 24'
-                    fill='none'
-                    stroke='currentColor'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth='2'
-                    className='text-muted-foreground h-4 w-4'
-                  >
-                    <path d='M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6' />
-                  </svg>
-                </CardHeader>
-                <CardContent>
-                  <div className='text-2xl font-bold'>$45,231.89</div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-                  <CardTitle className='text-sm font-medium'>
-                    Subscriptions
-                  </CardTitle>
-                  <svg
-                    xmlns='http://www.w3.org/2000/svg'
-                    viewBox='0 0 24 24'
-                    fill='none'
-                    stroke='currentColor'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth='2'
-                    className='text-muted-foreground h-4 w-4'
-                  >
-                    <path d='M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2' />
-                    <circle cx='9' cy='7' r='4' />
-                    <path d='M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75' />
-                  </svg>
-                </CardHeader>
-                <CardContent>
-                  <div className='text-2xl font-bold'>+2350</div>
-                  <p className='text-muted-foreground text-xs'>
-                    +180.1% from last month
-                  </p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-                  <CardTitle className='text-sm font-medium'>Sales</CardTitle>
-                  <svg
-                    xmlns='http://www.w3.org/2000/svg'
-                    viewBox='0 0 24 24'
-                    fill='none'
-                    stroke='currentColor'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth='2'
-                    className='text-muted-foreground h-4 w-4'
-                  >
-                    <rect width='20' height='14' x='2' y='5' rx='2' />
-                    <path d='M2 10h20' />
-                  </svg>
-                </CardHeader>
-                <CardContent>
-                  <div className='text-2xl font-bold'>+12,234</div>
-                  <p className='text-muted-foreground text-xs'>
-                    +19% from last month
-                  </p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-                  <CardTitle className='text-sm font-medium'>
-                    Active Now
-                  </CardTitle>
-                  <svg
-                    xmlns='http://www.w3.org/2000/svg'
-                    viewBox='0 0 24 24'
-                    fill='none'
-                    stroke='currentColor'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth='2'
-                    className='text-muted-foreground h-4 w-4'
-                  >
-                    <path d='M22 12h-4l-3 9L9 3l-3 9H2' />
-                  </svg>
-                </CardHeader>
-                <CardContent>
-                  <div className='text-2xl font-bold'>+573</div>
-                  <p className='text-muted-foreground text-xs'>
-                    +201 since last hour
-                  </p>
-                </CardContent>
-              </Card>
+
+          {/* Wallet Balance Card */}
+          <Card>
+            <CardHeader>
+              <CardTitle className='flex items-center gap-2'>
+                <svg
+                  xmlns='http://www.w3.org/2000/svg'
+                  viewBox='0 0 24 24'
+                  fill='none'
+                  stroke='currentColor'
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  strokeWidth='2'
+                  className='h-5 w-5'
+                >
+                  <path d='M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6' />
+                </svg>
+                Balance
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className='text-3xl font-bold'>$0.00</div>
+            </CardContent>
+          </Card>
+
+          {/* Wallet Address Section */}
+          <div className='space-y-3'>
+            <div className='flex items-center gap-3'>
+              <div className='flex items-center gap-2'>
+                <svg
+                  xmlns='http://www.w3.org/2000/svg'
+                  viewBox='0 0 24 24'
+                  fill='none'
+                  stroke='currentColor'
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  strokeWidth='2'
+                  className='h-5 w-5'
+                >
+                  <rect width='20' height='14' x='2' y='5' rx='2' />
+                  <path d='M2 10h20' />
+                </svg>
+                <h3 className='text-lg font-semibold'>Payment Address</h3>
+              </div>
+              <Button variant='outline' size='sm' className='gap-2'>
+                <Edit3 className='h-4 w-4' />
+                Change
+              </Button>
             </div>
-            <div className='grid grid-cols-1 gap-4 lg:grid-cols-7'>
-              {/* <Card className='col-span-1 lg:col-span-3'>
-                <CardHeader>
-                  <CardTitle>Recent Transactions</CardTitle>
-                  <CardDescription>
-                    You made 265 transactions this month.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <RecentSales />
-                </CardContent>
-              </Card> */}
+            <div className='bg-muted/50 rounded-lg border p-4'>
+              <div className='flex items-center justify-between'>
+                <div className='mr-4 flex-1 font-mono text-sm break-all'>
+                  0x0000...0000
+                </div>
+                <Button variant='ghost' size='sm' className='gap-2'>
+                  <Copy className='h-4 w-4' />
+                  Copy
+                </Button>
+              </div>
             </div>
-          </TabsContent>
-        </Tabs>
+          </div>
+        </div>
+
+        <TransactionsProvider>
+          <div className='mb-2 flex flex-wrap items-center justify-between space-y-2'>
+            <div>
+              <h2 className='text-2xl font-bold tracking-tight'>
+                Transactions
+              </h2>
+              <p className='text-muted-foreground'>
+                View your transactions here.3
+              </p>
+            </div>
+            {/* <TransactionsPrimaryButtons /> */}
+          </div>
+          <div className='-mx-4 flex-1 overflow-auto px-4 py-1 lg:flex-row lg:space-y-0 lg:space-x-12'>
+            <UsersTable data={userList} columns={columns} />
+          </div>
+        </TransactionsProvider>
       </Main>
     </>
   )
 }
-
-const topNav = [
-  {
-    title: 'Overview',
-    href: 'dashboard/overview',
-    isActive: true,
-    disabled: false,
-  },
-  {
-    title: 'Customers',
-    href: 'dashboard/customers',
-    isActive: false,
-    disabled: true,
-  },
-  {
-    title: 'Products',
-    href: 'dashboard/products',
-    isActive: false,
-    disabled: true,
-  },
-  {
-    title: 'Settings',
-    href: 'dashboard/settings',
-    isActive: false,
-    disabled: true,
-  },
-]
