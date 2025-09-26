@@ -1,3 +1,4 @@
+import { useUser } from '@clerk/clerk-react'
 import {
   Sidebar,
   SidebarContent,
@@ -6,10 +7,13 @@ import {
   SidebarRail,
 } from '@/components/ui/sidebar'
 import { NavGroup } from '@/components/layout/nav-group'
+import { NavUser } from './nav-user'
 import { useSidebarData } from './use-sidebar-data'
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const sidebarData = useSidebarData()
+  const { user } = useUser()
+
   return (
     <Sidebar collapsible='icon' variant='floating' {...props}>
       <SidebarHeader>
@@ -24,7 +28,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <NavGroup key={props.title} {...props} />
         ))}
       </SidebarContent>
-      <SidebarFooter>{/* <NavUser user={sidebarData.user} /> */}</SidebarFooter>
+      <SidebarFooter>
+        <NavUser
+          user={{
+            avatar: user?.imageUrl ?? '',
+            email: user?.emailAddresses[0].emailAddress ?? '',
+            name: user?.firstName ?? '',
+          }}
+        />
+      </SidebarFooter>
       <SidebarRail />
     </Sidebar>
   )

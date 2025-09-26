@@ -17,9 +17,9 @@ import {
 import { Separator } from '@/components/ui/separator'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
-import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
+import { WordPressIntegrationDialog } from './components/wordpress-integration-dialog'
 import { apps } from './data/apps'
 
 const appText = new Map<string, string>([
@@ -32,6 +32,16 @@ export default function Apps() {
   const [sort, setSort] = useState('ascending')
   const [appType, setAppType] = useState('all')
   const [searchTerm, setSearchTerm] = useState('')
+  const [isWordPressDialogOpen, setIsWordPressDialogOpen] = useState(false)
+  const [hasWallet] = useState(false) // Variable para controlar si el usuario tiene wallet
+
+  const handleAppClick = (app: (typeof apps)[0]) => {
+    if (app.name === 'Wordpress' && !app.connected) {
+      setIsWordPressDialogOpen(true)
+    } else if (app.onClick) {
+      app.onClick()
+    }
+  }
 
   const filteredApps = apps
     .sort((a, b) =>
@@ -77,7 +87,7 @@ export default function Apps() {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-            <Select value={appType} onValueChange={setAppType}>
+            {/* <Select value={appType} onValueChange={setAppType}>
               <SelectTrigger className='w-36'>
                 <SelectValue>{appText.get(appType)}</SelectValue>
               </SelectTrigger>
@@ -86,7 +96,7 @@ export default function Apps() {
                 <SelectItem value='connected'>Connected</SelectItem>
                 <SelectItem value='notConnected'>Not Connected</SelectItem>
               </SelectContent>
-            </Select>
+            </Select> */}
           </div>
 
           <Select value={sort} onValueChange={setSort}>
@@ -128,6 +138,7 @@ export default function Apps() {
                   variant='outline'
                   size='sm'
                   className={`${app.connected ? 'border border-blue-300 bg-blue-50 hover:bg-blue-100 dark:border-blue-700 dark:bg-blue-950 dark:hover:bg-blue-900' : ''}`}
+                  onClick={() => handleAppClick(app)}
                 >
                   {app.connected ? 'Connected' : 'Connect'}
                 </Button>
@@ -140,6 +151,13 @@ export default function Apps() {
           ))}
         </ul>
       </Main>
+
+      {/* WordPress Integration Dialog */}
+      <WordPressIntegrationDialog
+        open={isWordPressDialogOpen}
+        onOpenChange={setIsWordPressDialogOpen}
+        hasWallet={hasWallet}
+      />
     </>
   )
 }

@@ -1,6 +1,6 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useAuth, UserButton } from '@clerk/clerk-react'
-import { Copy, Edit3 } from 'lucide-react'
+import { Copy, Edit3, Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent } from '@/components/ui/tabs'
@@ -17,6 +17,18 @@ import { users } from '../transactions/data/users'
 
 export default function Dashboard() {
   const userList = userListSchema.parse(users)
+  const [copied, setCopied] = useState(false)
+  const walletAddress = '0xc0ffee254729296a45a3885639AC7E10F9d54979'
+
+  const copyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(walletAddress)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch (err) {
+      console.error('Failed to copy: ', err)
+    }
+  }
 
   return (
     <>
@@ -37,82 +49,93 @@ export default function Dashboard() {
             <Button>Download</Button>
           </div> */}
         </div>
-        <div className='max-w-2xl space-y-6'>
+        <div className='max-w-4xl space-y-6'>
           <p className='text-muted-foreground'>
-            Your wallet information and balance
+            Your payment wallet information and transactions
           </p>
 
-          {/* Wallet Balance Card */}
-          <Card>
-            <CardHeader>
-              <CardTitle className='flex items-center gap-2'>
-                <svg
-                  xmlns='http://www.w3.org/2000/svg'
-                  viewBox='0 0 24 24'
-                  fill='none'
-                  stroke='currentColor'
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                  strokeWidth='2'
-                  className='h-5 w-5'
-                >
-                  <path d='M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6' />
-                </svg>
-                Balance
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className='text-3xl font-bold'>$0.00</div>
-            </CardContent>
-          </Card>
-
-          {/* Wallet Address Section */}
-          <div className='space-y-3'>
-            <div className='flex items-center gap-3'>
-              <div className='flex items-center gap-2'>
-                <svg
-                  xmlns='http://www.w3.org/2000/svg'
-                  viewBox='0 0 24 24'
-                  fill='none'
-                  stroke='currentColor'
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                  strokeWidth='2'
-                  className='h-5 w-5'
-                >
-                  <rect width='20' height='14' x='2' y='5' rx='2' />
-                  <path d='M2 10h20' />
-                </svg>
-                <h3 className='text-lg font-semibold'>Payment Address</h3>
-              </div>
-              <Button variant='outline' size='sm' className='gap-2'>
-                <Edit3 className='h-4 w-4' />
-                Change
-              </Button>
-            </div>
-            <div className='bg-muted/50 rounded-lg border p-4'>
-              <div className='flex items-center justify-between'>
-                <div className='mr-4 flex-1 font-mono text-sm break-all'>
-                  0x0000...0000
+          {/* Cards Grid */}
+          <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
+            {/* Wallet Address Card */}
+            <Card>
+              <CardHeader>
+                <CardTitle className='flex items-center justify-between'>
+                  <div className='flex items-center gap-2'>
+                    <svg
+                      xmlns='http://www.w3.org/2000/svg'
+                      viewBox='0 0 24 24'
+                      fill='none'
+                      stroke='currentColor'
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                      strokeWidth='2'
+                      className='h-5 w-5'
+                    >
+                      <rect width='20' height='14' x='2' y='5' rx='2' />
+                      <path d='M2 10h20' />
+                    </svg>
+                    Payment Address
+                  </div>
+                  <Button variant='outline' size='sm' className='gap-2'>
+                    <Edit3 className='h-4 w-4' />
+                    Change
+                  </Button>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className='flex items-center gap-2'>
+                  <code className='text-md font-mono break-all'>
+                    0xc0ff...54979
+                  </code>
+                  <Button
+                    variant='ghost'
+                    size='sm'
+                    className='shrink-0 p-2'
+                    onClick={copyToClipboard}
+                  >
+                    {copied ? (
+                      <Check className='h-4 w-4 text-green-600' />
+                    ) : (
+                      <Copy className='h-4 w-4' />
+                    )}
+                  </Button>
                 </div>
-                <Button variant='ghost' size='sm' className='gap-2'>
-                  <Copy className='h-4 w-4' />
-                  Copy
-                </Button>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
+
+            {/* Wallet Balance Card */}
+            {/* <Card>
+              <CardHeader>
+                <CardTitle className='flex items-center gap-2'>
+                  <svg
+                    xmlns='http://www.w3.org/2000/svg'
+                    viewBox='0 0 24 24'
+                    fill='none'
+                    stroke='currentColor'
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    strokeWidth='2'
+                    className='h-5 w-5'
+                  >
+                    <path d='M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6' />
+                  </svg>
+                  Balance
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className='text-3xl font-bold'>$0.00</div>
+              </CardContent>
+            </Card> */}
           </div>
         </div>
-
+      </Main>
+      <Main>
         <TransactionsProvider>
           <div className='mb-2 flex flex-wrap items-center justify-between space-y-2'>
             <div>
               <h2 className='text-2xl font-bold tracking-tight'>
                 Transactions
               </h2>
-              <p className='text-muted-foreground'>
-                View your transactions here.3
-              </p>
             </div>
             {/* <TransactionsPrimaryButtons /> */}
           </div>

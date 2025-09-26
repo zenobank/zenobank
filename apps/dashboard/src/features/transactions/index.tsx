@@ -31,7 +31,7 @@ export default function Transactions() {
           <div>
             <h2 className='text-2xl font-bold tracking-tight'>Transactions</h2>
             <p className='text-muted-foreground'>
-              View your transactions here.3
+              View your transactions here.
             </p>
           </div>
           {/* <TransactionsPrimaryButtons /> */}

@@ -49,37 +49,22 @@ export function useSidebarData(): SidebarData {
             url: '/',
             icon: IconLayoutDashboard,
           },
-          {
-            title: 'Tasks',
-            url: '/tasks',
-            icon: IconChecklist,
-          },
 
           {
-            title: 'Transactions',
-            url: '/transactions',
-            icon: IconUsers,
-          },
-          {
-            title: 'Supported Tokens',
-            url: '/401',
-            icon: IconCurrencyDollar,
+            title: 'Integrations',
+            url: '/plugins',
+            icon: IconPlug,
           },
         ],
       },
 
       {
-        title: 'Integrations',
+        title: 'Others',
         items: [
           {
-            title: 'API keys',
-            url: '/transactions',
-            icon: IconKey,
-          },
-          {
-            title: 'Plugins',
-            url: '/plugins',
-            icon: IconPlug,
+            title: 'Help Center',
+            url: '/help-center',
+            icon: IconHelp,
           },
         ],
       },

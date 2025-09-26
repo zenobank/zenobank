@@ -5,7 +5,7 @@ export const apps = [
     name: 'Wordpress',
     logo: <IconBrandWordpress />,
     connected: false,
-    desc: 'Connect with Wordpress WooCommerce.',
+    desc: 'Integrate Crypto Payments into your WooCommerce store',
   },
   // {
   //   name: 'Notion',
