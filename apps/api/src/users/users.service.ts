@@ -7,6 +7,7 @@ import { WalletService } from 'src/wallet/wallet.service';
 
 import { CreateStoreDto } from './dtos/create-store.dto';
 import { StoreResponseDto } from './dtos/store-response.dto';
+import { UserResponseDto } from './dtos/user-response.dto';
 
 @Injectable()
 export class UsersService {
@@ -14,6 +15,16 @@ export class UsersService {
     private readonly db: PrismaService,
     private readonly walletService: WalletService,
   ) {}
+
+  async getUser(id: string): Promise<UserResponseDto | null> {
+    const user = await this.db.user.findUnique({
+      where: { id },
+    });
+    if (!user) {
+      return null;
+    }
+    return toDto(UserResponseDto, user);
+  }
 
   async createStore(createStoreDto: CreateStoreDto): Promise<StoreResponseDto> {
     const wallets = await this.walletService.registerEvmWallet(

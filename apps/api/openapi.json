@@ -155,6 +155,20 @@
         ]
       }
     },
+    "/api/v1/wallet/pr": {
+      "get": {
+        "operationId": "WalletController_protectedDemoEndpoint_v1",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Wallet"
+        ]
+      }
+    },
     "/api/v1/wallet": {
       "post": {
         "operationId": "WalletController_registerEvmWallet_v1",

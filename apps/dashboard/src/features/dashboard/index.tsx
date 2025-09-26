@@ -1,24 +1,36 @@
-import { UserButton } from '@clerk/clerk-react'
-import { ClerkFullLogo } from '@/assets/clerk-full-logo'
-import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { useEffect } from 'react'
+import { useAuth, UserButton } from '@clerk/clerk-react'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Tabs, TabsContent } from '@/components/ui/tabs'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
-import { TopNav } from '@/components/layout/top-nav'
-import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
-import { Overview } from './components/overview'
-import { RecentSales } from './components/recent-sales'
 
 export default function Dashboard() {
+  const { getToken } = useAuth()
+
+  async function callWallet() {
+    const token = await getToken()
+
+    const res = await fetch('http://localhost:3001/api/v1/wallet/pr', {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer333 ${token}`,
+        'Content-Type': 'application/json',
+      },
+    })
+
+    if (!res.ok) {
+      throw new Error('Request failed')
+    }
+
+    const data = await res.json()
+    console.log('!!!', data)
+  }
+  useEffect(() => {
+    callWallet()
+  }, [callWallet])
   return (
     <>
       {/* ===== Top Heading ===== */}
