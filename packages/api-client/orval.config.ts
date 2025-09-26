@@ -6,11 +6,11 @@ dotenv.config();
 
 export default defineConfig({
   api: {
-    input: '../api/openapi.json',
+    input: '../../apps/api/openapi.json',
     output: {
       baseUrl: process.env.API_BASE_URL,
-      target: 'src/lib/requests/api-client',
-      schemas: 'src/lib/requests/api-client/model',
+      target: 'src/index.ts',
+      schemas: 'src/model',
       client: 'react-query',
       clean: true,
     },
