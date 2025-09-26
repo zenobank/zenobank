@@ -1,4 +1,5 @@
 import { UserButton } from '@clerk/clerk-react'
+import { useState } from 'react'
 import { ClerkFullLogo } from '@/assets/clerk-full-logo'
 import { Button } from '@/components/ui/button'
 import {
@@ -17,8 +18,11 @@ import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { Overview } from './components/overview'
 import { RecentSales } from './components/recent-sales'
+import { ChangeWalletDialog } from '@/features/wallets/components/change-wallet-dialog'
 
 export default function Dashboard() {
+  const [isChangeWalletDialogOpen, setIsChangeWalletDialogOpen] = useState(false)
+
   return (
     <>
       {/* ===== Top Heading ===== */}
@@ -34,9 +38,14 @@ export default function Dashboard() {
       <Main>
         <div className='mb-2 flex items-center justify-between space-y-2'>
           <h1 className='text-2xl font-bold tracking-tight'>Dashboard</h1>
-          {/* <div className='flex items-center space-x-2'>
-            <Button>Download</Button>
-          </div> */}
+          <div className='flex items-center space-x-2'>
+            <Button 
+              onClick={() => setIsChangeWalletDialogOpen(true)}
+              variant="outline"
+            >
+              Change Wallet
+            </Button>
+          </div>
         </div>
         <Tabs
           orientation='vertical'
@@ -171,6 +180,12 @@ export default function Dashboard() {
           </TabsContent>
         </Tabs>
       </Main>
+      
+      <ChangeWalletDialog
+        open={isChangeWalletDialogOpen}
+        onOpenChange={setIsChangeWalletDialogOpen}
+        currentWallet="0x1234567890123456789012345678901234567890" // Wallet actual (esto vendría de tu estado/API)
+      />
     </>
   )
 }
