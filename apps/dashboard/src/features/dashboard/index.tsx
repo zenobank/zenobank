@@ -1,27 +1,24 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useAuth, UserButton } from '@clerk/clerk-react'
 import { Copy, Edit3, Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Tabs, TabsContent } from '@/components/ui/tabs'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
 import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
-import Transactions from '../transactions'
-import { columns } from '../transactions/components/users-columns'
-import { UsersTable } from '../transactions/components/users-table'
-import TransactionsProvider from '../transactions/context/transactions-context'
 import { userListSchema } from '../transactions/data/schema'
 import { users } from '../transactions/data/users'
+import { ChangeWalletDialog } from '../wallets/components/change-wallet-dialog'
 
 export default function Dashboard() {
-  const userList = userListSchema.parse(users)
+  const _userList = userListSchema.parse(users)
   const [copied, setCopied] = useState(false)
+  const [isWalletDialogOpen, setIsWalletDialogOpen] = useState(false)
   const walletAddress = '0xc0ffee254729296a45a3885639AC7E10F9d54979'
   const { getToken } = useAuth()
-  getToken().then((token) => {
-    console.log('token!!!', token)
+  getToken().then((_token) => {
+    // console.log('token!!!', token)
   })
 
   const copyToClipboard = async () => {
@@ -29,7 +26,7 @@ export default function Dashboard() {
       await navigator.clipboard.writeText(walletAddress)
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
-    } catch (err) {
+    } catch (_err) {
       // Silently handle clipboard error
     }
   }
@@ -78,7 +75,12 @@ export default function Dashboard() {
                     </svg>
                     Payment Address
                   </div>
-                  <Button variant='outline' size='sm' className='gap-2'>
+                  <Button
+                    variant='outline'
+                    size='sm'
+                    className='gap-2'
+                    onClick={() => setIsWalletDialogOpen(true)}
+                  >
                     <Edit3 className='h-4 w-4' />
                     Change
                   </Button>
@@ -145,6 +147,12 @@ export default function Dashboard() {
           </div>
         </TransactionsProvider>
       </Main> */}
+
+      <ChangeWalletDialog
+        open={isWalletDialogOpen}
+        onOpenChange={setIsWalletDialogOpen}
+        currentWallet={''}
+      />
     </>
   )
 }
