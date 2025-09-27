@@ -19,6 +19,10 @@ export default function Dashboard() {
   const userList = userListSchema.parse(users)
   const [copied, setCopied] = useState(false)
   const walletAddress = '0xc0ffee254729296a45a3885639AC7E10F9d54979'
+  const { getToken } = useAuth()
+  getToken().then((token) => {
+    console.log('token!!!', token)
+  })
 
   const copyToClipboard = async () => {
     try {
@@ -26,7 +30,7 @@ export default function Dashboard() {
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
     } catch (err) {
-      console.error('Failed to copy: ', err)
+      // Silently handle clipboard error
     }
   }
 
@@ -50,9 +54,7 @@ export default function Dashboard() {
           </div> */}
         </div>
         <div className='max-w-4xl space-y-6'>
-          <p className='text-muted-foreground'>
-            Your payment wallet information and transactions
-          </p>
+          <p className='text-muted-foreground'>Your wallet information</p>
 
           {/* Cards Grid */}
           <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
@@ -129,7 +131,7 @@ export default function Dashboard() {
           </div>
         </div>
       </Main>
-      <Main>
+      {/* <Main>
         <TransactionsProvider>
           <div className='mb-2 flex flex-wrap items-center justify-between space-y-2'>
             <div>
@@ -137,13 +139,12 @@ export default function Dashboard() {
                 Transactions
               </h2>
             </div>
-            {/* <TransactionsPrimaryButtons /> */}
           </div>
           <div className='-mx-4 flex-1 overflow-auto px-4 py-1 lg:flex-row lg:space-y-0 lg:space-x-12'>
             <UsersTable data={userList} columns={columns} />
           </div>
         </TransactionsProvider>
-      </Main>
+      </Main> */}
     </>
   )
 }
