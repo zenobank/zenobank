@@ -1,5 +1,5 @@
 import { isAfter } from 'date-fns';
-import { PaymentResponseDto, PaymentStatus } from '@/src/lib/requests/api-client/model';
+import { PaymentResponseDto, PaymentStatus } from '@repo/api-client/model';
 import { CheckoutState } from '@/src/features/payments/types/state';
 
 export const getPaymentCheckoutState = (payment: PaymentResponseDto): CheckoutState => {

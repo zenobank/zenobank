@@ -38,8 +38,6 @@ export default function Apps() {
   const handleAppClick = (app: (typeof apps)[0]) => {
     if (app.name === 'Wordpress' && !app.connected) {
       setIsWordPressDialogOpen(true)
-    } else if (app.onClick) {
-      app.onClick()
     }
   }
 

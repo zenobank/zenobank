@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@clerk/themes": "^2.4.10",
+    "@repo/api-client": "workspace:*",
     "@radix-ui/react-alert-dialog": "^1.1.14",
     "@radix-ui/react-avatar": "^1.1.10",
     "@radix-ui/react-checkbox": "^1.3.2",

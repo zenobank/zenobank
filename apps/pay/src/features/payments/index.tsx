@@ -19,8 +19,8 @@ import {
   useNetworksControllerGetNetworksV1,
   usePaymentControllerGetPaymentV1,
   usePaymentControllerUpdatePaymentDepositSelectionV1,
-} from '@/src/lib/requests/api-client/aPIDocs';
-import { NetworkId, TokenResponseDto } from '@/src/lib/requests/api-client/model';
+} from '@repo/api-client';
+import { NetworkId, TokenResponseDto } from '@repo/api-client/model';
 import { cn } from '@/src/lib/utils';
 import { Check, ChevronsUpDown, TimerIcon } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
@@ -75,7 +75,7 @@ export default function Payament({ id }: PaymentsProps) {
     return getPaymentCheckoutState(paymentData);
   }, [paymentData]);
 
-  const availableNetworksIdsForSelectedToken: NetworkId[] = useMemo(() => {
+  const availableNetworksIdsForSelectedToken: string[] = useMemo(() => {
     const tokens = supportedTokens?.filter((t) => t.canonicalTokenId === selectedTokenData?.canonicalTokenId);
 
     return tokens?.map((t) => t.networkId) || [];

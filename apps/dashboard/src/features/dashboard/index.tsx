@@ -75,7 +75,7 @@ export default function Dashboard() {
                     </svg>
                     Payment Address
                   </div>
-                  <Button
+                  {/* <Button
                     variant='outline'
                     size='sm'
                     className='gap-2'
@@ -83,7 +83,7 @@ export default function Dashboard() {
                   >
                     <Edit3 className='h-4 w-4' />
                     Change
-                  </Button>
+                  </Button> */}
                 </CardTitle>
               </CardHeader>
               <CardContent>
