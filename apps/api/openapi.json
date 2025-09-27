@@ -238,6 +238,27 @@
           "users"
         ]
       }
+    },
+    "/api/v1/users/test": {
+      "get": {
+        "operationId": "UsersController_getMe_v1",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "users"
+        ]
+      }
     }
   },
   "info": {

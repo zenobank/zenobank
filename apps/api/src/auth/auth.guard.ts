@@ -9,12 +9,14 @@ import { Request } from 'express';
 import { verifyToken, type ClerkClient } from '@clerk/backend';
 import { Env, getEnv } from 'src/lib/utils/env';
 import { CLERK_CLIENT } from './auth.constants';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
     @Inject(CLERK_CLIENT)
     private readonly clerkClient: ClerkClient,
+    private readonly db: PrismaService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -44,7 +46,13 @@ export class AuthGuard implements CanActivate {
         throw new UnauthorizedException('Invalid session');
       }
 
-      const user = await this.clerkClient.users.getUser(tokenPayload.sub);
+      const clerkUser = await this.clerkClient.users.getUser(tokenPayload.sub);
+      const user = await this.db.user.findUniqueOrThrow({
+        where: {
+          clerkUserId: tokenPayload.sub,
+        },
+      });
+      (request as any).clerkUser = clerkUser;
       (request as any).user = user;
       return true;
     } catch (err) {
