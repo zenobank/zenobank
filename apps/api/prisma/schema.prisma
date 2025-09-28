@@ -14,8 +14,6 @@ enum NetworkType {
 
 model User {
   id          String   @id @default(uuid())
-  email       String   @unique
-  password    String
   clerkUserId String   @unique
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -29,9 +27,9 @@ model Store {
   wallets   Wallet[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  Payment   Payment[]
+  payments  Payment[]
   apiKey    String    @unique @default(cuid())
-  User      User?     @relation(fields: [userId], references: [id])
+  user      User?     @relation(fields: [userId], references: [id])
   userId    String?
 }
 
@@ -50,7 +48,7 @@ model Wallet {
 
   activityWebhook   ActivityWebhook? @relation(fields: [activityWebhookId], references: [id])
   activityWebhookId String?
-  Store             Store?           @relation(fields: [storeId], references: [id])
+  store             Store?           @relation(fields: [storeId], references: [id])
   storeId           String?
 
   @@unique([networkId, address])
@@ -147,7 +145,7 @@ model Token {
   network   Network  @relation(fields: [networkId], references: [id])
   networkId String
 
-  Payment Payment[]
+  payments Payment[]
 
   @@unique([networkId, address])
   @@index([canonicalTokenId])

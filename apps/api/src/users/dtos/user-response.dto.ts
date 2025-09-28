@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Expose } from 'class-transformer';
+import { Expose, Type } from 'class-transformer';
+import { StoreResponseDto } from 'src/stores/dtos/store-response.dto';
 
 export class UserResponseDto {
   @Expose()
@@ -8,4 +9,19 @@ export class UserResponseDto {
     example: '123e4567-e89b-12d3-a456-426614174000',
   })
   id: string;
+
+  @Expose()
+  @ApiProperty({
+    description: 'The clerk user id',
+    example: 'user_2U8Lvq31HfMbvKb09tJgRgJz7M6',
+  })
+  clerkUserId: string;
+
+  @Expose()
+  @Type(() => StoreResponseDto)
+  @ApiProperty({
+    description: 'The user&apos;s stores',
+    type: [StoreResponseDto],
+  })
+  stores: StoreResponseDto[];
 }

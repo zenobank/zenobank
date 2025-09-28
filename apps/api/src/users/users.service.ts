@@ -5,67 +5,65 @@ import { SupportedNetworksId } from 'src/networks/network.interface';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { WalletService } from 'src/wallet/wallet.service';
 
-import { CreateStoreDto } from './dtos/create-store.dto';
-import { StoreResponseDto } from './dtos/store-response.dto';
+import { CreateStoreDto } from '../stores/dtos/create-store.dto';
+import { StoreResponseDto } from '../stores/dtos/store-response.dto';
 import { UserResponseDto } from './dtos/user-response.dto';
 
 @Injectable()
 export class UsersService {
-  constructor(
-    private readonly db: PrismaService,
-    private readonly walletService: WalletService,
-  ) {}
+  constructor(private readonly db: PrismaService) {}
 
-  async getUser(id: string): Promise<UserResponseDto | null> {
-    const user = await this.db.user.findUnique({
-      where: { id },
+  async bootstrap(): Promise<any> {
+    const user = await this.db.user.create({
+      data: {
+        clerkUserId: '123',
+      },
     });
-    if (!user) {
-      return null;
-    }
-    return toDto(UserResponseDto, user);
   }
 
-  async createStore(createStoreDto: CreateStoreDto): Promise<StoreResponseDto> {
-    const wallets = await this.walletService.registerEvmWallet(
-      createStoreDto.walletAddress,
-    );
-
-    const store = await this.db.store.create({
-      data: {
-        name: createStoreDto.name,
-        domain: createStoreDto.domain,
-        wallets: {
-          connect: wallets.map((wallet) => ({
-            id: wallet.id,
-          })),
-        },
+  async getUser(): Promise<UserResponseDto | null> {
+    const user = await this.db.user.findUnique({
+      where: {
+        id: '98188bdb-4ecb-4366-967b-9340a2fb2666',
       },
       include: {
-        wallets: {
+        stores: {
           select: {
-            id: true,
-            address: true,
-            label: true,
-            createdAt: true,
-            updatedAt: true,
-            network: {
+            apiKey: true,
+            domain: true,
+            wallets: {
               select: {
                 id: true,
+                address: true,
+                label: true,
+                createdAt: true,
+                updatedAt: true,
+                network: {
+                  select: {
+                    id: true,
+                  },
+                },
               },
             },
+            id: true,
+            name: true,
           },
         },
       },
     });
-
-    return toDto(StoreResponseDto, {
-      ...store,
-      wallets: store.wallets.map((wallet) => ({
-        id: wallet.id,
-        network: toEnumValue(SupportedNetworksId, wallet.network.id),
-        address: wallet.address,
-        label: wallet.label,
+    if (!user) {
+      return null;
+    }
+    return toDto(UserResponseDto, {
+      ...user,
+      stores: user.stores.map((store) => ({
+        ...store,
+        apiKey: store.apiKey,
+        domain: store.domain,
+        wallets: store.wallets.map((wallet) => ({
+          ...wallet,
+          network: toEnumValue(SupportedNetworksId, wallet.network.id),
+        })),
       })),
     });
   }

@@ -1,4 +1,4 @@
-import { NetworkId } from '@/src/lib/requests/api-client/model';
+import { NetworkId } from '@repo/api-client/model';
 
 export interface CanonicalTokenOption {
   canonicalTokenId: string;

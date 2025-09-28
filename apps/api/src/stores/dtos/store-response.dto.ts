@@ -32,20 +32,6 @@ export class StoreResponseDto {
   apiKey: string;
 
   @Expose()
-  @ApiProperty({
-    description: 'Creation timestamp',
-    example: '2023-01-01T00:00:00.000Z',
-  })
-  createdAt: Date;
-
-  @Expose()
-  @ApiProperty({
-    description: 'Last update timestamp',
-    example: '2023-01-01T00:00:00.000Z',
-  })
-  updatedAt: Date;
-
-  @Expose()
   @Type(() => WalletResponseDto)
   @ApiProperty({
     description: 'Associated wallets',

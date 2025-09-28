@@ -207,9 +207,53 @@
         ]
       }
     },
-    "/api/v1/users/store": {
+    "/api/v1/users/me": {
+      "get": {
+        "operationId": "UsersController_getMe_v1",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "users"
+        ]
+      }
+    },
+    "/api/v1/users/me/bootstrap": {
       "post": {
-        "operationId": "UsersController_createStore_v1",
+        "description": "It initializes the user in our database.",
+        "operationId": "UsersController_bootstrap_v1",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Create initial backend resources for the newly signed-up user",
+        "tags": [
+          "users"
+        ]
+      }
+    },
+    "/api/v1/stores": {
+      "post": {
+        "operationId": "StoresController_createStore_v1",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -235,28 +279,7 @@
         },
         "summary": "Create a new store",
         "tags": [
-          "users"
-        ]
-      }
-    },
-    "/api/v1/users/test": {
-      "get": {
-        "operationId": "UsersController_getMe_v1",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "users"
+          "Stores"
         ]
       }
     }
@@ -588,30 +611,6 @@
           "address"
         ]
       },
-      "CreateStoreDto": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "maxLength": 256,
-            "example": "My Store"
-          },
-          "domain": {
-            "type": "string",
-            "maxLength": 256,
-            "example": "my-store.com"
-          },
-          "walletAddress": {
-            "type": "string",
-            "example": "0xc429e068b65b3462f0e422b3ea388a7a37b23bff"
-          }
-        },
-        "required": [
-          "name",
-          "domain",
-          "walletAddress"
-        ]
-      },
       "WalletResponseDto": {
         "type": "object",
         "properties": {
@@ -674,18 +673,6 @@
             "description": "API key for the store",
             "example": "cuid_1234567890abcdef"
           },
-          "createdAt": {
-            "format": "date-time",
-            "type": "string",
-            "description": "Creation timestamp",
-            "example": "2023-01-01T00:00:00.000Z"
-          },
-          "updatedAt": {
-            "format": "date-time",
-            "type": "string",
-            "description": "Last update timestamp",
-            "example": "2023-01-01T00:00:00.000Z"
-          },
           "wallets": {
             "description": "Associated wallets",
             "type": "array",
@@ -699,9 +686,58 @@
           "name",
           "domain",
           "apiKey",
-          "createdAt",
-          "updatedAt",
           "wallets"
+        ]
+      },
+      "UserResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for the user",
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          "clerkUserId": {
+            "type": "string",
+            "description": "The clerk user id",
+            "example": "user_2U8Lvq31HfMbvKb09tJgRgJz7M6"
+          },
+          "stores": {
+            "description": "The user&apos;s stores",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StoreResponseDto"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "clerkUserId",
+          "stores"
+        ]
+      },
+      "CreateStoreDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 256,
+            "example": "My Store"
+          },
+          "domain": {
+            "type": "string",
+            "maxLength": 256,
+            "example": "my-store.com"
+          },
+          "walletAddress": {
+            "type": "string",
+            "example": "0xc429e068b65b3462f0e422b3ea388a7a37b23bff"
+          }
+        },
+        "required": [
+          "name",
+          "domain",
+          "walletAddress"
         ]
       }
     }
