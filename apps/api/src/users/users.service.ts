@@ -24,7 +24,8 @@ export class UsersService {
   async getUser(): Promise<UserResponseDto | null> {
     const user = await this.db.user.findUnique({
       where: {
-        id: '98188bdb-4ecb-4366-967b-9340a2fb2666',
+        // id: '98188bdb-4ecb-4366-967b-9340a2fb2666',
+        id: '708f3ab1-a81d-4db8-8a46-0f759d021ac0',
       },
       include: {
         stores: {

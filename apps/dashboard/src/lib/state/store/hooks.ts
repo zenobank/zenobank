@@ -10,7 +10,6 @@ import { useUser } from '../user/hooks'
 export function useActiveStore() {
   const { user, isLoading } = useUser()
   const queryClient = useQueryClient()
-
   const activeStore = useMemo(() => {
     return user?.stores[0] || null
   }, [user?.stores])

@@ -9,7 +9,6 @@ export function useUser() {
     useUsersControllerGetMeV1()
 
   const queryClient = useQueryClient()
-
   const invalidateUser = () => {
     queryClient.invalidateQueries({
       queryKey: getUsersControllerGetMeV1QueryKey(),

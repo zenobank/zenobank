@@ -61,14 +61,21 @@ export function ChangeWalletDialog({
   })
 
   const onSubmit = async (values: WalletForm) => {
+    if (!activeStore) {
+      toast.error('No store found!')
+      return
+    }
     setLoading(true)
     try {
       await registerExternalWallet({
         address: values.walletAddress,
-        storeId: activeStore!.id,
+        storeId: activeStore.id,
       })
       toast.success('Wallet changed successfully!')
       form.reset()
+    } catch (error) {
+      console.log('error chaning wallet', error)
+      toast.error('Failed to change wallet!')
     } finally {
       setLoading(false)
     }
@@ -86,6 +93,7 @@ export function ChangeWalletDialog({
         <DialogHeader>
           <DialogTitle>Change Payment Wallet</DialogTitle>
           <DialogDescription>
+            {activeStore ? activeStore.name : 'No store found!'}
             Enter the wallet address you want to set as payment wallet.
           </DialogDescription>
         </DialogHeader>
@@ -120,12 +128,7 @@ export function ChangeWalletDialog({
           <Button variant='outline' onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button
-            type='submit'
-            onClick={() => form.handleSubmit(onSubmit)}
-            form='wallet-form'
-            disabled={loading}
-          >
+          <Button type='submit' form='wallet-form' disabled={loading}>
             {loading ? (
               <Loader2 className='h-6 w-6 animate-spin' />
             ) : (
