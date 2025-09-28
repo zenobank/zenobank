@@ -7,7 +7,6 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AlchemyService } from 'src/alchemy/alchemy.service';
-import { WebhookActivityDto as AlchemyWebhookActivityDto } from 'src/alchemy/dto/webhook-activity.dto';
 import { AlchemySignatureGuard } from './guards/alchemy-signature.guard';
 import { ApiOperation } from '@nestjs/swagger';
 

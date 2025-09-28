@@ -1,16 +1,9 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import {
-  ActivityWebhook,
-  PaymentStatus,
-  WebhookProvider,
-} from '@prisma/client';
+import { PaymentStatus, WebhookProvider } from '@prisma/client';
 import { SupportedNetworksId } from 'src/networks/network.interface';
 import { Alchemy, WebhookType as AlchemyWebhookType } from 'alchemy-sdk';
 import { PrismaService } from 'src/prisma/prisma.service';
-import {
-  ALCHEMY_MAX_ACTIVITY_WEBHOOK_SIZE,
-  ALCHEMY_SDK,
-} from './lib/alchemy.constants';
+import { ALCHEMY_SDK } from './lib/alchemy.constants';
 import { Env, getEnv } from 'src/lib/utils/env';
 import { AddressActivityWebhookResponse } from './lib/alchemy.interface';
 import { isNumber } from 'class-validator';
@@ -21,6 +14,8 @@ import {
 } from './lib/alchemy.network-map';
 import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts';
 import { WEBHOOKS_PATHS } from 'src/webhooks/webhooks.constants';
+import { AddressActivityWebhookDto } from 'src/wallet/dto/address-activity-webhook.dto';
+import { toDto } from 'src/lib/utils/to-dto';
 
 @Injectable()
 export class AlchemyService {
@@ -118,35 +113,40 @@ export class AlchemyService {
 
     return { received: true };
   }
-  async getWebhook(network: SupportedNetworksId): Promise<ActivityWebhook> {
-    let webhook = await this.findWebhookWithSpace(network);
+
+  async activateWebhook(webhookId: string) {
+    await this.alchemy.notify.updateWebhook(webhookId, {
+      isActive: true,
+    });
+  }
+
+  async getWebhook(
+    network: SupportedNetworksId,
+  ): Promise<AddressActivityWebhookDto> {
+    const webhooksData = await this.alchemy.notify.getAllWebhooks();
+    const webhook = webhooksData.webhooks.find(
+      (w) => w.network === NETWORK_TO_ALCHEMY_SDK[network],
+    );
     if (!webhook) {
-      this.logger.log(
-        `Webhook not found, creating webhook for network ${network}`,
+      this.logger.error(
+        `Webhook not found for network ${network}. Creating it...`,
       );
-      // alchemy webhook creation requires an address
-      webhook = await this.createWebhook(
+      const createdWebhook = await this.createWebhook(
         network,
         privateKeyToAccount(generatePrivateKey()).address,
       );
+      return createdWebhook;
     }
-    return webhook;
-  }
-
-  async findWebhookWithSpace(
-    network: SupportedNetworksId,
-  ): Promise<ActivityWebhook | null> {
-    const webhooks = await this.db.activityWebhook.findMany({
-      where: {
-        networkId: network,
-      },
-      orderBy: {
-        currentSize: 'asc',
-      },
+    if (!webhook?.isActive) {
+      this.logger.error(
+        `Webhook ${webhook.id} is not active. Activating it...`,
+      );
+      await this.activateWebhook(webhook.id);
+    }
+    return toDto(AddressActivityWebhookDto, {
+      id: webhook.id,
+      network: ALCHEMY_WEBHOOK_TO_NETWORK_MAP[webhook.network],
     });
-    return (
-      webhooks.find((webhook) => webhook.currentSize < webhook.maxSize) || null
-    );
   }
 
   async addAddressToWebhook({
@@ -156,28 +156,8 @@ export class AlchemyService {
     webhookId: string;
     address: string;
   }) {
-    const [webhook] = await Promise.all([
-      this.db.activityWebhook.findUniqueOrThrow({
-        where: { id: webhookId },
-      }),
-      this.alchemy.notify.updateWebhook(webhookId, {
-        addAddresses: [address],
-      }),
-    ]);
-
-    await this.db.activityWebhook.update({
-      where: { id: webhookId },
-      data: {
-        currentSize: { increment: 1 },
-        wallets: {
-          connect: {
-            networkId_address: {
-              networkId: webhook.networkId,
-              address: address,
-            },
-          },
-        },
-      },
+    await this.alchemy.notify.updateWebhook(webhookId, {
+      addAddresses: [address],
     });
     this.logger.log(`Added address ${address} to webhook ${webhookId}.`);
   }
@@ -197,7 +177,7 @@ export class AlchemyService {
   async createWebhook(
     network: SupportedNetworksId,
     address: string,
-  ): Promise<ActivityWebhook> {
+  ): Promise<AddressActivityWebhookDto> {
     const alchemyWebhook = await this.alchemy.notify.createWebhook(
       getEnv(Env.API_BASE_URL) + WEBHOOKS_PATHS.ALCHEMY,
       AlchemyWebhookType.ADDRESS_ACTIVITY,
@@ -209,23 +189,10 @@ export class AlchemyService {
     if (!alchemyWebhook.id) {
       throw new Error('Failed to create webhook');
     }
-    const newWebhook = await this.db.activityWebhook.create({
-      data: {
-        networkId: network,
-        maxSize: ALCHEMY_MAX_ACTIVITY_WEBHOOK_SIZE,
-        currentSize: 1,
-        webhookId: alchemyWebhook.id,
-        providerId: WebhookProvider.ALCHEMY,
-        wallets: {
-          connect: {
-            networkId_address: {
-              networkId: network,
-              address,
-            },
-          },
-        },
-      },
+
+    return toDto(AddressActivityWebhookDto, {
+      id: alchemyWebhook.id,
+      network: ALCHEMY_WEBHOOK_TO_NETWORK_MAP[alchemyWebhook.network],
     });
-    return newWebhook;
   }
 }

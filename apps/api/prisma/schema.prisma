@@ -46,10 +46,8 @@ model Wallet {
 
   payments Payment[] @relation("DepositWallet")
 
-  activityWebhook   ActivityWebhook? @relation(fields: [activityWebhookId], references: [id])
-  activityWebhookId String?
-  store             Store?           @relation(fields: [storeId], references: [id])
-  storeId           String?
+  store   Store?  @relation(fields: [storeId], references: [id])
+  storeId String?
 
   @@unique([networkId, address])
 }
@@ -124,10 +122,9 @@ model Network {
   maxConfirmationAttempts Int @default(100)
   confirmationRetryDelay  Int @default(1000) // in ms
 
-  tokens           Token[]
-  wallets          Wallet[]
-  Payment          Payment[]
-  activityWebhooks ActivityWebhook[]
+  tokens  Token[]
+  wallets Wallet[]
+  Payment Payment[]
 }
 
 model Token {
@@ -186,22 +183,4 @@ enum TransactionStatus {
 
 enum WebhookProvider {
   ALCHEMY
-}
-
-model ActivityWebhook {
-  id        String @id @default(uuid())
-  webhookId String @unique
-
-  providerId WebhookProvider
-
-  networkId String
-  network   Network @relation(fields: [networkId], references: [id])
-
-  currentSize Int @default(0)
-  maxSize     Int
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  wallets Wallet[]
 }
