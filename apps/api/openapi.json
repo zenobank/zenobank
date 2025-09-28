@@ -598,7 +598,8 @@
             "type": "string"
           },
           "storeId": {
-            "type": "string"
+            "type": "string",
+            "format": "uuid"
           }
         },
         "required": [

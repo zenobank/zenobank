@@ -9,6 +9,7 @@ import { AddressActivityWebhookResponse } from './lib/alchemy.interface';
 import { isNumber } from 'class-validator';
 import { PaymentService } from 'src/payments/payment.service';
 import {
+  ALCHEMY_SDK_TO_NETWORK_MAP,
   ALCHEMY_WEBHOOK_TO_NETWORK_MAP,
   NETWORK_TO_ALCHEMY_SDK,
 } from './lib/alchemy.network-map';
@@ -124,10 +125,12 @@ export class AlchemyService {
     network: SupportedNetworksId,
   ): Promise<AddressActivityWebhookDto> {
     const webhooksData = await this.alchemy.notify.getAllWebhooks();
+    this.logger.log(`Webhooks data: ${JSON.stringify(webhooksData)}`);
     const webhook = webhooksData.webhooks.find(
       (w) => w.network === NETWORK_TO_ALCHEMY_SDK[network],
     );
-    if (!webhook) {
+    this.logger.log(`Webhook found: ${JSON.stringify(webhook)}`);
+    if (!webhook || !webhook.id) {
       this.logger.error(
         `Webhook not found for network ${network}. Creating it...`,
       );
@@ -143,10 +146,12 @@ export class AlchemyService {
       );
       await this.activateWebhook(webhook.id);
     }
-    return toDto(AddressActivityWebhookDto, {
+    const obj = toDto(AddressActivityWebhookDto, {
       id: webhook.id,
-      network: ALCHEMY_WEBHOOK_TO_NETWORK_MAP[webhook.network],
+      network: SupportedNetworksId.ETHEREUM_MAINNET,
     });
+    console.log('obj', obj);
+    return obj;
   }
 
   async addAddressToWebhook({
@@ -156,6 +161,9 @@ export class AlchemyService {
     webhookId: string;
     address: string;
   }) {
+    if (!webhookId) {
+      throw new Error('Webhook ID is required to add address to webhook');
+    }
     await this.alchemy.notify.updateWebhook(webhookId, {
       addAddresses: [address],
     });
@@ -168,6 +176,11 @@ export class AlchemyService {
     webhookId: string;
     addresses: string[];
   }) {
+    if (!webhookId) {
+      throw new Error(
+        'Webhook ID is required to remove addresses from webhook',
+      );
+    }
     await this.alchemy.notify.updateWebhook(webhookId, {
       removeAddresses: addresses,
     });

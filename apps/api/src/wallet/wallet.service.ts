@@ -3,6 +3,8 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { SupportedNetworksId } from 'src/networks/network.interface';
 import { AlchemyService } from 'src/alchemy/alchemy.service';
 import { Wallet, NetworkType } from '@prisma/client';
+import { toEnumValue } from 'src/lib/utils/to-enum';
+import { AddressActivityWebhookDto } from './dto/address-activity-webhook.dto';
 
 @Injectable()
 export class WalletService {
@@ -59,10 +61,23 @@ export class WalletService {
     if (walletsWithThatAddress.length > 0) {
       throw new ConflictException(`Wallet ${address} already exists`);
     }
-
-    this.logger.log(
-      `Registering evm wallet ${address} to ${networks.length} networks`,
-    );
+    for (const network of networks.slice(0, 1)) {
+      this.logger.log(
+        `Subscribing to address activity for ${address} on network ${network.id}`,
+      );
+      await this.subscribeToAddressActivity({
+        address,
+        network: toEnumValue(SupportedNetworksId, network.id),
+      });
+    }
+    // await Promise.all(
+    //   networks.map((network) =>
+    //     this.subscribeToAddressActivity({
+    //       address,
+    //       network: toEnumValue(SupportedNetworksId, network.id),
+    //     }),
+    //   ),
+    // );
 
     const wallets = await this.db.$transaction(async (tx) => {
       return await Promise.all(
@@ -78,15 +93,6 @@ export class WalletService {
       );
     });
 
-    await Promise.all(
-      wallets.map((wallet) =>
-        this.subscribeToAddressActivity({
-          address: wallet.address,
-          network: wallet.networkId as SupportedNetworksId,
-        }),
-      ),
-    );
-
     return wallets;
   }
   async subscribeToAddressActivity({
@@ -95,13 +101,17 @@ export class WalletService {
   }: {
     address: string;
     network: SupportedNetworksId;
-  }) {
+  }): Promise<AddressActivityWebhookDto> {
     const webhook = await this.alchemyService.getWebhook(network);
     if (!webhook) {
       throw new Error(
         `Webhook not found for network ${network}. Address: ${address}`,
       );
     }
+    this.logger.log(
+      `Adding address ${address} to webhook ${JSON.stringify(webhook)}`,
+    );
+    // aquí es donde falla
     await this.alchemyService.addAddressToWebhook({
       webhookId: webhook.id,
       address: address,

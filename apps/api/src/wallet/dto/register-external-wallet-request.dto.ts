@@ -13,5 +13,6 @@ export class RegisterExternalWalletDto {
 
   @IsString()
   @IsNotEmpty()
+  @IsUUID()
   storeId: string;
 }

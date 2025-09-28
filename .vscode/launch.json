@@ -1,0 +1,15 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug NestJS (API)",
+      "skipFiles": ["<node_internals>/**"],
+      "program": "${workspaceFolder}/apps/api/src/main.ts",
+      "cwd": "${workspaceFolder}/apps/api",
+      "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "ts-node/register"]
+    }
+  ]
+}
