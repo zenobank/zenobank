@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useAuth, UserButton } from '@clerk/clerk-react'
-import { useUsersControllerGetMeV1 } from '@repo/api-client'
 import { Copy, Edit3, Check, Loader2 } from 'lucide-react'
+import { useActiveStore } from '@/lib/state/store/hooks'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Header } from '@/components/layout/header'
@@ -11,16 +11,11 @@ import { ThemeSwitch } from '@/components/theme-switch'
 import { ChangeWalletDialog } from '../wallets/components/change-wallet-dialog'
 
 export default function Dashboard() {
-  const { data: { data: userData } = {}, isLoading: isUserDataLoading } =
-    useUsersControllerGetMeV1()
-
-  const currentStore = useMemo(() => {
-    return userData?.stores[0] || null
-  }, [userData?.stores])
+  const { activeStore, isLoading } = useActiveStore()
 
   const paymentWallet = useMemo(() => {
-    return currentStore?.wallets[0] || null
-  }, [currentStore])
+    return activeStore?.wallets[0] || null
+  }, [activeStore])
 
   const [copied, setCopied] = useState(false)
   const [isWalletDialogOpen, setIsWalletDialogOpen] = useState(false)
@@ -86,7 +81,7 @@ export default function Dashboard() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {isUserDataLoading ? (
+                {isLoading ? (
                   <div className='flex items-center justify-center py-8'>
                     <Loader2 className='h-6 w-6 animate-spin' />
                   </div>

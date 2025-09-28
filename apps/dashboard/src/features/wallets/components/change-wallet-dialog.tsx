@@ -1,9 +1,15 @@
 'use client'
 
+import { useState } from 'react'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
+import {
+  useActiveStore,
+  useRegisterExternalWallet,
+} from '@/lib/state/store/hooks'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -43,6 +49,10 @@ export function ChangeWalletDialog({
   onOpenChange,
   currentWallet,
 }: Props) {
+  const { registerExternalWallet } = useRegisterExternalWallet()
+  const { activeStore } = useActiveStore()
+  const [loading, setLoading] = useState(false)
+
   const form = useForm<WalletForm>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -50,10 +60,18 @@ export function ChangeWalletDialog({
     },
   })
 
-  const onSubmit = (values: WalletForm) => {
-    toast.success('Wallet changed successfully!')
-    form.reset()
-    onOpenChange(false)
+  const onSubmit = async (values: WalletForm) => {
+    setLoading(true)
+    try {
+      await registerExternalWallet({
+        address: values.walletAddress,
+        storeId: activeStore!.id,
+      })
+      toast.success('Wallet changed successfully!')
+      form.reset()
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -102,8 +120,17 @@ export function ChangeWalletDialog({
           <Button variant='outline' onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button type='submit' form='wallet-form'>
-            Change Wallet
+          <Button
+            type='submit'
+            onClick={() => form.handleSubmit(onSubmit)}
+            form='wallet-form'
+            disabled={loading}
+          >
+            {loading ? (
+              <Loader2 className='h-6 w-6 animate-spin' />
+            ) : (
+              'Change Wal3let'
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>
