@@ -21,28 +21,44 @@ export class WalletService {
    * @returns Promise<Wallet[]> - Array of created wallet records for each EVM network
    */
 
-  async registerEvmWallet(_address: string): Promise<Wallet[]> {
+  async registerExternalEvmWallet({
+    _address,
+    storeId,
+  }: {
+    _address: string;
+    storeId: string;
+  }): Promise<Wallet[]> {
     const address = _address.toLowerCase();
 
     // Check if wallet already exists in any EVM network
-    const existingWallets = await this.db.wallet.findMany({
-      where: {
-        address,
-        network: {
-          networkType: NetworkType.EVM,
-        },
-      },
-    });
-
-    if (existingWallets.length > 0) {
-      throw new ConflictException(`Wallet ${address} already exists`);
+    const [walletsWithThatAddress, otherStoreWallets, networks] =
+      await Promise.all([
+        this.db.wallet.findMany({
+          where: {
+            address,
+            network: {
+              networkType: NetworkType.EVM,
+            },
+          },
+        }),
+        this.db.wallet.findMany({
+          where: {
+            storeId,
+          },
+        }),
+        this.db.network.findMany({
+          where: {
+            networkType: NetworkType.EVM,
+          },
+        }),
+      ]);
+    if (otherStoreWallets.length > 0) {
+      throw new ConflictException(`A wallet already exists for this store`);
     }
 
-    const networks = await this.db.network.findMany({
-      where: {
-        networkType: NetworkType.EVM,
-      },
-    });
+    if (walletsWithThatAddress.length > 0) {
+      throw new ConflictException(`Wallet ${address} already exists`);
+    }
 
     this.logger.log(
       `Registering evm wallet ${address} to ${networks.length} networks`,
@@ -53,6 +69,7 @@ export class WalletService {
         networks.map((network) =>
           tx.wallet.create({
             data: {
+              storeId,
               address,
               networkId: network.id,
             },

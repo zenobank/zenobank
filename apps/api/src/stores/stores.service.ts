@@ -15,7 +15,7 @@ export class StoresService {
   ) {}
 
   async createStore(createStoreDto: CreateStoreDto): Promise<StoreResponseDto> {
-    const wallets = await this.walletService.registerEvmWallet(
+    const wallets = await this.walletService.registerExternalEvmWallet(
       createStoreDto.walletAddress,
     );
 
