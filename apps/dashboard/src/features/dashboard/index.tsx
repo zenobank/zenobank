@@ -1,5 +1,9 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useAuth, UserButton } from '@clerk/clerk-react'
+import {
+  usersControllerGetMeV1,
+  useUsersControllerGetMeV1,
+} from '@repo/api-client'
 import { Copy, Edit3, Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -13,9 +17,20 @@ import { ChangeWalletDialog } from '../wallets/components/change-wallet-dialog'
 
 export default function Dashboard() {
   const _userList = userListSchema.parse(users)
+  const { data: { data: userData } = {}, isLoading: isUserDataLoading } =
+    useUsersControllerGetMeV1()
+
+  // a esto le falta la base
+  const currentStore = useMemo(() => {
+    return userData?.stores[0] || null
+  }, [userData?.stores])
+
+  const paymentWallet = useMemo(() => {
+    return currentStore?.wallets[0] || null
+  }, [currentStore])
+
   const [copied, setCopied] = useState(false)
   const [isWalletDialogOpen, setIsWalletDialogOpen] = useState(false)
-  const walletAddress = '0xc0ffee254729296a45a3885639AC7E10F9d54979'
   const { getToken } = useAuth()
   getToken().then((_token) => {
     // console.log('token!!!', token)
@@ -23,7 +38,10 @@ export default function Dashboard() {
 
   const copyToClipboard = async () => {
     try {
-      await navigator.clipboard.writeText(walletAddress)
+      if (!paymentWallet) {
+        return
+      }
+      await navigator.clipboard.writeText(paymentWallet.address)
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
     } catch (_err) {
@@ -89,7 +107,7 @@ export default function Dashboard() {
               <CardContent>
                 <div className='flex items-center gap-2'>
                   <code className='text-md font-mono break-all'>
-                    0xc0ff...54979
+                    {paymentWallet?.address}
                   </code>
                   <Button
                     variant='ghost'
@@ -106,30 +124,6 @@ export default function Dashboard() {
                 </div>
               </CardContent>
             </Card>
-
-            {/* Wallet Balance Card */}
-            {/* <Card>
-              <CardHeader>
-                <CardTitle className='flex items-center gap-2'>
-                  <svg
-                    xmlns='http://www.w3.org/2000/svg'
-                    viewBox='0 0 24 24'
-                    fill='none'
-                    stroke='currentColor'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth='2'
-                    className='h-5 w-5'
-                  >
-                    <path d='M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6' />
-                  </svg>
-                  Balance
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className='text-3xl font-bold'>$0.00</div>
-              </CardContent>
-            </Card> */}
           </div>
         </div>
       </Main>
