@@ -100,7 +100,7 @@ export default function Dashboard() {
                     onClick={() => setIsWalletDialogOpen(true)}
                   >
                     <Edit3 className='h-4 w-4' />
-                    Change
+                    Add
                   </Button> */}
                 </CardTitle>
               </CardHeader>
@@ -127,20 +127,6 @@ export default function Dashboard() {
           </div>
         </div>
       </Main>
-      {/* <Main>
-        <TransactionsProvider>
-          <div className='mb-2 flex flex-wrap items-center justify-between space-y-2'>
-            <div>
-              <h2 className='text-2xl font-bold tracking-tight'>
-                Transactions
-              </h2>
-            </div>
-          </div>
-          <div className='-mx-4 flex-1 overflow-auto px-4 py-1 lg:flex-row lg:space-y-0 lg:space-x-12'>
-            <UsersTable data={userList} columns={columns} />
-          </div>
-        </TransactionsProvider>
-      </Main> */}
 
       <ChangeWalletDialog
         open={isWalletDialogOpen}
