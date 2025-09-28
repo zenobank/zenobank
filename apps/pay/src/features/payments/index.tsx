@@ -77,8 +77,8 @@ export default function Payament({ id }: PaymentsProps) {
 
   const availableNetworksIdsForSelectedToken: NetworkId[] = useMemo(() => {
     const tokens = supportedTokens?.filter((t) => t.canonicalTokenId === selectedTokenData?.canonicalTokenId);
-
-    return tokens?.map((t) => t.networkId) || ([] as NetworkId[]);
+    const tokenNetworks = tokens?.map((t) => t.networkId);
+    return (tokenNetworks as NetworkId[]) || ([] as NetworkId[]);
   }, [supportedTokens, selectedTokenData?.canonicalTokenId]);
 
   console.log('!!availableNetworksIdsForSelectedToken', availableNetworksIdsForSelectedToken);
