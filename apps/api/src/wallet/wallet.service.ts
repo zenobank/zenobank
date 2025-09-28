@@ -111,9 +111,8 @@ export class WalletService {
     this.logger.log(
       `Adding address ${address} to webhook ${JSON.stringify(webhook)}`,
     );
-    // aquí es donde falla
     await this.alchemyService.addAddressToWebhook({
-      webhookId: webhook.id,
+      webhookId: 'wh_l1c8dkarfvdjxt4m',
       address: address,
     });
 
