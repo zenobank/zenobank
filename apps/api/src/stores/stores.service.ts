@@ -15,19 +15,10 @@ export class StoresService {
   ) {}
 
   async createStore(createStoreDto: CreateStoreDto): Promise<StoreResponseDto> {
-    const wallets = await this.walletService.registerExternalEvmWallet(
-      createStoreDto.walletAddress,
-    );
-
     const store = await this.db.store.create({
       data: {
         name: createStoreDto.name,
         domain: createStoreDto.domain,
-        wallets: {
-          connect: wallets.map((wallet) => ({
-            id: wallet.id,
-          })),
-        },
       },
       include: {
         wallets: {

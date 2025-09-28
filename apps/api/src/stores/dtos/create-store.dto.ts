@@ -23,12 +23,4 @@ export class CreateStoreDto {
   })
   @MaxLength(256)
   domain: string;
-
-  @IsNotEmpty()
-  @IsEthereumAddress()
-  @ApiProperty({
-    example: '0xc429e068b65b3462f0e422b3ea388a7a37b23bff',
-  })
-  @Transform(({ value }) => value?.toLowerCase())
-  walletAddress: string;
 }

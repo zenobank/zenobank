@@ -723,16 +723,11 @@
             "type": "string",
             "maxLength": 256,
             "example": "my-store.com"
-          },
-          "walletAddress": {
-            "type": "string",
-            "example": "0xc429e068b65b3462f0e422b3ea388a7a37b23bff"
           }
         },
         "required": [
           "name",
-          "domain",
-          "walletAddress"
+          "domain"
         ]
       }
     }
