@@ -15,12 +15,4 @@ export class CreateStoreDto {
   })
   @MaxLength(256)
   name: string;
-
-  @IsNotEmpty()
-  @IsString()
-  @ApiProperty({
-    example: 'my-store.com',
-  })
-  @MaxLength(256)
-  domain: string;
 }

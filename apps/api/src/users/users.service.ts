@@ -13,11 +13,28 @@ import { UserResponseDto } from './dtos/user-response.dto';
 export class UsersService {
   constructor(private readonly db: PrismaService) {}
 
-  async bootstrap(): Promise<any> {
+  async bootstrap(): Promise<UserResponseDto> {
+    // ver el usuario
     const user = await this.db.user.create({
       data: {
         clerkUserId: '123',
+        stores: {
+          create: {
+            name: 'Default Store',
+          },
+        },
       },
+      include: {
+        stores: true,
+      },
+    });
+    return toDto(UserResponseDto, {
+      ...user,
+      stores: user.stores.map((store) => ({
+        ...store,
+        apiKey: store.apiKey,
+        wallets: [],
+      })),
     });
   }
 
@@ -31,7 +48,6 @@ export class UsersService {
         stores: {
           select: {
             apiKey: true,
-            domain: true,
             wallets: {
               select: {
                 id: true,
@@ -60,7 +76,6 @@ export class UsersService {
       stores: user.stores.map((store) => ({
         ...store,
         apiKey: store.apiKey,
-        domain: store.domain,
         wallets: store.wallets.map((wallet) => ({
           ...wallet,
           network: toEnumValue(SupportedNetworksId, wallet.network.id),

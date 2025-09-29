@@ -19,13 +19,6 @@ export class StoreResponseDto {
 
   @Expose()
   @ApiProperty({
-    description: 'Domain of the store',
-    example: 'my-store.com',
-  })
-  domain: string;
-
-  @Expose()
-  @ApiProperty({
     description: 'API key for the store',
     example: 'cuid_1234567890abcdef',
   })

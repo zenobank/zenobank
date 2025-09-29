@@ -34,7 +34,6 @@ export class UsersController {
 
   @ApiOperation({
     summary: 'Create initial backend resources for the newly signed-up user',
-    description: 'It initializes the user in our database.',
   })
   @UseGuards(AuthGuard)
   @Post('me/bootstrap')

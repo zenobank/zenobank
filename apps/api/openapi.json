@@ -242,7 +242,6 @@
     },
     "/api/v1/users/me/bootstrap": {
       "post": {
-        "description": "It initializes the user in our database.",
         "operationId": "UsersController_bootstrap_v1",
         "parameters": [],
         "responses": {
@@ -260,38 +259,6 @@
         "summary": "Create initial backend resources for the newly signed-up user",
         "tags": [
           "users"
-        ]
-      }
-    },
-    "/api/v1/stores": {
-      "post": {
-        "operationId": "StoresController_createStore_v1",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateStoreDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StoreResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "summary": "Create a new store",
-        "tags": [
-          "Stores"
         ]
       }
     }
@@ -702,11 +669,6 @@
             "description": "Name of the store",
             "example": "My Store"
           },
-          "domain": {
-            "type": "string",
-            "description": "Domain of the store",
-            "example": "my-store.com"
-          },
           "apiKey": {
             "type": "string",
             "description": "API key for the store",
@@ -723,7 +685,6 @@
         "required": [
           "id",
           "name",
-          "domain",
           "apiKey",
           "wallets"
         ]
@@ -753,25 +714,6 @@
           "id",
           "clerkUserId",
           "stores"
-        ]
-      },
-      "CreateStoreDto": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "maxLength": 256,
-            "example": "My Store"
-          },
-          "domain": {
-            "type": "string",
-            "maxLength": 256,
-            "example": "my-store.com"
-          }
-        },
-        "required": [
-          "name",
-          "domain"
         ]
       }
     }

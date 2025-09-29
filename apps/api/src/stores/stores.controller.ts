@@ -8,10 +8,10 @@ import { ApiOperation } from '@nestjs/swagger';
 export class StoresController {
   constructor(private readonly storesService: StoresService) {}
 
-  @UseGuards(AuthGuard)
-  @Post()
-  @ApiOperation({ summary: 'Create a new store' })
-  async createStore(@Body() createStoreDto: CreateStoreDto) {
-    return this.storesService.createStore(createStoreDto);
-  }
+  // @UseGuards(AuthGuard)
+  // @Post()
+  // @ApiOperation({ summary: 'Create a new store' })
+  // async createStore(@Body() createStoreDto: CreateStoreDto) {
+  //   return this.storesService.createStore(createStoreDto);
+  // }
 }

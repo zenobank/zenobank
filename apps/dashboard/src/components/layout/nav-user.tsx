@@ -1,13 +1,5 @@
-import { Link } from '@tanstack/react-router'
-import {
-  BadgeCheck,
-  Bell,
-  ChevronsUpDown,
-  CreditCard,
-  LogOut,
-  Settings,
-  Sparkles,
-} from 'lucide-react'
+import { useClerk } from '@clerk/clerk-react'
+import { ChevronsUpDown, LogOut, Settings } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
   DropdownMenu,
@@ -35,6 +27,15 @@ export function NavUser({
   }
 }) {
   const { isMobile } = useSidebar()
+  const { openUserProfile, signOut } = useClerk()
+
+  const handleManageAccount = () => {
+    openUserProfile()
+  }
+
+  const handleSignOut = async () => {
+    await signOut()
+  }
 
   return (
     <SidebarMenu>
@@ -75,15 +76,19 @@ export function NavUser({
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem asChild>
-                <Link to='/settings/account' className='cursor-pointer'>
-                  <Settings />
-                  Manage Account
-                </Link>
+              <DropdownMenuItem
+                onClick={handleManageAccount}
+                className='cursor-pointer'
+              >
+                <Settings />
+                Manage Account
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className='cursor-pointer'>
+            <DropdownMenuItem
+              onClick={handleSignOut}
+              className='cursor-pointer'
+            >
               <LogOut />
               Sign out
             </DropdownMenuItem>

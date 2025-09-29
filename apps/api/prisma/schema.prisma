@@ -18,7 +18,6 @@ model User {
 model Store {
   id        String    @id @default(cuid())
   name      String
-  domain    String
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   apiKey    String    @unique @default(cuid())

@@ -58,16 +58,16 @@ export function useSidebarData(): SidebarData {
         ],
       },
 
-      {
-        title: 'Others',
-        items: [
-          {
-            title: 'Help Center',
-            url: '/help-center',
-            icon: IconHelp,
-          },
-        ],
-      },
+      // {
+      //   title: 'Others',
+      //   items: [
+      //     {
+      //       title: 'Help Center',
+      //       url: '/help-center',
+      //       icon: IconHelp,
+      //     },
+      //   ],
+      // },
     ],
   }
 }

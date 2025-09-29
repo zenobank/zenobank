@@ -18,7 +18,6 @@ export class StoresService {
     const store = await this.db.store.create({
       data: {
         name: createStoreDto.name,
-        domain: createStoreDto.domain,
       },
       include: {
         wallets: {
