@@ -154,7 +154,6 @@ export default function Apps() {
       <WordPressIntegrationDialog
         open={isWordPressDialogOpen}
         onOpenChange={setIsWordPressDialogOpen}
-        hasWallet={hasWallet}
       />
     </>
   )

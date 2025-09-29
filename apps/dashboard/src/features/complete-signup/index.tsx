@@ -6,9 +6,13 @@ export default function CompleteSignup() {
   const router = useRouter()
   const { mutateAsync: mutateBootstrap } = useUsersControllerBootstrapV1()
   useEffect(() => {
-    mutateBootstrap().then(() => {
-      router.navigate({ to: '/' })
-    })
+    mutateBootstrap()
+      .then(() => {
+        router.navigate({ to: '/' })
+      })
+      .catch((error) => {
+        console.error(error)
+      })
   }, [mutateBootstrap, router])
   return <div>Redirecting to dashboard...</div>
 }

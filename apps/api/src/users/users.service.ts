@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { toDto } from 'src/lib/utils/to-dto';
 import { toEnumValue } from 'src/lib/utils/to-enum';
 import { SupportedNetworksId } from 'src/networks/network.interface';
@@ -11,13 +11,16 @@ import { UserResponseDto } from './dtos/user-response.dto';
 
 @Injectable()
 export class UsersService {
+  private readonly logger = new Logger(UsersService.name);
   constructor(private readonly db: PrismaService) {}
 
   async bootstrap(): Promise<UserResponseDto> {
     // ver el usuario
+
+    this.logger.log('Bootstrapping user');
     const user = await this.db.user.create({
       data: {
-        clerkUserId: '123',
+        clerkUserId: Math.random().toString(36).substring(2, 15),
         stores: {
           create: {
             name: 'Default Store',

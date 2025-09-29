@@ -35,7 +35,7 @@ export class UsersController {
   @ApiOperation({
     summary: 'Create initial backend resources for the newly signed-up user',
   })
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Post('me/bootstrap')
   async bootstrap(@Req() req: AuthenticatedRequest): Promise<any> {
     return this.usersService.bootstrap();
