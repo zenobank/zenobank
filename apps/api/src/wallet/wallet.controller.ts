@@ -1,17 +1,15 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { WalletService } from './wallet.service';
-import { ApiOperation } from '@nestjs/swagger';
+import { ApiOperation, ApiSecurity } from '@nestjs/swagger';
 import { RegisterExternalWalletDto } from './dto/register-external-wallet-request.dto';
-import { AlchemyService } from 'src/alchemy/alchemy.service';
-import { SupportedNetworksId } from 'src/networks/network.interface';
+import { ApiKeyGuard } from 'src/auth/api-key.guard';
 
 @Controller('wallet')
 export class WalletController {
-  constructor(
-    private readonly walletService: WalletService,
-    private readonly alchemyService: AlchemyService,
-  ) {}
+  constructor(private readonly walletService: WalletService) {}
 
+  @UseGuards(ApiKeyGuard)
+  @ApiSecurity('api-key')
   @Post('external')
   @ApiOperation({ summary: 'Register an external wallet for a store' })
   async registerExternalWallet(
@@ -21,13 +19,5 @@ export class WalletController {
       _address: registerExternalWalletDto.address,
       storeId: registerExternalWalletDto.storeId,
     });
-  }
-
-  @Get('test')
-  async test() {
-    const webhook = await this.alchemyService.getWebhook(
-      SupportedNetworksId.ARBITRUM_MAINNET,
-    );
-    return webhook;
   }
 }

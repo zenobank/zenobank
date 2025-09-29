@@ -41,19 +41,18 @@ export class AuthGuard implements CanActivate {
       const tokenPayload = await verifyToken(tokenToVerify, {
         secretKey: getEnv(Env.CLERK_SECRET_KEY),
       });
-
       if (!tokenPayload) {
         throw new UnauthorizedException('Invalid session');
       }
 
       const clerkUser = await this.clerkClient.users.getUser(tokenPayload.sub);
-      const user = await this.db.user.findUniqueOrThrow({
-        where: {
-          clerkUserId: tokenPayload.sub,
-        },
-      });
+      // const user = await this.db.user.findUniqueOrThrow({
+      //   where: {
+      //     clerkUserId: tokenPayload.sub,
+      //   },
+      // });
       (request as any).clerkUser = clerkUser;
-      (request as any).user = user;
+      // (request as any).user = user;
       return true;
     } catch (err) {
       console.error('Token verification error:', err);

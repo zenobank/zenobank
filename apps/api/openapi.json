@@ -109,7 +109,7 @@
     },
     "/api/v1/currencies": {
       "get": {
-        "operationId": "AssetController_getSupportedTokens_v1",
+        "operationId": "CurrenciesController_getSupportedTokens_v1",
         "parameters": [],
         "responses": {
           "200": {
@@ -127,7 +127,7 @@
           }
         },
         "tags": [
-          "Asset"
+          "Currencies"
         ]
       }
     },
@@ -176,28 +176,12 @@
             "description": ""
           }
         },
-        "summary": "Register an external wallet for a store",
-        "tags": [
-          "Wallet"
-        ]
-      }
-    },
-    "/api/v1/wallet/test": {
-      "get": {
-        "operationId": "WalletController_test_v1",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AddressActivityWebhookDto"
-                }
-              }
-            }
+        "security": [
+          {
+            "api-key": []
           }
-        },
+        ],
+        "summary": "Register an external wallet for a store",
         "tags": [
           "Wallet"
         ]
@@ -219,7 +203,7 @@
         ]
       }
     },
-    "/api/v1/users/me": {
+    "/api/v1/me": {
       "get": {
         "operationId": "UsersController_getMe_v1",
         "parameters": [],
@@ -240,7 +224,7 @@
         ]
       }
     },
-    "/api/v1/users/me/bootstrap": {
+    "/api/v1/me/bootstrap": {
       "post": {
         "operationId": "UsersController_bootstrap_v1",
         "parameters": [],
@@ -257,6 +241,27 @@
           }
         },
         "summary": "Create initial backend resources for the newly signed-up user",
+        "tags": [
+          "users"
+        ]
+      }
+    },
+    "/api/v1/test": {
+      "get": {
+        "operationId": "UsersController_test_v1",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
         "tags": [
           "users"
         ]
@@ -593,28 +598,6 @@
         "required": [
           "address",
           "storeId"
-        ]
-      },
-      "AddressActivityWebhookDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "network": {
-            "type": "string",
-            "enum": [
-              "ETHEREUM_MAINNET",
-              "BASE_MAINNET",
-              "ARBITRUM_MAINNET",
-              "ETHEREUM_HOLESKY",
-              "ETHEREUM_SEPOLIA"
-            ]
-          }
-        },
-        "required": [
-          "id",
-          "network"
         ]
       },
       "WalletResponseDto": {

@@ -2,12 +2,12 @@ import { Module } from '@nestjs/common';
 import { TokenService } from './token/token.service';
 import { TokenGasService } from './token/tokens-gas.service';
 import { PrismaModule } from 'src/prisma/prisma.module';
-import { AssetController } from './currency.controller';
+import { CurrenciesController } from './currency.controller';
 
 @Module({
   providers: [TokenService, TokenGasService],
   exports: [TokenService, TokenGasService],
   imports: [PrismaModule],
-  controllers: [AssetController],
+  controllers: [CurrenciesController],
 })
 export class AssetModule {}

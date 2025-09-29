@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 import * as fs from 'fs';
-
+import cookieParser from 'cookie-parser';
 import { WEBHOOKS_PATHS } from './webhooks/webhooks.constants';
 import * as express from 'express';
 async function bootstrap() {
@@ -58,6 +58,7 @@ async function bootstrap() {
     res.removeHeader('X-Powered-By');
     next();
   });
+  app.use(cookieParser());
 
   await app.listen(3001);
 }

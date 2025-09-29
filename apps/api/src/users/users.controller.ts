@@ -17,12 +17,11 @@ import { type AuthenticatedRequest } from 'src/auth/auth.interface';
 import { UserResponseDto } from './dtos/user-response.dto';
 
 @ApiTags('users')
-@Controller('users')
 export class UsersController {
   private readonly logger = new Logger(UsersController.name);
   constructor(private readonly usersService: UsersService) {}
 
-  // @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard)
   @Get('me')
   async getMe(@Req() req: AuthenticatedRequest): Promise<UserResponseDto> {
     const user = await this.usersService.getUser();
@@ -35,9 +34,16 @@ export class UsersController {
   @ApiOperation({
     summary: 'Create initial backend resources for the newly signed-up user',
   })
-  // @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard)
   @Post('me/bootstrap')
   async bootstrap(@Req() req: AuthenticatedRequest): Promise<any> {
     return this.usersService.bootstrap();
+  }
+
+  @UseGuards(AuthGuard)
+  @Get('test')
+  async test(@Req() req: AuthenticatedRequest) {
+    console.log(req['clerkUser']);
+    return 'test';
   }
 }
