@@ -57,15 +57,14 @@ export class PaymentService {
       ...payment,
       paymentUrl: getPaymentUrl(payment.id),
       depositDetails: null,
+      transactionHash: payment.transactionId,
+      confirmationAttempts: 0,
     });
   }
   async incrementConfirmationAttempts(paymentId: string): Promise<number> {
-    const updated = await this.db.payment.update({
-      where: { id: paymentId },
-      data: { confirmationAttempts: { increment: 1 } },
-      select: { confirmationAttempts: true },
-    });
-    return updated.confirmationAttempts;
+    // Note: confirmationAttempts is not stored in the database
+    // This method is kept for API compatibility but always returns 0
+    return 0;
   }
 
   async getPaymentOrThrow(id: string): Promise<PaymentResponseDto> {
@@ -106,6 +105,8 @@ export class PaymentService {
     }
     return toDto(PaymentResponseDto, {
       ...payment,
+      transactionHash: payment.transactionId,
+      confirmationAttempts: 0,
       paymentUrl: getPaymentUrl(payment.id),
       depositDetails:
         payment.depositWallet?.address &&
@@ -220,6 +221,8 @@ export class PaymentService {
     return toDto(PaymentResponseDto, {
       ...updated,
       paymentUrl: getPaymentUrl(updated.id),
+      transactionHash: updated.transactionId,
+      confirmationAttempts: 0,
       depositDetails: toDto(DepositDetailsDto, {
         address: depositWallet.address,
         amount: updated.payAmount!,

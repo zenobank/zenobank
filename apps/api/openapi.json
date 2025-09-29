@@ -294,11 +294,11 @@
         "type": "string",
         "enum": [
           "PENDING",
-          "PROCESSING",
           "UNDER_PAYMENT",
           "COMPLETED",
           "EXPIRED",
-          "CANCELLED"
+          "CANCELLED",
+          "PROCESSING"
         ]
       },
       "NetworkId": {
@@ -518,17 +518,13 @@
             "type": "boolean",
             "example": false
           },
-          "minBlockConfirmations": {
+          "depositConfirmations": {
             "type": "number",
             "example": 3
           },
-          "maxConfirmationAttempts": {
-            "type": "object",
-            "example": 100
-          },
-          "confirmationRetryDelay": {
-            "type": "object",
-            "example": 1000
+          "avgBlockTime": {
+            "type": "number",
+            "example": 12000
           }
         },
         "required": [
@@ -537,9 +533,8 @@
           "displayName",
           "networkType",
           "isTestnet",
-          "minBlockConfirmations",
-          "maxConfirmationAttempts",
-          "confirmationRetryDelay"
+          "depositConfirmations",
+          "avgBlockTime"
         ]
       },
       "CreateWalletDto": {

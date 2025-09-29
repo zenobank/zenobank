@@ -38,15 +38,10 @@ export class NetworkResponseDto {
   @Expose()
   @IsNumber()
   @ApiProperty({ example: 3 })
-  minBlockConfirmations: number;
+  depositConfirmations: number;
 
   @Expose()
   @IsNumber()
-  @ApiProperty({ example: 100 })
-  maxConfirmationAttempts;
-
-  @Expose()
-  @IsNumber()
-  @ApiProperty({ example: 1000 })
-  confirmationRetryDelay;
+  @ApiProperty({ example: 12000 })
+  avgBlockTime: number;
 }

@@ -55,7 +55,7 @@ export class TransactionConfirmationWorker extends WorkerHost {
     if (!network) {
       throw new Error('network not available');
     }
-    if (payment.confirmationAttempts >= network.maxConfirmationAttempts) {
+    if (payment.confirmationAttempts >= network.depositConfirmations) {
       this.logger.warn(
         `Max confirmation attempts reached for payment ${paymentId}`,
       );
@@ -65,12 +65,12 @@ export class TransactionConfirmationWorker extends WorkerHost {
 
     if (txStatus.status !== 'success') {
       await this.paymentService.incrementConfirmationAttempts(paymentId);
-      await job.moveToDelayed(Date.now() + network.confirmationRetryDelay);
+      await job.moveToDelayed(Date.now() + network.avgBlockTime * 1000);
       return;
     }
-    if (txStatus.confirmations < network.minBlockConfirmations) {
+    if (txStatus.confirmations < network.depositConfirmations) {
       await this.paymentService.incrementConfirmationAttempts(paymentId);
-      await job.moveToDelayed(Date.now() + network.confirmationRetryDelay);
+      await job.moveToDelayed(Date.now() + network.avgBlockTime * 1000);
       return;
     }
     await this.paymentService.markPaymentAsCompleted(paymentId);
