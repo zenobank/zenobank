@@ -1,5 +1,4 @@
 import {
-  Body,
   Controller,
   Get,
   Logger,
@@ -8,9 +7,7 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { CreateStoreDto } from '../stores/dtos/create-store.dto';
-import { StoreResponseDto } from '../stores/dtos/store-response.dto';
+import { ApiOperation } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { type AuthenticatedRequest } from 'src/auth/auth.interface';
