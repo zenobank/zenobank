@@ -343,11 +343,11 @@
         "type": "string",
         "enum": [
           "PENDING",
-          "PROCESSING",
           "UNDER_PAYMENT",
           "COMPLETED",
           "EXPIRED",
-          "CANCELLED"
+          "CANCELLED",
+          "PROCESSING"
         ]
       },
       "NetworkId": {
