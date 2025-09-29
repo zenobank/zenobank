@@ -33,7 +33,6 @@ export class AlchemySignatureGuard implements CanActivate {
     }
     const sig = req.headers['x-alchemy-signature'] as string;
     const signingKey = getEnv(Env.ALCHEMY_AUTH_TOKEN);
-    this.logger.log(`IP: ${ip}`);
     return true;
   }
 }
