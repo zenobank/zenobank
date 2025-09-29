@@ -99,8 +99,7 @@ if (!rootElement.innerHTML) {
         afterSignOutUrl='/sign-in'
         signInUrl='/sign-in'
         signUpUrl='/sign-up'
-        signInFallbackRedirectUrl='/'
-        signUpFallbackRedirectUrl='/'
+        signUpForceRedirectUrl='/complete-signup'
         appearance={{
           theme: shadcn,
         }}

@@ -18,7 +18,7 @@ export const Route = createFileRoute('/(auth)/sign-up')({
 
     return (
       <SignUp
-        afterSignOutUrl={afterSignOutUrl}
+        redirectUrl={afterSignOutUrl}
         fallback={<Skeleton className='h-[30rem] w-[25rem]' />}
       />
     )
