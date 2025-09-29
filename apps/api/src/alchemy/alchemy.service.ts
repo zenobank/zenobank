@@ -45,14 +45,6 @@ export class AlchemyService {
       this.logger.error(`Invalid network ${body.event.network}`);
       return;
     }
-    const supportedTokens = await this.db.token.findMany({
-      where: {
-        networkId: network,
-      },
-    });
-    const supportedTokensAddresses = supportedTokens.map((t) =>
-      t.address.toLowerCase(),
-    );
 
     const filteredActivities = body.event.activity
       .filter((a) => a.erc721TokenId == null && a.erc1155Metadata == null)
@@ -66,12 +58,8 @@ export class AlchemyService {
     this.logger.log(`Filtered activities length ${filteredActivities.length}`);
     for (const activity of filteredActivities) {
       const tokenAmount = activity.value;
-      const tokenId = supportedTokens.find(
-        (t) =>
-          t.address.toLowerCase() ===
-          activity.rawContract?.address?.toLowerCase(),
-      )?.id;
-      if (!tokenId || !activity.toAddress || !tokenAmount) {
+
+      if (!activity.toAddress || !tokenAmount) {
         this.logger.error('Invalid activity', { activity });
         continue;
       }
@@ -83,12 +71,6 @@ export class AlchemyService {
       const payment = await this.db.payment.findFirst({
         where: {
           payAmount: tokenAmount.toString(),
-          payCurrencyId: tokenId,
-          networkId: network,
-          depositWallet: {
-            address: activity.toAddress,
-            networkId: network,
-          },
           status: PaymentStatus.PENDING,
         },
       });
@@ -107,7 +89,6 @@ export class AlchemyService {
         this.logger.warn(
           `Payment not found ${JSON.stringify({
             payAmount: tokenAmount,
-            payCurrencyId: tokenId,
             depositWallet: activity.toAddress,
             networkId: network,
             tokenAddress: activity.rawContract?.address,
