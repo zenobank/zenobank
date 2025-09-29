@@ -15,7 +15,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/src/components/ui/pop
 import { CheckoutState } from '@/src/features/payments/types/state';
 import { ms } from '@/src/lib/ms';
 import {
-  useAssetControllerGetSupportedTokensV1,
+  useCurrenciesControllerGetSupportedTokensV1,
   useNetworksControllerGetNetworksV1,
   usePaymentControllerGetPaymentV1,
   usePaymentControllerUpdatePaymentDepositSelectionV1,
@@ -48,7 +48,7 @@ export default function Payament({ id }: PaymentsProps) {
       refetchInterval: ms('3s'),
     },
   });
-  const { data: { data: supportedTokens } = {} } = useAssetControllerGetSupportedTokensV1();
+  const { data: { data: supportedTokens } = {} } = useCurrenciesControllerGetSupportedTokensV1();
 
   const { data: { data: networks } = {} } = useNetworksControllerGetNetworksV1();
   const [isLoading, setIsLoading] = useState(false);

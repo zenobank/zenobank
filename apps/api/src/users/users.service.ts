@@ -14,23 +14,30 @@ export class UsersService {
   private readonly logger = new Logger(UsersService.name);
   constructor(private readonly db: PrismaService) {}
 
-  async bootstrap(): Promise<UserResponseDto> {
-    // ver el usuario
-
+  async bootstrap(userId: string): Promise<UserResponseDto> {
     this.logger.log('Bootstrapping user');
-    const user = await this.db.user.create({
-      data: {
-        clerkUserId: Math.random().toString(36).substring(2, 15),
+    const user = await this.db.user.upsert({
+      where: { id: userId },
+      create: {
+        id: userId,
         stores: {
           create: {
             name: 'Default Store',
           },
         },
       },
-      include: {
-        stores: true,
-      },
+      update: {}, // si ya existe, no hacemos nada aquí
+      include: { stores: true },
     });
+    if (user.stores.length === 0) {
+      const store = await this.db.store.create({
+        data: {
+          name: 'Default Store',
+          userId: user.id,
+        },
+      });
+      user.stores.push(store);
+    }
     return toDto(UserResponseDto, {
       ...user,
       stores: user.stores.map((store) => ({
@@ -41,11 +48,10 @@ export class UsersService {
     });
   }
 
-  async getUser(): Promise<UserResponseDto | null> {
+  async getUser(userId: string): Promise<UserResponseDto | null> {
     const user = await this.db.user.findUnique({
       where: {
-        // id: '98188bdb-4ecb-4366-967b-9340a2fb2666',
-        id: '708f3ab1-a81d-4db8-8a46-0f759d021ac0',
+        id: userId,
       },
       include: {
         stores: {

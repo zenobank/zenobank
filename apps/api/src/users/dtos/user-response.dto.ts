@@ -11,13 +11,6 @@ export class UserResponseDto {
   id: string;
 
   @Expose()
-  @ApiProperty({
-    description: 'The clerk user id',
-    example: 'user_2U8Lvq31HfMbvKb09tJgRgJz7M6',
-  })
-  clerkUserId: string;
-
-  @Expose()
   @Type(() => StoreResponseDto)
   @ApiProperty({
     description: 'The user&apos;s stores',

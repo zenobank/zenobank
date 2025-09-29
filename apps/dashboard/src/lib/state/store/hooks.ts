@@ -9,39 +9,43 @@ import { useUser } from '../user/hooks'
 
 export function useActiveStore() {
   const { user, isLoading } = useUser()
-  const queryClient = useQueryClient()
   const activeStore = useMemo(() => {
     return user?.stores[0] || null
   }, [user?.stores])
 
-  const invalidateUser = useCallback(() => {
-    queryClient.invalidateQueries({
-      queryKey: getUsersControllerGetMeV1QueryKey(),
-    })
-  }, [queryClient])
-
-  return { activeStore, invalidateUser, isLoading }
+  return { activeStore, isLoading }
 }
 
 export function useRegisterExternalWallet() {
-  const { mutateAsync: mutateRegisterExternalWallet } =
-    useWalletControllerRegisterExternalWalletV1()
+  const { activeStore } = useActiveStore()
   const queryClient = useQueryClient()
+
+  const { mutateAsync: mutateRegisterExternalWallet } =
+    useWalletControllerRegisterExternalWalletV1({
+      axios: {
+        headers: {
+          'x-api-key': activeStore?.apiKey || '',
+        },
+      },
+
+      mutation: {
+        onSuccess: () => {
+          queryClient.invalidateQueries({
+            queryKey: getUsersControllerGetMeV1QueryKey(),
+          })
+        },
+      },
+    })
 
   const registerExternalWallet = useCallback(
     async ({ address, storeId }: { address: string; storeId: string }) => {
       await mutateRegisterExternalWallet({
         data: {
           address,
-          storeId,
         },
-      }).then(() => {
-        queryClient.invalidateQueries({
-          queryKey: getUsersControllerGetMeV1QueryKey(),
-        })
       })
     },
-    [mutateRegisterExternalWallet, queryClient]
+    [mutateRegisterExternalWallet]
   )
 
   return { registerExternalWallet }

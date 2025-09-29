@@ -14,7 +14,8 @@ import { PaymentResponseDto } from './dto/payment-response.dto';
 import { UpdateDepositSelectionDto } from './dto/update-payment-selection.dto';
 import { ApiKeyGuard } from 'src/auth/api-key.guard';
 import { ApiKey } from 'src/auth/api-key.decorator';
-import { ApiSecurity } from '@nestjs/swagger';
+import { ApiHeader, ApiSecurity } from '@nestjs/swagger';
+import { API_KEY_HEADER } from 'src/auth/auth.constants';
 
 @Controller('payments')
 export class PaymentController {
@@ -22,7 +23,11 @@ export class PaymentController {
 
   @Post('')
   @UseGuards(ApiKeyGuard)
-  @ApiSecurity('api-key')
+  @ApiHeader({
+    name: API_KEY_HEADER,
+    description: 'External API Key',
+    required: true,
+  })
   async createPayment(
     @Body() createPaymentDto: CreatePaymentDto,
     @ApiKey() apiKey: string,

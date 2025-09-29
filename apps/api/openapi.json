@@ -4,7 +4,17 @@
     "/api/v1/payments": {
       "post": {
         "operationId": "PaymentController_createPayment_v1",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "description": "External API Key",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -27,11 +37,6 @@
             }
           }
         },
-        "security": [
-          {
-            "api-key": []
-          }
-        ],
         "tags": [
           "Payment"
         ]
@@ -160,7 +165,17 @@
     "/api/v1/wallet/external": {
       "post": {
         "operationId": "WalletController_registerExternalWallet_v1",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "x-api-key",
+            "required": true,
+            "in": "header",
+            "description": "External API Key",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -178,7 +193,7 @@
         },
         "security": [
           {
-            "api-key": []
+            "x-api-key": []
           }
         ],
         "summary": "Register an external wallet for a store",
@@ -203,7 +218,7 @@
         ]
       }
     },
-    "/api/v1/me": {
+    "/api/v1/users/me": {
       "get": {
         "operationId": "UsersController_getMe_v1",
         "parameters": [],
@@ -220,11 +235,11 @@
           }
         },
         "tags": [
-          "users"
+          "Users"
         ]
       }
     },
-    "/api/v1/me/bootstrap": {
+    "/api/v1/users/me/bootstrap": {
       "post": {
         "operationId": "UsersController_bootstrap_v1",
         "parameters": [],
@@ -242,11 +257,11 @@
         },
         "summary": "Create initial backend resources for the newly signed-up user",
         "tags": [
-          "users"
+          "Users"
         ]
       }
     },
-    "/api/v1/test": {
+    "/api/v1/users/test": {
       "get": {
         "operationId": "UsersController_test_v1",
         "parameters": [],
@@ -263,7 +278,7 @@
           }
         },
         "tags": [
-          "users"
+          "Users"
         ]
       }
     }
@@ -589,15 +604,10 @@
         "properties": {
           "address": {
             "type": "string"
-          },
-          "storeId": {
-            "type": "string",
-            "format": "uuid"
           }
         },
         "required": [
-          "address",
-          "storeId"
+          "address"
         ]
       },
       "WalletResponseDto": {
@@ -680,11 +690,6 @@
             "description": "Unique identifier for the user",
             "example": "123e4567-e89b-12d3-a456-426614174000"
           },
-          "clerkUserId": {
-            "type": "string",
-            "description": "The clerk user id",
-            "example": "user_2U8Lvq31HfMbvKb09tJgRgJz7M6"
-          },
           "stores": {
             "description": "The user&apos;s stores",
             "type": "array",
@@ -695,7 +700,6 @@
         },
         "required": [
           "id",
-          "clerkUserId",
           "stores"
         ]
       }

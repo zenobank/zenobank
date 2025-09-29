@@ -16,7 +16,7 @@ import { AuthGuard } from 'src/auth/auth.guard';
 import { type AuthenticatedRequest } from 'src/auth/auth.interface';
 import { UserResponseDto } from './dtos/user-response.dto';
 
-@ApiTags('users')
+@Controller('users')
 export class UsersController {
   private readonly logger = new Logger(UsersController.name);
   constructor(private readonly usersService: UsersService) {}
@@ -24,7 +24,8 @@ export class UsersController {
   @UseGuards(AuthGuard)
   @Get('me')
   async getMe(@Req() req: AuthenticatedRequest): Promise<UserResponseDto> {
-    const user = await this.usersService.getUser();
+    const user = await this.usersService.getUser(req.userId);
+
     if (!user) {
       throw new NotFoundException();
     }
@@ -37,13 +38,15 @@ export class UsersController {
   @UseGuards(AuthGuard)
   @Post('me/bootstrap')
   async bootstrap(@Req() req: AuthenticatedRequest): Promise<any> {
-    return this.usersService.bootstrap();
+    // COOKIES
+    console.log(req.cookies);
+    return this.usersService.bootstrap(req.userId);
   }
 
   @UseGuards(AuthGuard)
   @Get('test')
   async test(@Req() req: AuthenticatedRequest) {
-    console.log(req['clerkUser']);
+    console.log(req.userId);
     return 'test';
   }
 }

@@ -7,6 +7,7 @@ import {
   QueryClientProvider,
 } from '@tanstack/react-query'
 import { RouterProvider, createRouter } from '@tanstack/react-router'
+import { Clerk } from '@clerk/clerk-js'
 import { ClerkProvider } from '@clerk/clerk-react'
 import { dark, shadcn } from '@clerk/themes'
 import { toast } from 'sonner'
@@ -17,6 +18,8 @@ import { ThemeProvider, useTheme } from './context/theme-context'
 import './index.css'
 // Generated Routes
 import { routeTree } from './routeTree.gen'
+
+const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -49,13 +52,13 @@ const queryClient = new QueryClient({
     },
   },
   queryCache: new QueryCache({
-    onError: (error) => {
+    onError: async (error) => {
       if (error instanceof AxiosError) {
         if (error.response?.status === 401) {
           toast.error('Session expired!')
           useAuthStore.getState().auth.reset()
           const redirect = `${router.history.location.href}`
-          router.navigate({ to: '/sign-in', search: { redirect } })
+          // router.navigate({ to: '/sign-in', search: { redirect } })
         }
         if (error.response?.status === 500) {
           toast.error('Internal Server Error!')
@@ -85,7 +88,6 @@ declare module '@tanstack/react-router' {
 }
 
 // Import your Publishable Key
-const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
 
 // Render the app
 const rootElement = document.getElementById('root')!

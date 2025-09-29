@@ -1,4 +1,9 @@
-import { Injectable, Logger, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { SupportedNetworksId } from 'src/networks/network.interface';
 import { AlchemyService } from 'src/alchemy/alchemy.service';
@@ -25,12 +30,19 @@ export class WalletService {
 
   async registerExternalEvmWallet({
     _address,
-    storeId,
+    apiKey,
   }: {
     _address: string;
-    storeId: string;
+    apiKey: string;
   }): Promise<void> {
     const address = _address.toLowerCase();
+
+    const store = await this.db.store.findUnique({
+      where: { apiKey },
+    });
+    if (!store) {
+      throw new NotFoundException('Store not found');
+    }
 
     // Check if wallet already exists in any EVM network
     const [walletsWithThatAddress, otherStoreWallets, networks] =
@@ -45,7 +57,7 @@ export class WalletService {
         }),
         this.db.wallet.findMany({
           where: {
-            storeId,
+            storeId: store.id,
           },
         }),
         this.db.network.findMany({
@@ -84,7 +96,7 @@ export class WalletService {
         networks.map((network) =>
           tx.wallet.create({
             data: {
-              storeId,
+              storeId: store.id,
               address,
               networkId: network.id,
             },

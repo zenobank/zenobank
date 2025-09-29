@@ -8,11 +8,10 @@ datasource db {
 }
 
 model User {
-  id          String   @id @default(uuid())
-  clerkUserId String   @unique
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  stores      Store[]
+  id        String   @id // same as clerkUserId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  stores    Store[]
 }
 
 model Store {

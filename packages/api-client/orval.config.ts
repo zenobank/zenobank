@@ -8,7 +8,7 @@ export default defineConfig({
   api: {
     input: '../../apps/api/openapi.json',
     output: {
-      baseUrl: 'http://localhost:3001',
+      baseUrl: '/',
       target: 'src/index.ts',
       schemas: 'src/model',
       client: 'react-query',

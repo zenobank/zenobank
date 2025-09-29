@@ -3,21 +3,16 @@ import {
   CanActivate,
   ExecutionContext,
   UnauthorizedException,
-  Inject,
+  Logger,
 } from '@nestjs/common';
 import { Request } from 'express';
-import { verifyToken, type ClerkClient } from '@clerk/backend';
+import { verifyToken } from '@clerk/backend';
 import { Env, getEnv } from 'src/lib/utils/env';
-import { CLERK_CLIENT } from './auth.constants';
-import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(
-    @Inject(CLERK_CLIENT)
-    private readonly clerkClient: ClerkClient,
-    private readonly db: PrismaService,
-  ) {}
+  private readonly logger = new Logger(AuthGuard.name);
+  constructor() {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<Request>();
@@ -32,6 +27,7 @@ export class AuthGuard implements CanActivate {
       : null;
 
     if (!sessionToken && !bearerToken) {
+      this.logger.error('No authentication token provided');
       throw new UnauthorizedException('No authentication token provided');
     }
 
@@ -45,17 +41,10 @@ export class AuthGuard implements CanActivate {
         throw new UnauthorizedException('Invalid session');
       }
 
-      const clerkUser = await this.clerkClient.users.getUser(tokenPayload.sub);
-      // const user = await this.db.user.findUniqueOrThrow({
-      //   where: {
-      //     clerkUserId: tokenPayload.sub,
-      //   },
-      // });
-      (request as any).clerkUser = clerkUser;
-      // (request as any).user = user;
+      (request as any).userId = tokenPayload.sub;
       return true;
     } catch (err) {
-      console.error('Token verification error:', err);
+      this.logger.error('Token verification error:', err);
       throw new UnauthorizedException('Invalid or expired token');
     }
   }

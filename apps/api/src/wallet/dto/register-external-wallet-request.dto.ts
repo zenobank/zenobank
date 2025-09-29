@@ -10,9 +10,4 @@ export class RegisterExternalWalletDto {
   @IsNotEmpty()
   @IsEthereumAddress()
   address: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @IsUUID()
-  storeId: string;
 }
