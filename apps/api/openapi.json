@@ -234,6 +234,7 @@
             }
           }
         },
+        "summary": "Get the current user data",
         "tags": [
           "Users"
         ]
@@ -256,27 +257,6 @@
           }
         },
         "summary": "Create initial backend resources for the newly signed-up user",
-        "tags": [
-          "Users"
-        ]
-      }
-    },
-    "/api/v1/users/test": {
-      "get": {
-        "operationId": "UsersController_test_v1",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        },
         "tags": [
           "Users"
         ]

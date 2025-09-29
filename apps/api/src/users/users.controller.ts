@@ -22,10 +22,12 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @UseGuards(AuthGuard)
+  @ApiOperation({
+    summary: 'Get the current user data',
+  })
   @Get('me')
   async getMe(@Req() req: AuthenticatedRequest): Promise<UserResponseDto> {
     const user = await this.usersService.getUser(req.userId);
-
     if (!user) {
       throw new NotFoundException();
     }
@@ -39,12 +41,5 @@ export class UsersController {
   @Post('me/bootstrap')
   async bootstrap(@Req() req: AuthenticatedRequest): Promise<any> {
     return this.usersService.bootstrap(req.userId);
-  }
-
-  @UseGuards(AuthGuard)
-  @Get('test')
-  async test(@Req() req: AuthenticatedRequest) {
-    console.log(req.userId);
-    return 'test';
   }
 }
