@@ -14,5 +14,5 @@ export default function CompleteSignup() {
         console.error(error)
       })
   }, [mutateBootstrap, router])
-  return <div>Redirecting to dashboard...</div>
+  return <div>Creating your account...</div>
 }

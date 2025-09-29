@@ -38,8 +38,6 @@ export class UsersController {
   @UseGuards(AuthGuard)
   @Post('me/bootstrap')
   async bootstrap(@Req() req: AuthenticatedRequest): Promise<any> {
-    // COOKIES
-    console.log(req.cookies);
     return this.usersService.bootstrap(req.userId);
   }
 

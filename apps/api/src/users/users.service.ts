@@ -16,20 +16,28 @@ export class UsersService {
 
   async bootstrap(userId: string): Promise<UserResponseDto> {
     this.logger.log('Bootstrapping user');
-    const user = await this.db.user.upsert({
+
+    // First, try to find the user
+    let user = await this.db.user.findUnique({
       where: { id: userId },
-      create: {
-        id: userId,
-        stores: {
-          create: {
-            name: 'Default Store',
-          },
-        },
-      },
-      update: {}, // si ya existe, no hacemos nada aquí
       include: { stores: true },
     });
-    if (user.stores.length === 0) {
+
+    // If user doesn't exist, create them
+    if (!user) {
+      user = await this.db.user.create({
+        data: {
+          id: userId,
+          stores: {
+            create: {
+              name: 'Default Store',
+            },
+          },
+        },
+        include: { stores: true },
+      });
+    } else if (user.stores.length === 0) {
+      // If user exists but has no stores, create a default store
       const store = await this.db.store.create({
         data: {
           name: 'Default Store',
@@ -38,6 +46,7 @@ export class UsersService {
       });
       user.stores.push(store);
     }
+
     return toDto(UserResponseDto, {
       ...user,
       stores: user.stores.map((store) => ({
