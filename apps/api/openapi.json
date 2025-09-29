@@ -182,6 +182,27 @@
         ]
       }
     },
+    "/api/v1/wallet/test": {
+      "get": {
+        "operationId": "WalletController_test_v1",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AddressActivityWebhookDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Wallet"
+        ]
+      }
+    },
     "/api/v1/webhooks/alchemy": {
       "post": {
         "description": "Receive Alchemy webhook",
@@ -605,6 +626,28 @@
         "required": [
           "address",
           "storeId"
+        ]
+      },
+      "AddressActivityWebhookDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "network": {
+            "type": "string",
+            "enum": [
+              "ETHEREUM_MAINNET",
+              "BASE_MAINNET",
+              "ARBITRUM_MAINNET",
+              "ETHEREUM_HOLESKY",
+              "ETHEREUM_SEPOLIA"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "network"
         ]
       },
       "WalletResponseDto": {

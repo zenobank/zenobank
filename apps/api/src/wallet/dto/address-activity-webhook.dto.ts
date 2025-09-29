@@ -9,7 +9,11 @@ export class AddressActivityWebhookDto {
   id: string;
 
   @Expose()
-  @Transform(({ value }) => ALCHEMY_WEBHOOK_TO_NETWORK_MAP[value])
+  @Transform(({ value }) =>
+    Object.values(SupportedNetworksId).includes(value)
+      ? value
+      : (ALCHEMY_WEBHOOK_TO_NETWORK_MAP[value] ?? value),
+  )
   @IsEnum(SupportedNetworksId)
   network: SupportedNetworksId;
 }

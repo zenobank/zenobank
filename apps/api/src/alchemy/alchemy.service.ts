@@ -125,7 +125,6 @@ export class AlchemyService {
     network: SupportedNetworksId,
   ): Promise<AddressActivityWebhookDto> {
     const webhooksData = await this.alchemy.notify.getAllWebhooks();
-    this.logger.log(`Webhooks data: ${JSON.stringify(webhooksData)}`);
     const webhook = webhooksData.webhooks.find(
       (w) => w.network === NETWORK_TO_ALCHEMY_SDK[network],
     );
@@ -150,7 +149,6 @@ export class AlchemyService {
       id: webhook.id,
       network: SupportedNetworksId.ETHEREUM_MAINNET,
     });
-    console.log('obj', obj);
     return obj;
   }
 

@@ -29,7 +29,7 @@ export class WalletService {
   }: {
     _address: string;
     storeId: string;
-  }): Promise<Wallet[]> {
+  }): Promise<void> {
     const address = _address.toLowerCase();
 
     // Check if wallet already exists in any EVM network
@@ -92,8 +92,6 @@ export class WalletService {
         ),
       );
     });
-
-    return wallets;
   }
   async subscribeToAddressActivity({
     address,
@@ -104,6 +102,9 @@ export class WalletService {
   }): Promise<AddressActivityWebhookDto> {
     const webhook = await this.alchemyService.getWebhook(network);
     if (!webhook) {
+      this.logger.error(
+        `!!Webhook not found for network ${network}. Address: ${address}`,
+      );
       throw new Error(
         `Webhook not found for network ${network}. Address: ${address}`,
       );
@@ -112,7 +113,7 @@ export class WalletService {
       `Adding address ${address} to webhook ${JSON.stringify(webhook)}`,
     );
     await this.alchemyService.addAddressToWebhook({
-      webhookId: 'wh_l1c8dkarfvdjxt4m',
+      webhookId: webhook.id,
       address: address,
     });
 
