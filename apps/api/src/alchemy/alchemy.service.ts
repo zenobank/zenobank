@@ -49,11 +49,7 @@ export class AlchemyService {
     const filteredActivities = body.event.activity
       .filter((a) => a.erc721TokenId == null && a.erc1155Metadata == null)
       .filter((a) => a.category === 'token')
-      .filter((a) =>
-        supportedTokensAddresses.includes(
-          a.rawContract?.address?.toLowerCase() ?? '',
-        ),
-      )
+
       .filter((a) => a.log?.removed === false);
     this.logger.log(`Filtered activities length ${filteredActivities.length}`);
     for (const activity of filteredActivities) {
