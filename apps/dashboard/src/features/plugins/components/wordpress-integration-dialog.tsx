@@ -7,7 +7,7 @@ import {
   IconKey,
   IconCopy,
 } from '@tabler/icons-react'
-import { CheckCircle, CheckCircle2, CheckCircleIcon } from 'lucide-react'
+import { CheckCircleIcon } from 'lucide-react'
 import { toast } from 'sonner'
 import { useActiveStore } from '@/lib/state/store/hooks'
 import { Button } from '@/components/ui/button'
