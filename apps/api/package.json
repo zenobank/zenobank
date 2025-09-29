@@ -7,7 +7,7 @@
     "build": "pnpm prisma db push && pnpm run db:generate && nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
-    "tunel": "lt -s dkfjadskfjaercl --port 3001",
+    "tunnel": "lt -s dkfjadskfjaercl --port 3001",
     "dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/src/main.js",
