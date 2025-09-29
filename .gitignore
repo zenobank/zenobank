@@ -41,3 +41,10 @@ yarn-error.log*
 .DS_Store
 *.pem
 apps/web/src/routeTree.gen.ts
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
