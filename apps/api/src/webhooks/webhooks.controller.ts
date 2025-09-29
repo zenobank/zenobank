@@ -16,9 +16,9 @@ export class WebhooksController {
   @Post('alchemy')
   // @UseGuards(AlchemySignatureGuard)
   @HttpCode(200)
-  async receiveAlchemyWebhook(@Req() req: Request & { rawBody?: Buffer }) {
-    const raw = req.rawBody?.toString('utf8');
-    const body = raw ? JSON.parse(raw) : req.body;
-    return this.alchemyService.processAddressActivityWebhook(body);
+  async receiveAlchemyWebhook(@Req() req: Request & { body?: Buffer }) {
+    const rawBody = req.body?.toString('utf8');
+    const json = JSON.parse(rawBody);
+    return this.alchemyService.processAddressActivityWebhook(json);
   }
 }
