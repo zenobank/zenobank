@@ -1,13 +1,15 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import {
   IconWallet,
   IconDownload,
   IconKey,
   IconCopy,
 } from '@tabler/icons-react'
+import { CheckCircle, CheckCircle2, CheckCircleIcon } from 'lucide-react'
 import { toast } from 'sonner'
+import { useActiveStore } from '@/lib/state/store/hooks'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
@@ -18,19 +20,20 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { ChangeWalletDialog } from '@/features/wallets/components/change-wallet-dialog'
 
 interface Props {
   open: boolean
   onOpenChange: (open: boolean) => void
-  hasWallet?: boolean
 }
 
-export function WordPressIntegrationDialog({
-  open,
-  onOpenChange,
-  hasWallet = false,
-}: Props) {
+export function WordPressIntegrationDialog({ open, onOpenChange }: Props) {
   const [apiKey] = useState('zeno_sk_live_1234567890abcdef')
+  const [isWalletDialogOpen, setIsWalletDialogOpen] = useState(false)
+  const { activeStore } = useActiveStore()
+  const paymentWallet = useMemo(() => {
+    return activeStore?.wallets[0] || null
+  }, [activeStore])
 
   const copyApiKey = () => {
     navigator.clipboard.writeText(apiKey)
@@ -41,87 +44,109 @@ export function WordPressIntegrationDialog({
     toast.success('Plugin download started!')
   }
 
-  const createWallet = () => {
-    toast.success('Wallet created!')
+  const addWallet = () => {
+    setIsWalletDialogOpen(true)
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className='sm:max-w-lg'>
-        <DialogHeader>
-          <DialogTitle>WordPress Integration</DialogTitle>
-          <DialogDescription>
-            Follow these steps to integrate crypto payments
-          </DialogDescription>
-        </DialogHeader>
+    <>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className='sm:max-w-lg'>
+          <DialogHeader>
+            <DialogTitle>WordPress Integration</DialogTitle>
+            <DialogDescription>
+              Follow these steps to integrate crypto payments
+            </DialogDescription>
+          </DialogHeader>
 
-        <div className='space-y-4'>
-          {/* Step 1: Wallet */}
-          {!hasWallet && (
+          <div className='space-y-4'>
+            {/* Step 1: Wallet */}
+
             <Card>
               <CardHeader className='pb-2'>
                 <CardTitle className='flex items-center gap-2 text-base'>
                   <IconWallet className='h-5 w-5' />
-                  1. Connect Wallet
+                  1. Add Wallet <CheckCircleIcon className='h-5 w-5' />
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {paymentWallet ? (
+                  <div className='space-y-2'>
+                    <p className='text-muted-foreground text-sm'>
+                      Payments will be received directly in this wallet:
+                    </p>
+                    <div className='flex items-center gap-2'>
+                      <code className='text-md font-mono break-all'>
+                        {paymentWallet.address}
+                      </code>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <p className='text-muted-foreground mb-3 text-sm'>
+                      Connect your wallet to receive crypto payments directly
+                    </p>
+                    <Button onClick={addWallet} size='sm'>
+                      Add Wallet
+                    </Button>
+                  </>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Step 2: Download Plugin */}
+            <Card>
+              <CardHeader className='pb-2'>
+                <CardTitle className='flex items-center gap-2 text-base'>
+                  <IconDownload className='h-5 w-5' />
+                  2. Download Plugin
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <p className='text-muted-foreground mb-3 text-sm'>
-                  Connect your wallet to receive crypto payments
+                  Download and install the WordPress plugin
                 </p>
-                <Button onClick={createWallet} size='sm'>
-                  Connect Wallet
+                <Button onClick={downloadPlugin} size='sm'>
+                  Download Plugin
                 </Button>
               </CardContent>
             </Card>
-          )}
 
-          {/* Step 2: Download Plugin */}
-          <Card>
-            <CardHeader className='pb-2'>
-              <CardTitle className='flex items-center gap-2 text-base'>
-                <IconDownload className='h-5 w-5' />
-                2. Download Plugin
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className='text-muted-foreground mb-3 text-sm'>
-                Download and install the WordPress plugin
-              </p>
-              <Button onClick={downloadPlugin} size='sm'>
-                Download Plugin
-              </Button>
-            </CardContent>
-          </Card>
-
-          {/* Step 3: API Key */}
-          <Card>
-            <CardHeader className='pb-2'>
-              <CardTitle className='flex items-center gap-2 text-base'>
-                <IconKey className='h-5 w-5' />
-                3. Configure API Key
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className='text-muted-foreground mb-3 text-sm'>
-                Copy this API key to your WordPress plugin settings
-              </p>
-              <div className='flex items-center gap-2'>
-                <div className='bg-muted flex-1 rounded-md border px-3 py-2 font-mono text-sm'>
-                  {apiKey}
+            {/* Step 3: API Key */}
+            <Card>
+              <CardHeader className='pb-2'>
+                <CardTitle className='flex items-center gap-2 text-base'>
+                  <IconKey className='h-5 w-5' />
+                  3. Configure API Key
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className='text-muted-foreground mb-3 text-sm'>
+                  Copy this API key to your WordPress plugin settings
+                </p>
+                <div className='flex items-center gap-2'>
+                  <div className='bg-muted flex-1 rounded-md border px-3 py-2 font-mono text-sm'>
+                    {apiKey}
+                  </div>
+                  <Button variant='outline' size='sm' onClick={copyApiKey}>
+                    <IconCopy className='h-4 w-4' />
+                  </Button>
                 </div>
-                <Button variant='outline' size='sm' onClick={copyApiKey}>
-                  <IconCopy className='h-4 w-4' />
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+              </CardContent>
+            </Card>
+          </div>
 
-        <DialogFooter>
-          <Button onClick={() => onOpenChange(false)}>Done</Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+          <DialogFooter>
+            <Button onClick={() => onOpenChange(false)}>Done</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <ChangeWalletDialog
+        open={isWalletDialogOpen}
+        onOpenChange={setIsWalletDialogOpen}
+        currentWallet={''}
+      />
+    </>
   )
 }

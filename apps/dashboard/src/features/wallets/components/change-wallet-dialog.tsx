@@ -73,9 +73,9 @@ export function ChangeWalletDialog({
       })
       toast.success('Wallet changed successfully!')
       form.reset()
+      onOpenChange(false)
     } catch (error) {
-      console.log('error chaning wallet', error)
-      toast.error('Failed to change wallet!')
+      toast.error('Failed to update wallet!')
     } finally {
       setLoading(false)
     }
@@ -91,9 +91,8 @@ export function ChangeWalletDialog({
     >
       <DialogContent className='sm:max-w-md'>
         <DialogHeader>
-          <DialogTitle>Change Payment Wallet</DialogTitle>
+          <DialogTitle>Update Payment Wallet</DialogTitle>
           <DialogDescription>
-            {activeStore ? activeStore.name : 'No store found!'}
             Enter the wallet address you want to set as payment wallet.
           </DialogDescription>
         </DialogHeader>
@@ -132,7 +131,7 @@ export function ChangeWalletDialog({
             {loading ? (
               <Loader2 className='h-6 w-6 animate-spin' />
             ) : (
-              'Change Wal3let'
+              'Update Wallet'
             )}
           </Button>
         </DialogFooter>
