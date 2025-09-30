@@ -19,11 +19,6 @@ export class Env {
   @IsString()
   REDIS_QUEUE_URL: string;
 
-  static readonly GAS_TANKER_TESTING_PRIVATE_KEY =
-    'GAS_TANKER_TESTING_PRIVATE_KEY';
-  @IsString()
-  GAS_TANKER_TESTING_PRIVATE_KEY: string;
-
   static readonly ALCHEMY_AUTH_TOKEN = 'ALCHEMY_AUTH_TOKEN';
   @IsString()
   ALCHEMY_AUTH_TOKEN: string;

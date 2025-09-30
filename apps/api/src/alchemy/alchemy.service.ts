@@ -113,17 +113,24 @@ export class AlchemyService {
   async findWebhookWithSpace(
     network: SupportedNetworksId,
   ): Promise<ActivityWebhook | null> {
-    const webhooks = await this.db.activityWebhook.findMany({
-      where: {
-        networkId: network,
-      },
-      orderBy: {
-        currentSize: 'asc',
-      },
-    });
-    return (
-      webhooks.find((webhook) => webhook.currentSize < webhook.maxSize) || null
+    const webhooks = await this.alchemy.notify.getAllWebhooks();
+
+    const webhook = webhooks.webhooks.find(
+      (webhook) => webhook.network === NETWORK_TO_ALCHEMY_SDK[network],
     );
+    if (!webhook) {
+      return null;
+    }
+    return {
+      id: webhook.id,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      networkId: network,
+      webhookId: webhook.id,
+      providerId: WebhookProvider.ALCHEMY,
+      currentSize: 10,
+      maxSize: 100_000,
+    };
   }
 
   async addAddressToWebhook({
@@ -133,10 +140,7 @@ export class AlchemyService {
     webhookId: string;
     address: string;
   }) {
-    const [webhook] = await Promise.all([
-      this.db.activityWebhook.findUniqueOrThrow({
-        where: { id: webhookId },
-      }),
+    await Promise.all([
       this.alchemy.notify.updateWebhook(webhookId, {
         addAddresses: [address],
       }),
@@ -172,23 +176,16 @@ export class AlchemyService {
     if (!alchemyWebhook.id) {
       throw new Error('Failed to create webhook');
     }
-    const newWebhook = await this.db.activityWebhook.create({
-      data: {
-        networkId: network,
-        maxSize: ALCHEMY_MAX_ACTIVITY_WEBHOOK_SIZE,
-        currentSize: 1,
-        webhookId: alchemyWebhook.id,
-        providerId: WebhookProvider.ALCHEMY,
-        wallets: {
-          connect: {
-            networkId_address: {
-              networkId: network,
-              address,
-            },
-          },
-        },
-      },
-    });
-    return newWebhook;
+
+    return {
+      id: alchemyWebhook.id,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      networkId: network,
+      webhookId: alchemyWebhook.id,
+      providerId: WebhookProvider.ALCHEMY,
+      currentSize: 1,
+      maxSize: ALCHEMY_MAX_ACTIVITY_WEBHOOK_SIZE,
+    };
   }
 }
