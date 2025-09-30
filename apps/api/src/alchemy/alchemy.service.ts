@@ -142,20 +142,6 @@ export class AlchemyService {
       }),
     ]);
 
-    await this.db.activityWebhook.update({
-      where: { id: webhookId },
-      data: {
-        currentSize: { increment: 1 },
-        wallets: {
-          connect: {
-            networkId_address: {
-              networkId: webhook.networkId,
-              address: address,
-            },
-          },
-        },
-      },
-    });
     this.logger.log(`Added address ${address} to webhook ${webhookId}.`);
   }
   async removeAddressFromWebhook({
