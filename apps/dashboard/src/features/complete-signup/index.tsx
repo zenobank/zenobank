@@ -6,13 +6,9 @@ export default function CompleteSignup() {
   const router = useRouter()
   const { mutateAsync: mutateBootstrap } = useUsersControllerBootstrapV1()
   useEffect(() => {
-    mutateBootstrap()
-      .then(() => {
-        router.navigate({ to: '/' })
-      })
-      .catch((error) => {
-        console.error(error)
-      })
+    mutateBootstrap().then(() => {
+      router.navigate({ to: '/' })
+    })
   }, [mutateBootstrap, router])
   return <div>Creating your account...</div>
 }

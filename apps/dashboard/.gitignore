@@ -26,6 +26,5 @@ dist-ssr
 *.sw?
 
 .tanstack/tmp
-src/routeTree.gen.ts
 
 src/lib/requests/api-client
