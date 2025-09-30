@@ -47,7 +47,14 @@ export class WalletService {
     this.logger.log(
       `Registering evm wallet ${address} to ${networks.length} networks`,
     );
-
+    await Promise.all(
+      networks.map((network) =>
+        this.subscribeToAddressActivity({
+          address: address,
+          network: network.id as SupportedNetworksId,
+        }),
+      ),
+    );
     const wallets = await this.db.$transaction(async (tx) => {
       return await Promise.all(
         networks.map((network) =>
@@ -60,15 +67,6 @@ export class WalletService {
         ),
       );
     });
-
-    await Promise.all(
-      wallets.map((wallet) =>
-        this.subscribeToAddressActivity({
-          address: wallet.address,
-          network: wallet.networkId as SupportedNetworksId,
-        }),
-      ),
-    );
 
     return wallets;
   }
