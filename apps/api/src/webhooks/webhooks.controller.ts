@@ -1,7 +1,9 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   HttpCode,
+  Logger,
   Post,
   Req,
   UseGuards,
@@ -12,13 +14,18 @@ import { AlchemySignatureGuard } from './guards/alchemy-signature.guard';
 
 @Controller('webhooks')
 export class WebhooksController {
+  private readonly logger = new Logger(WebhooksController.name);
   constructor(private readonly alchemyService: AlchemyService) {}
   @Post('alchemy')
   // @UseGuards(AlchemySignatureGuard)
   @HttpCode(200)
-  async receiveAlchemyWebhook(@Req() req: Request & { body?: Buffer }) {
-    const rawBody = req.body?.toString('utf8');
-    const json = JSON.parse(rawBody);
-    return this.alchemyService.processAddressActivityWebhook(json);
+  async receiveAlchemyWebhook(@Body() body: any) {
+    try {
+      this.logger.log('Received Alchemy webhook');
+      return this.alchemyService.processAddressActivityWebhook(body);
+    } catch (error) {
+      console.error('Error processing Alchemy webhook:', error);
+      throw error;
+    }
   }
 }

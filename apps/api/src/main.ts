@@ -42,7 +42,6 @@ async function bootstrap() {
 
   SwaggerModule.setup('docs', app, document);
   // alchemy webhook validation
-  app.use(WEBHOOKS_PATHS.ALCHEMY, express.raw({ type: '*/*' }));
   app.use((req: Request, res: Response, next: NextFunction) => {
     res.removeHeader('X-Powered-By');
     next();
