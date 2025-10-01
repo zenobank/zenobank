@@ -14,22 +14,6 @@ An **open-source crypto payment gateway** you can **self-host** or use in the cl
 
 ---
 
-## 📍 Roadmap
-
-- [ ] Release the **WordPress plugin**
-- [ ] Onboard the **first merchants/customers**
-- [ ] Build a **dashboard** for analytics & management
-- [ ] Add support for more **cryptocurrencies**
-- [ ] Develop **plugins for other platforms** (Shopify, Magento, etc.)
-
----
-
-## 🛠 Tech Stack
-
-- **Monorepo** powered by [Turborepo](https://turbo.build/repo).
-
----
-
 ## 🚀 Getting Started
 
 ```bash
