@@ -74,7 +74,7 @@ export function ChangeWalletDialog({
       toast.success('Wallet changed successfully!')
       form.reset()
       onOpenChange(false)
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to update wallet!')
     } finally {
       setLoading(false)
@@ -94,6 +94,17 @@ export function ChangeWalletDialog({
           <DialogTitle>Update Payment Wallet</DialogTitle>
           <DialogDescription>
             Enter the wallet address you want to set as payment wallet.
+          </DialogDescription>
+          <DialogDescription className='pt-2'>
+            Don't have a wallet?{' '}
+            <a
+              href='https://metamask.io/download/'
+              target='_blank'
+              rel='noopener noreferrer'
+              className='text-primary hover:text-primary/80 underline'
+            >
+              Download MetaMask extension
+            </a>
           </DialogDescription>
         </DialogHeader>
 

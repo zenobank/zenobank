@@ -66,7 +66,8 @@ export function WordPressIntegrationDialog({ open, onOpenChange }: Props) {
               <CardHeader className='pb-2'>
                 <CardTitle className='flex items-center gap-2 text-base'>
                   <IconWallet className='h-5 w-5' />
-                  1. Add Wallet <CheckCircleIcon className='h-5 w-5' />
+                  1. Add Wallet{' '}
+                  {paymentWallet && <CheckCircleIcon className='h-5 w-5' />}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -95,45 +96,49 @@ export function WordPressIntegrationDialog({ open, onOpenChange }: Props) {
             </Card>
 
             {/* Step 2: Download Plugin */}
-            <Card>
-              <CardHeader className='pb-2'>
-                <CardTitle className='flex items-center gap-2 text-base'>
-                  <IconDownload className='h-5 w-5' />
-                  2. Download Plugin
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className='text-muted-foreground mb-3 text-sm'>
-                  Download and install the WordPress plugin
-                </p>
-                <Button onClick={downloadPlugin} size='sm'>
-                  Download Plugin
-                </Button>
-              </CardContent>
-            </Card>
+            {paymentWallet && (
+              <Card>
+                <CardHeader className='pb-2'>
+                  <CardTitle className='flex items-center gap-2 text-base'>
+                    <IconDownload className='h-5 w-5' />
+                    2. Download Plugin
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className='text-muted-foreground mb-3 text-sm'>
+                    Download and install the WordPress plugin
+                  </p>
+                  <Button onClick={downloadPlugin} size='sm'>
+                    Download Plugin
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
 
             {/* Step 3: API Key */}
-            <Card>
-              <CardHeader className='pb-2'>
-                <CardTitle className='flex items-center gap-2 text-base'>
-                  <IconKey className='h-5 w-5' />
-                  3. Configure API Key
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className='text-muted-foreground mb-3 text-sm'>
-                  Copy this API key to your WordPress plugin settings
-                </p>
-                <div className='flex items-center gap-2'>
-                  <div className='bg-muted flex-1 rounded-md border px-3 py-2 font-mono text-sm'>
-                    {apiKey}
+            {paymentWallet && (
+              <Card>
+                <CardHeader className='pb-2'>
+                  <CardTitle className='flex items-center gap-2 text-base'>
+                    <IconKey className='h-5 w-5' />
+                    3. Configure API Key
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className='text-muted-foreground mb-3 text-sm'>
+                    Copy this API key to your WordPress plugin settings
+                  </p>
+                  <div className='flex items-center gap-2'>
+                    <div className='bg-muted flex-1 rounded-md border px-3 py-2 font-mono text-sm'>
+                      {apiKey}
+                    </div>
+                    <Button variant='outline' size='sm' onClick={copyApiKey}>
+                      <IconCopy className='h-4 w-4' />
+                    </Button>
                   </div>
-                  <Button variant='outline' size='sm' onClick={copyApiKey}>
-                    <IconCopy className='h-4 w-4' />
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            )}
           </div>
 
           <DialogFooter>
