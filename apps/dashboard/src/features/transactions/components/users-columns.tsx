@@ -3,8 +3,8 @@ import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import LongText from '@/components/long-text'
-import { callTypes, userTypes } from '../data/data'
-import { User } from '../data/schema'
+import { callTypes, userTypes, paymentStatusColors } from '../data/data'
+import { User, Payment } from '../data/schema'
 import { DataTableColumnHeader } from './data-table-column-header'
 import { DataTableRowActions } from './data-table-row-actions'
 
@@ -139,5 +139,64 @@ export const columns: ColumnDef<User>[] = [
   {
     id: 'actions',
     cell: DataTableRowActions,
+  },
+]
+
+export const paymentColumns: ColumnDef<Payment>[] = [
+  {
+    accessorKey: 'id',
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title='Transaction ID' />
+    ),
+    cell: ({ row }) => (
+      <div className='font-mono text-sm'>{row.getValue('id')}</div>
+    ),
+  },
+  {
+    id: 'amount',
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title='Amount' />
+    ),
+    cell: ({ row }) => {
+      const { priceAmount, priceCurrency } = row.original
+      return (
+        <div className='font-medium'>
+          {priceAmount} {priceCurrency}
+        </div>
+      )
+    },
+  },
+  {
+    accessorKey: 'status',
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title='Status' />
+    ),
+    cell: ({ row }) => {
+      const { status } = row.original
+      const badgeColor = paymentStatusColors.get(status)
+      return (
+        <Badge variant='outline' className={cn('capitalize', badgeColor)}>
+          {row.getValue('status')}
+        </Badge>
+      )
+    },
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id))
+    },
+    enableSorting: false,
+  },
+  {
+    accessorKey: 'createdAt',
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title='Created At' />
+    ),
+    cell: ({ row }) => {
+      const date = new Date(row.getValue('createdAt'))
+      return (
+        <div className='text-sm'>
+          {date.toLocaleDateString()} {date.toLocaleTimeString()}
+        </div>
+      )
+    },
   },
 ]

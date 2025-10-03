@@ -9,17 +9,20 @@ import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
 import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
-import { columns } from '../transactions/components/users-columns'
+import { paymentColumns } from '../transactions/components/users-columns'
 import { UsersTable } from '../transactions/components/users-table'
 import TransactionsProvider from '../transactions/context/transactions-context'
-import { userListSchema } from '../transactions/data/schema'
-import { users } from '../transactions/data/users'
+import { paymentListSchema } from '../transactions/data/schema'
 import { ChangeWalletDialog } from '../wallets/components/change-wallet-dialog'
 
 export default function Dashboard() {
-  const userList = userListSchema.parse(users)
   const { payments, isLoading: isPaymentsLoading } = usePayments()
   const { activeStore, isLoading } = useActiveStore()
+
+  const paymentList = useMemo(() => {
+    if (!payments) return []
+    return paymentListSchema.parse(payments)
+  }, [payments])
 
   const paymentWallet = useMemo(() => {
     return activeStore?.wallets[0] || null
@@ -142,7 +145,13 @@ export default function Dashboard() {
             </div>
           </div>
           <div className='-mx-4 flex-1 overflow-auto px-4 py-1 lg:flex-row lg:space-y-0 lg:space-x-12'>
-            <UsersTable data={userList} columns={columns} />
+            {isPaymentsLoading ? (
+              <div className='flex items-center justify-center py-8'>
+                <Loader2 className='h-6 w-6 animate-spin' />
+              </div>
+            ) : (
+              <UsersTable data={paymentList} columns={paymentColumns} />
+            )}
           </div>
         </TransactionsProvider>
       </Main>
