@@ -42,7 +42,7 @@ export const columns: ColumnDef<User>[] = [
   {
     accessorKey: 'username',
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title='Transaction ID' />
+      <DataTableColumnHeader column={column} title='ID' />
     ),
     cell: ({ row }) => (
       <LongText className='max-w-36'>{row.getValue('username')}</LongText>
@@ -146,7 +146,7 @@ export const paymentColumns: ColumnDef<Payment>[] = [
   {
     accessorKey: 'id',
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title='Transaction ID' />
+      <DataTableColumnHeader column={column} title='Payment ID' />
     ),
     cell: ({ row }) => (
       <div className='font-mono text-sm'>{row.getValue('id')}</div>
