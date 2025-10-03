@@ -31,6 +31,26 @@ export class PaymentService {
     private readonly tokenService: TokenService,
     private readonly networksService: NetworksService,
   ) {}
+  async getPayments(apiKey: string): Promise<PaymentResponseDto[]> {
+    const store = await this.db.store.findUnique({
+      where: { apiKey },
+    });
+    if (!store) {
+      throw new NotFoundException('Store not found');
+    }
+    const payments = await this.db.payment.findMany({
+      where: { storeId: store.id },
+      orderBy: { createdAt: 'desc' },
+      take: 100,
+    });
+    return payments.map((payment) =>
+      toDto(PaymentResponseDto, {
+        ...payment,
+        paymentUrl: getPaymentUrl(payment.id),
+        depositDetails: null,
+      }),
+    );
+  }
 
   async createPayment(
     createPaymentDto: CreatePaymentDto,

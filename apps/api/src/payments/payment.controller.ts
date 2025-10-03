@@ -35,6 +35,17 @@ export class PaymentController {
     return this.paymentsService.createPayment(createPaymentDto, apiKey);
   }
 
+  @Get('')
+  @UseGuards(ApiKeyGuard)
+  @ApiHeader({
+    name: API_KEY_HEADER,
+    description: 'External API Key',
+    required: true,
+  })
+  async getPayments(@ApiKey() apiKey: string): Promise<PaymentResponseDto[]> {
+    return this.paymentsService.getPayments(apiKey);
+  }
+
   @Get(':id')
   async getPayment(@Param('id') id: string): Promise<PaymentResponseDto> {
     const payment = await this.paymentsService.getPayment(id);

@@ -40,6 +40,38 @@
         "tags": [
           "Payment"
         ]
+      },
+      "get": {
+        "operationId": "PaymentController_getPayments_v1",
+        "parameters": [
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "description": "External API Key",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PaymentResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Payment"
+        ]
       }
     },
     "/api/v1/payments/{id}": {
