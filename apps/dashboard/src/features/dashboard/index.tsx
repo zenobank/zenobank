@@ -136,6 +136,9 @@ export default function Dashboard() {
           <div className='mb-2 flex flex-wrap items-center justify-between space-y-2'>
             <div>
               <h2 className='text-2xl font-bold tracking-tight'>Payments</h2>
+              <p className='text-muted-foreground'>
+                Showing the last 100 payments
+              </p>
             </div>
           </div>
           <div className='-mx-4 flex-1 overflow-auto px-4 py-1 lg:flex-row lg:space-y-0 lg:space-x-12'>
