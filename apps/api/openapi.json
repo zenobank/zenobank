@@ -1,9 +1,9 @@
 {
   "openapi": "3.0.0",
   "paths": {
-    "/api/v1/currencies": {
+    "/api/v1/tokens": {
       "get": {
-        "operationId": "CurrenciesController_getSupportedTokens_v1",
+        "operationId": "TokensController_getTokens_v1",
         "parameters": [],
         "responses": {
           "200": {
@@ -21,7 +21,7 @@
           }
         },
         "tags": [
-          "Currencies"
+          "Tokens"
         ]
       }
     },
