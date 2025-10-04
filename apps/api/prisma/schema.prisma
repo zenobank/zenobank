@@ -117,7 +117,7 @@ model Checkout {
   priceCurrency String
   priceAmount   String
   status        CheckoutStatus @default(OPEN)
-  expiresAt     DateTime?
+  expiresAt     DateTime?      @default(dbgenerated("now() + interval '1 hour'"))
 
   storeId String
   store   Store  @relation(fields: [storeId], references: [id])
@@ -214,8 +214,6 @@ model Payment {
   paidAt    DateTime?
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt
-
-  expiredAt DateTime @default(dbgenerated("now() + interval '1 hour'"))
 
   // Intento ganador (inmutable) – relación 1–1 nombrada
   attemptId String         @unique

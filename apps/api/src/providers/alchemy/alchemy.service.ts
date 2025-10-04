@@ -1,5 +1,5 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { PaymentRail, PaymentStatus } from '@prisma/client';
+import { AttemptStatus, PaymentRail, PaymentStatus } from '@prisma/client';
 import { SupportedNetworksId } from 'src/networks/network.interface';
 import { Alchemy, WebhookType as AlchemyWebhookType } from 'alchemy-sdk';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -77,18 +77,26 @@ export class AlchemyService {
       const paymentAttempt = await this.db.paymentAttempt.findFirst({
         where: {
           rail: PaymentRail.ONCHAIN,
-          status: PaymentStatus.PENDING,
+          status: AttemptStatus.PENDING,
           onchain: {
-            networkId: network,
-            wallet: {
-              address: {
-                equals: activity.toAddress,
-              },
-              network: {
-                id: network,
+            is: {
+              networkId: network,
+              wallet: {
+                is: {
+                  address: {
+                    equals: activity.toAddress,
+                  },
+                  network: {
+                    id: network,
+                  },
+                },
               },
             },
           },
+        },
+        include: {
+          onchain: { include: { wallet: true, network: true } },
+          checkout: true,
         },
       });
       if (!paymentAttempt) {
@@ -99,20 +107,26 @@ export class AlchemyService {
         );
         continue;
       }
-      const payment = await this.db.payment.findFirst({
-        where: {
-          attemptId: paymentAttempt.id,
-        },
-      });
-      if (!payment) {
-        this.logger.error(`Payment not found ${paymentAttempt.id}`);
+      const { checkout } = paymentAttempt;
+      if (checkout?.expiresAt && checkout.expiresAt < new Date()) {
+        this.logger.error(
+          `Activity received but checkout expired ${checkout.id}`,
+        );
+        await this.db.paymentAttempt.update({
+          where: { id: paymentAttempt.id },
+          data: { status: AttemptStatus.EXPIRED },
+        });
         continue;
       }
-      if (payment.expiredAt < new Date()) {
-        this.logger.error(`Payment received but expired ${payment.id}`);
-        await this.db.payment.update({
-          where: { id: payment.id },
-          data: { status: PaymentStatus.EXPIRED },
+      if (!checkout) {
+        this.logger.error(`Checkout not found ${paymentAttempt.id}`);
+        continue;
+      }
+      if (checkout.expiresAt && checkout.expiresAt < new Date()) {
+        this.logger.error(`Payment received but expired ${checkout.id}`);
+        await this.db.paymentAttempt.update({
+          where: { id: paymentAttempt.id },
+          data: { status: AttemptStatus.EXPIRED },
         });
         continue;
       }
