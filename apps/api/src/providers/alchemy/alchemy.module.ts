@@ -6,7 +6,7 @@ import { Env, getEnv } from 'src/lib/utils/env';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { SvixModule } from 'src/webhooks/svix.module';
 import { PaymentsModule } from 'src/payments/payment.module';
-import { TokensModule } from 'src/currencies/tokens.module';
+import { TokensModule } from 'src/tokens/tokens.module';
 @Module({
   providers: [
     AlchemyService,

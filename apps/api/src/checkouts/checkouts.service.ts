@@ -9,7 +9,7 @@ import { CreateCheckoutDto } from './dtos/create-checkout.dto';
 import { CheckoutResponseDto } from './dtos/checkout-response.dto';
 import { toDto } from 'src/lib/utils/to-dto';
 import { StoresService } from 'src/stores/stores.service';
-import { TokensService } from 'src/currencies/token/tokens.service';
+import { TokensService } from 'src/tokens/tokens.service';
 import { PaymentRail } from '@prisma/client';
 import { getCheckoutUrl } from 'src/payments/lib/utils';
 

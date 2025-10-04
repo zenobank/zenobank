@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { TokensService } from './token/tokens.service';
-import { TokenGasService } from './token/tokens-gas.service';
+import { TokensService } from './tokens.service';
+import { TokenGasService } from './tokens-gas.service';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { TokensController } from './tokens.controller';
 

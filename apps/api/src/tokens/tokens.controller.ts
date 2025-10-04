@@ -1,5 +1,5 @@
 import { Controller, Get } from '@nestjs/common';
-import { TokensService } from './token/tokens.service';
+import { TokensService } from './tokens.service';
 import { TokenResponseDto } from './dto/token-response.dto';
 
 @Controller('tokens')

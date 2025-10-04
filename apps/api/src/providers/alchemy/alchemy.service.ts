@@ -25,7 +25,7 @@ import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts';
 import { WEBHOOKS_PATHS } from 'src/webhooks/webhooks.constants';
 import { AddressActivityWebhookDto } from 'src/wallets/dto/address-activity-webhook.dto';
 import { toDto } from 'src/lib/utils/to-dto';
-import { TokensService } from 'src/currencies/token/tokens.service';
+import { TokensService } from 'src/tokens/tokens.service';
 
 @Injectable()
 export class AlchemyService {

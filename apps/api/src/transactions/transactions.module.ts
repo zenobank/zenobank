@@ -3,7 +3,7 @@ import { TransactionsService } from './transactions.service';
 import { BullModule } from '@nestjs/bullmq';
 import { TX_CONFIRMATION_QUEUE_NAME } from './lib/transactions.constants';
 import { PrismaModule } from 'src/prisma/prisma.module';
-import { TokensModule } from 'src/currencies/tokens.module';
+import { TokensModule } from 'src/tokens/tokens.module';
 import { BlockchainModule } from 'src/blockchain/blockchain.module';
 import { TransactionsController } from './transactions.controller';
 

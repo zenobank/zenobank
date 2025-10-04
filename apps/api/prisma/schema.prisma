@@ -13,6 +13,10 @@ datasource db {
 
 enum PaymentRail {
   ONCHAIN
+  CUSTODIAL
+}
+
+enum Provider {
   BINANCE_PAY
 }
 
@@ -48,10 +52,6 @@ enum TokenStandard {
   NATIVE
   ERC20
   SPL
-}
-
-enum Provider {
-  BINANCE_PAY
 }
 
 /**
@@ -121,9 +121,10 @@ model Checkout {
   storeId String
   store   Store  @relation(fields: [storeId], references: [id])
 
-  attempts      PaymentAttempt[]
-  enabledTokens Token[]
-  enabledRails  PaymentRail[]
+  attempts              PaymentAttempt[]
+  enabledTokens         Token[]
+  enabledProviderTokens ProviderToken[]
+  enabledRails          PaymentRail[]
 
   // back-ref 1–1 desde Payment (relación nombrada)
   payment Payment? @relation("CheckoutPayment")
@@ -165,11 +166,13 @@ model PaymentAttempt {
  * Detalle del intento ONCHAIN
  */
 model OnchainAttempt {
-  id               String  @id @default(uuid())
-  attemptId        String  @unique
-  transactionHash  String?
-  confirmations    Int     @default(0)
-  minConfirmations Int     @default(3)
+  id              String  @id @default(uuid())
+  attemptId       String  @unique
+  transactionHash String?
+  tokenId         String
+  tokenPayAmount  String
+
+  confirmations Int @default(0)
 
   networkId       String
   depositWalletId String
@@ -177,31 +180,40 @@ model OnchainAttempt {
   attempt PaymentAttempt @relation(fields: [attemptId], references: [id])
   network Network        @relation(fields: [networkId], references: [id])
   wallet  Wallet         @relation(fields: [depositWalletId], references: [id])
+  token   Token          @relation(fields: [tokenId], references: [id])
 }
 
 /**
  * Detalle del intento BINANCE PAY
  */
 model BinancePayPayment {
-  id              String    @id @default(uuid())
-  attemptId       String    @unique
-  credentialId    String
-  merchantTradeNo String    @unique // usa attemptId o checkout.orderId para idempotencia
-  prepayId        String?
-  transactionId   String?
-  nativeStatus    String // "PENDING" | "SUCCESS" | "CLOSED" | etc.
-  qrCodeUrl       String?
-  expireAt        DateTime?
-  lastRequest     Json?
-  lastResponse    Json?
+  id        String @id @default(uuid())
+  attemptId String @unique
+
+  credentialId  String
+  prepayId      String?
+  transactionId String?
+
+  tokenPayAmount String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   attempt    PaymentAttempt  @relation(fields: [attemptId], references: [id])
   credential StoreCredential @relation(fields: [credentialId], references: [id])
+}
 
-  @@index([nativeStatus])
+model ProviderToken {
+  id       String   @id @default(uuid())
+  provider Provider
+
+  providerTokenId  String
+  canonicalTokenId String
+  logoUrl          String
+  Checkout         Checkout? @relation(fields: [checkoutId], references: [id])
+  checkoutId       String?
+
+  @@unique([provider, providerTokenId])
 }
 
 /**
@@ -255,20 +267,22 @@ model Network {
   onchainAttempts OnchainAttempt[]
 }
 
+// model for onchain rail
 model Token {
-  id               String        @id
+  id               String           @id
   canonicalTokenId String
   standard         TokenStandard
   address          String
   decimals         Int
   symbol           String
-  createdAt        DateTime      @default(now())
-  updatedAt        DateTime      @updatedAt
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
   networkId        String
-  network          Network       @relation(fields: [networkId], references: [id])
-  checkout         Checkout?     @relation(fields: [checkoutId], references: [id])
+  network          Network          @relation(fields: [networkId], references: [id])
+  checkout         Checkout?        @relation(fields: [checkoutId], references: [id])
   checkoutId       String?
   logoUrl          String
+  OnchainAttempt   OnchainAttempt[]
 
   @@unique([networkId, address])
   @@index([canonicalTokenId])

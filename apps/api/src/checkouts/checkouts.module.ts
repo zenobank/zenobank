@@ -3,7 +3,7 @@ import { CheckoutsService } from './checkouts.service';
 import { CheckoutsController } from './checkouts.controller';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { StoresModule } from 'src/stores/stores.module';
-import { TokensModule } from 'src/currencies/tokens.module';
+import { TokensModule } from 'src/tokens/tokens.module';
 import { AttemptsModule } from './attempts/attempts.module';
 
 @Module({
