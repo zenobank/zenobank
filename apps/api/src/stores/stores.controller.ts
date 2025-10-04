@@ -14,12 +14,12 @@ import { AuthGuard } from 'src/auth/auth.guard';
 import { ApiHeader, ApiOperation, ApiSecurity } from '@nestjs/swagger';
 import { ApiKeyGuard } from 'src/auth/api-key.guard';
 import { API_KEY_HEADER } from 'src/auth/auth.constants';
-import { StoreApiKeyAuth } from 'src/auth/api-key-auth.decorator';
+import { ApiKeyAuth } from 'src/auth/api-key-auth.decorator';
 @Controller('stores')
 export class StoresController {
   constructor(private readonly storesService: StoresService) {}
 
-  @StoreApiKeyAuth()
+  @ApiKeyAuth()
   @Post('credentials')
   @ApiOperation({ summary: 'Create a new store credential' })
   async createStoreCredential(
@@ -32,7 +32,7 @@ export class StoresController {
     );
   }
 
-  @StoreApiKeyAuth()
+  @ApiKeyAuth()
   @Get('credentials')
   @ApiOperation({ summary: 'Get all store credentials' })
   async getStoreCredentials(@Headers(API_KEY_HEADER) apiKey: string) {

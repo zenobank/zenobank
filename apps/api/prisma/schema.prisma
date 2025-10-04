@@ -112,7 +112,7 @@ model StoreCredential {
 
 model Checkout {
   id            String         @id @default(cuid())
-  orderId       String         @unique
+  orderId       String
   priceCurrency String
   priceAmount   String
   status        CheckoutStatus @default(OPEN)
@@ -131,7 +131,7 @@ model Checkout {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([storeId, status])
+  @@unique([storeId, orderId])
 }
 
 /**

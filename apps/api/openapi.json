@@ -160,7 +160,7 @@
             "name": "x-api-key",
             "required": true,
             "in": "header",
-            "description": "Store API Key",
+            "description": "External API Key",
             "schema": {
               "type": "string"
             }
@@ -205,7 +205,7 @@
             "name": "x-api-key",
             "required": true,
             "in": "header",
-            "description": "Store API Key",
+            "description": "External API Key",
             "schema": {
               "type": "string"
             }
@@ -234,6 +234,118 @@
         "summary": "Get all store credentials",
         "tags": [
           "Stores"
+        ]
+      }
+    },
+    "/api/v1/checkouts": {
+      "post": {
+        "operationId": "CheckoutsController_createCheckout_v1",
+        "parameters": [
+          {
+            "name": "x-api-key",
+            "required": true,
+            "in": "header",
+            "description": "External API Key",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCheckoutDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckoutResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "x-api-key": []
+          }
+        ],
+        "summary": "Create a new checkout",
+        "tags": [
+          "Checkouts"
+        ]
+      }
+    },
+    "/api/v1/checkouts/{id}": {
+      "get": {
+        "operationId": "CheckoutsController_getCheckout_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckoutResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get checkout by ID",
+        "tags": [
+          "Checkouts"
+        ]
+      }
+    },
+    "/api/v1/checkouts/{id}/attempts": {
+      "get": {
+        "operationId": "CheckoutsController_getCheckoutAttempts_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CheckoutAttemptResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get checkout attempts by ID",
+        "tags": [
+          "Checkouts"
         ]
       }
     }
@@ -510,6 +622,124 @@
           "provider",
           "apiKey"
         ]
+      },
+      "CreateCheckoutDto": {
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "type": "string",
+            "maxLength": 256,
+            "example": "order-12345",
+            "description": "Unique order identifier"
+          },
+          "priceAmount": {
+            "type": "string",
+            "minimum": 1,
+            "example": "100.12",
+            "description": "Price amount in the specified currency"
+          },
+          "priceCurrency": {
+            "type": "string",
+            "example": "USD",
+            "description": "ISO 4217 currency code"
+          }
+        },
+        "required": [
+          "orderId",
+          "priceAmount",
+          "priceCurrency"
+        ]
+      },
+      "CheckoutResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "ckl1234567890",
+            "description": "Checkout ID"
+          },
+          "orderId": {
+            "type": "string",
+            "example": "order-12345",
+            "description": "Unique order identifier"
+          },
+          "priceCurrency": {
+            "type": "string",
+            "example": "USD",
+            "description": "Currency code"
+          },
+          "priceAmount": {
+            "type": "string",
+            "example": "100.00",
+            "description": "Price amount"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "OPEN",
+              "COMPLETED",
+              "EXPIRED",
+              "CANCELLED"
+            ],
+            "example": "OPEN",
+            "description": "Current status of the checkout"
+          },
+          "expiresAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true,
+            "example": "2025-10-05T12:00:00Z",
+            "description": "Expiration date"
+          },
+          "enabledRails": {
+            "type": "array",
+            "example": [
+              "ONCHAIN",
+              "BINANCE_PAY"
+            ],
+            "description": "Enabled payment rails",
+            "items": {
+              "type": "string",
+              "enum": [
+                "ONCHAIN",
+                "BINANCE_PAY"
+              ]
+            }
+          },
+          "checkoutUrl": {
+            "type": "string",
+            "example": "https://pay.zenobank.io/ckl1234567890",
+            "description": "URL to complete the checkout"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2025-10-04T10:00:00Z",
+            "description": "Creation date"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2025-10-04T10:00:00Z",
+            "description": "Last update date"
+          }
+        },
+        "required": [
+          "id",
+          "orderId",
+          "priceCurrency",
+          "priceAmount",
+          "status",
+          "expiresAt",
+          "enabledRails",
+          "checkoutUrl",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "CheckoutAttemptResponseDto": {
+        "type": "object",
+        "properties": {}
       }
     }
   }

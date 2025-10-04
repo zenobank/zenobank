@@ -122,3 +122,29 @@ export const formatDollarAmount = (
     ? `${showSymbol ? '$' : ''}${formattedAmount}`
     : '-';
 };
+
+export function trimTrailingDecimalZeros(value: BigNumber.Value): string {
+  const valueStr = String(value);
+  const decimalPointIndex = valueStr.indexOf('.');
+  if (decimalPointIndex === -1) return valueStr; // no decimal part
+
+  let lastSignificantIndex = valueStr.length - 1;
+  let iterations = 0;
+  const MAX_ITERATIONS = 256; // prevent infinite loop attacks
+
+  while (
+    lastSignificantIndex > decimalPointIndex &&
+    valueStr[lastSignificantIndex] === '0' &&
+    iterations < MAX_ITERATIONS
+  ) {
+    lastSignificantIndex--;
+    iterations++;
+  }
+
+  // If we ended on the decimal point, remove it as well
+  if (lastSignificantIndex === decimalPointIndex) {
+    lastSignificantIndex--;
+  }
+
+  return valueStr.slice(0, lastSignificantIndex + 1);
+}
