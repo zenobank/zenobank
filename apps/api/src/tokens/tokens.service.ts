@@ -5,7 +5,7 @@ import { requestWithRepeatDelay } from 'src/lib/utils/request-with-repeat-delay'
 import { erc20Abi } from 'viem';
 import { isNativeToken, nativeTokenAddress } from './lib/utils';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Token } from '@prisma/client';
+import { ProviderToken, Token } from '@prisma/client';
 import { SupportedNetworksId } from 'src/networks/network.interface';
 import { TokenResponseDto } from './dto/token-response.dto';
 import { toDto } from 'src/lib/utils/to-dto';
@@ -26,6 +26,11 @@ export class TokensService {
       where: { id },
     });
     return token;
+  }
+  getProviderToken(id: string): Promise<ProviderToken | null> {
+    return this.db.providerToken.findUnique({
+      where: { id },
+    });
   }
 
   async getNetworkTokens(networkId: SupportedNetworksId): Promise<Token[]> {

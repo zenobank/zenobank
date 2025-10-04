@@ -347,6 +347,45 @@
         "tags": [
           "Checkouts"
         ]
+      },
+      "post": {
+        "operationId": "CheckoutsController_createCheckoutAttempt_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCheckoutAttemptDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckoutAttemptResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Create a new checkout attempt",
+        "tags": [
+          "Checkouts"
+        ]
       }
     }
   },
@@ -702,7 +741,7 @@
               "type": "string",
               "enum": [
                 "ONCHAIN",
-                "BINANCE_PAY"
+                "CUSTODIAL"
               ]
             }
           },
@@ -739,7 +778,77 @@
       },
       "CheckoutAttemptResponseDto": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for the payment attempt"
+          },
+          "checkoutId": {
+            "type": "string",
+            "description": "Checkout ID this attempt belongs to"
+          },
+          "rail": {
+            "type": "string",
+            "description": "Payment rail used for this attempt",
+            "enum": [
+              "ONCHAIN",
+              "CUSTODIAL"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "description": "Status of the payment attempt",
+            "enum": [
+              "PENDING",
+              "PROCESSING",
+              "SUCCEEDED",
+              "FAILED",
+              "EXPIRED"
+            ]
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Timestamp when the attempt was created"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Timestamp when the attempt was last updated"
+          }
+        },
+        "required": [
+          "id",
+          "checkoutId",
+          "rail",
+          "status",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "CreateCheckoutAttemptDto": {
+        "type": "object",
+        "properties": {
+          "rail": {
+            "type": "string",
+            "description": "Payment rail to use for this attempt",
+            "enum": [
+              "ONCHAIN",
+              "CUSTODIAL"
+            ],
+            "example": "ONCHAIN"
+          },
+          "tokenId": {
+            "type": "string",
+            "maxLength": 256,
+            "description": "Token ID to use for this attempt",
+            "example": "USDC_ETHEREUM_MAINNET"
+          }
+        },
+        "required": [
+          "rail",
+          "tokenId"
+        ]
       }
     }
   }

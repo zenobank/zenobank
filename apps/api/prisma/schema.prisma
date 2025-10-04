@@ -172,8 +172,6 @@ model OnchainAttempt {
   tokenId         String
   tokenPayAmount  String
 
-  confirmations Int @default(0)
-
   networkId       String
   depositWalletId String
 
@@ -190,9 +188,7 @@ model BinancePayPayment {
   id        String @id @default(uuid())
   attemptId String @unique
 
-  credentialId  String
-  prepayId      String?
-  transactionId String?
+  credentialId String
 
   tokenPayAmount String
 
@@ -201,19 +197,6 @@ model BinancePayPayment {
 
   attempt    PaymentAttempt  @relation(fields: [attemptId], references: [id])
   credential StoreCredential @relation(fields: [credentialId], references: [id])
-}
-
-model ProviderToken {
-  id       String   @id @default(uuid())
-  provider Provider
-
-  providerTokenId  String
-  canonicalTokenId String
-  logoUrl          String
-  Checkout         Checkout? @relation(fields: [checkoutId], references: [id])
-  checkoutId       String?
-
-  @@unique([provider, providerTokenId])
 }
 
 /**
@@ -267,22 +250,50 @@ model Network {
   onchainAttempts OnchainAttempt[]
 }
 
-// model for onchain rail
+/**
+ * ProviderToken.id and Token.id must be different
+ */
+
+/**
+ * ProviderToken.id and Token.id must be different
+ */
+/**
+ * model for provider tokens
+ */
+model ProviderToken {
+  id       String   @id
+  provider Provider
+
+  providerTokenId  String
+  canonicalTokenId String
+  logoUrl          String
+  checkoutId       String?
+
+  checkout Checkout? @relation(fields: [checkoutId], references: [id])
+
+  @@unique([provider, providerTokenId])
+}
+
+/**
+ * Token.id and ProviderToken.id must be different
+ */
 model Token {
-  id               String           @id
+  id               String        @id
   canonicalTokenId String
   standard         TokenStandard
   address          String
   decimals         Int
   symbol           String
-  createdAt        DateTime         @default(now())
-  updatedAt        DateTime         @updatedAt
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
   networkId        String
-  network          Network          @relation(fields: [networkId], references: [id])
-  checkout         Checkout?        @relation(fields: [checkoutId], references: [id])
-  checkoutId       String?
-  logoUrl          String
-  OnchainAttempt   OnchainAttempt[]
+
+  checkoutId String?
+  logoUrl    String
+
+  network         Network          @relation(fields: [networkId], references: [id])
+  checkout        Checkout?        @relation(fields: [checkoutId], references: [id])
+  onchainAttempts OnchainAttempt[]
 
   @@unique([networkId, address])
   @@index([canonicalTokenId])

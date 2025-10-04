@@ -13,7 +13,7 @@ import { CheckoutResponseDto } from './dtos/checkout-response.dto';
 import { ApiKeyAuth } from 'src/auth/api-key-auth.decorator';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { API_KEY_HEADER } from 'src/auth/auth.constants';
-import { CheckoutAttemptResponseDto } from './attempts/dtos/checkout-attempt-response.dto';
+import { CreateCheckoutAttemptDto } from './attempts/dtos/create-checkout-attempt.dto';
 import { AttemptsService } from './attempts/attempts.service';
 
 @ApiTags('Checkouts')
@@ -43,12 +43,26 @@ export class CheckoutsController {
     }
     return checkout;
   }
-  @Get(':id/attempts')
-  @ApiOperation({ summary: 'Get checkout attempts by ID' })
-  async getCheckoutAttempts(
-    @Param('id') id: string,
-  ): Promise<CheckoutAttemptResponseDto[]> {
-    const attempts = await this.attemptsService.getCheckoutAttempts(id);
-    return attempts;
+  //   @Get(':id/attempts')
+  //   @ApiOperation({ summary: 'Get checkout attempts by ID' })
+  //   async getCheckoutAttempts(
+  //     @Param('id') id: string,
+  //   ): Promise<CheckoutAttemptResponseDto[]> {
+  //     const attempts = await this.attemptsService.getCheckoutAttempts(id);
+  //     return attempts;
+  //   }
+  // TODO: CAMBIAR EL ANY
+  @ApiKeyAuth()
+  @Post(':id/attempts')
+  @ApiOperation({ summary: 'Create a new checkout attempt' })
+  async createCheckoutAttempt(
+    @Param('id') checkoutId: string,
+    @Headers(API_KEY_HEADER) apiKey: string,
+    @Body() createCheckoutAttemptDto: CreateCheckoutAttemptDto,
+  ): Promise<any> {
+    return this.attemptsService.createCheckoutAttempt(
+      { checkoutId, apiKey },
+      createCheckoutAttemptDto,
+    );
   }
 }
