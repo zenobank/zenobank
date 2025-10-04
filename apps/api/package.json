@@ -4,7 +4,7 @@
   "description": "",
   "private": true,
   "scripts": {
-    "build": "pnpm prisma db push && pnpm run db:generate && nest build",
+    "build": "pnpm run db:generate && nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "tunnel": "lt -s dkfjadskfjaercl --port 3001",
