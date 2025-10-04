@@ -101,7 +101,6 @@ model StoreCredential {
   storeId String
   store   Store  @relation(fields: [storeId], references: [id])
 
-  // back-ref correcto (antes estaba con ????????)
   binancePayments BinancePayPayment[]
 
   @@unique([storeId, provider])
@@ -263,13 +262,13 @@ model Token {
   address          String
   decimals         Int
   symbol           String
-  isDeprecated     Boolean       @default(false)
   createdAt        DateTime      @default(now())
   updatedAt        DateTime      @updatedAt
   networkId        String
   network          Network       @relation(fields: [networkId], references: [id])
   checkout         Checkout?     @relation(fields: [checkoutId], references: [id])
   checkoutId       String?
+  logoUrl          String
 
   @@unique([networkId, address])
   @@index([canonicalTokenId])

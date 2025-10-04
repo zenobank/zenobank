@@ -13,7 +13,6 @@ import { PaymentService } from './payment.service';
 import { PaymentResponseDto } from './dto/payment-response.dto';
 import { UpdateDepositSelectionDto } from './dto/update-payment-selection.dto';
 import { ApiKeyGuard } from 'src/auth/api-key.guard';
-import { ApiKey } from 'src/auth/api-key.decorator';
 import { ApiHeader, ApiSecurity } from '@nestjs/swagger';
 import { API_KEY_HEADER } from 'src/auth/auth.constants';
 import { Pay, PayRestAPI } from '@binance/pay';

@@ -1,11 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateStoreDto } from './dtos/create-store.dto';
+import { CreateStoreCredentialDto } from './dtos/create-store-credential.dto';
 import { StoreResponseDto } from './dtos/store-response.dto';
 import { toEnumValue } from 'src/lib/utils/to-enum';
 import { SupportedNetworksId } from 'src/networks/network.interface';
 import { toDto } from 'src/lib/utils/to-dto';
 import { WalletService } from 'src/wallets/wallet.service';
+import { Store } from '@prisma/client';
+import { StoreCredentialDto } from './dtos/store-credential.response.dto';
 
 @Injectable()
 export class StoresService {
@@ -13,6 +16,19 @@ export class StoresService {
     private readonly db: PrismaService,
     private readonly walletService: WalletService,
   ) {}
+  async getStoreCredentials(apiKey: string): Promise<StoreCredentialDto[]> {
+    const credentials = await this.db.storeCredential.findMany({
+      where: {
+        apiKey,
+      },
+    });
+    if (!credentials) {
+      throw new NotFoundException('Store not found');
+    }
+    return credentials.map((credential) =>
+      toDto(StoreCredentialDto, credential),
+    );
+  }
 
   async createStore(
     createStoreDto: CreateStoreDto,
@@ -50,5 +66,36 @@ export class StoresService {
         label: wallet.label,
       })),
     });
+  }
+
+  async getStore(apiKey: string): Promise<Store | null> {
+    const store = await this.db.store.findUnique({
+      where: { apiKey },
+    });
+    if (!store) {
+      return null;
+    }
+    return store;
+  }
+
+  async createStoreCredential(
+    apiKey: string,
+    createStoreCredentialDto: CreateStoreCredentialDto,
+  ): Promise<StoreCredentialDto> {
+    const store = await this.getStore(apiKey);
+
+    if (!store) {
+      throw new NotFoundException('Store not found');
+    }
+    const credential = await this.db.storeCredential.create({
+      data: {
+        storeId: store.id,
+        provider: createStoreCredentialDto.provider,
+        apiKey: createStoreCredentialDto.apiKey,
+        apiSecret: createStoreCredentialDto.apiSecret,
+      },
+    });
+
+    return toDto(StoreCredentialDto, credential);
   }
 }

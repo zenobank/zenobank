@@ -17,7 +17,11 @@ export class WalletController {
     required: true,
   })
   @Post('external')
-  @ApiOperation({ summary: 'Register an external wallet for a store' })
+  @ApiOperation({
+    summary: 'Register an external wallet for a store.',
+    description:
+      'An Externall wallet is an non-custodial wallet. Address must be an EVM address.',
+  })
   async registerExternalWallet(
     @Body() registerExternalWalletDto: RegisterExternalWalletDto,
     @Headers(API_KEY_HEADER) apiKey: string,

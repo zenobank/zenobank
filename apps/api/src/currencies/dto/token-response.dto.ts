@@ -2,7 +2,14 @@ import { ApiProperty } from '@nestjs/swagger';
 import { TokenStandard } from '@prisma/client';
 import { SupportedNetworksId } from 'src/networks/network.interface';
 import { Expose } from 'class-transformer';
-import { IsBoolean, IsEnum, IsInt, IsString, Min } from 'class-validator';
+import {
+  IsBoolean,
+  IsEnum,
+  IsInt,
+  IsString,
+  IsUrl,
+  Min,
+} from 'class-validator';
 
 export class TokenResponseDto {
   @Expose()
@@ -16,9 +23,20 @@ export class TokenResponseDto {
   canonicalTokenId: string;
 
   @Expose()
+  @ApiProperty({
+    example: SupportedNetworksId.ETHEREUM_MAINNET,
+  })
+  networkId: string;
+
+  @Expose()
   @IsEnum(TokenStandard)
   @ApiProperty({ enum: TokenStandard, example: TokenStandard.ERC20 })
   standard: TokenStandard;
+
+  @Expose()
+  @IsString()
+  @ApiProperty({ example: 'USDC' })
+  symbol: string;
 
   @Expose()
   @IsString()
@@ -32,18 +50,7 @@ export class TokenResponseDto {
   decimals: number;
 
   @Expose()
-  @IsString()
-  @ApiProperty({ example: 'USDC' })
-  symbol: string;
-
-  @Expose()
-  @IsBoolean()
-  @ApiProperty({ example: false })
-  isDeprecated!: boolean;
-
-  @Expose()
-  @ApiProperty({
-    example: SupportedNetworksId.ETHEREUM_MAINNET,
-  })
-  networkId: string;
+  @IsUrl()
+  @ApiProperty({ example: 'https://example.com/logo.png' })
+  logoUrl: string;
 }

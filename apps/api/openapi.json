@@ -53,6 +53,7 @@
     },
     "/api/v1/wallet/external": {
       "post": {
+        "description": "An Externall wallet is an non-custodial wallet. Address must be an EVM address.",
         "operationId": "WalletController_registerExternalWallet_v1",
         "parameters": [
           {
@@ -85,7 +86,7 @@
             "x-api-key": []
           }
         ],
-        "summary": "Register an external wallet for a store",
+        "summary": "Register an external wallet for a store.",
         "tags": [
           "Wallet"
         ]
@@ -150,6 +151,91 @@
           "Users"
         ]
       }
+    },
+    "/api/v1/stores/credentials": {
+      "post": {
+        "operationId": "StoresController_createStoreCredential_v1",
+        "parameters": [
+          {
+            "name": "x-api-key",
+            "required": true,
+            "in": "header",
+            "description": "Store API Key",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateStoreCredentialDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoreCredentialDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "x-api-key": []
+          }
+        ],
+        "summary": "Create a new store credential",
+        "tags": [
+          "Stores"
+        ]
+      },
+      "get": {
+        "operationId": "StoresController_getStoreCredentials_v1",
+        "parameters": [
+          {
+            "name": "x-api-key",
+            "required": true,
+            "in": "header",
+            "description": "Store API Key",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/StoreCredentialDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "x-api-key": []
+          }
+        ],
+        "summary": "Get all store credentials",
+        "tags": [
+          "Stores"
+        ]
+      }
     }
   },
   "info": {
@@ -180,6 +266,10 @@
             "type": "string",
             "example": "USDC"
           },
+          "networkId": {
+            "type": "string",
+            "example": "ETHEREUM_MAINNET"
+          },
           "standard": {
             "type": "string",
             "enum": [
@@ -188,6 +278,10 @@
               "SPL"
             ],
             "example": "ERC20"
+          },
+          "symbol": {
+            "type": "string",
+            "example": "USDC"
           },
           "address": {
             "type": "string",
@@ -198,28 +292,21 @@
             "minimum": 0,
             "example": 6
           },
-          "symbol": {
+          "logoUrl": {
             "type": "string",
-            "example": "USDC"
-          },
-          "isDeprecated": {
-            "type": "boolean",
-            "example": false
-          },
-          "networkId": {
-            "type": "string",
-            "example": "ETHEREUM_MAINNET"
+            "format": "uri",
+            "example": "https://example.com/logo.png"
           }
         },
         "required": [
           "id",
           "canonicalTokenId",
+          "networkId",
           "standard",
+          "symbol",
           "address",
           "decimals",
-          "symbol",
-          "isDeprecated",
-          "networkId"
+          "logoUrl"
         ]
       },
       "NetworkResponseDto": {
@@ -375,6 +462,53 @@
         "required": [
           "id",
           "stores"
+        ]
+      },
+      "CreateStoreCredentialDto": {
+        "type": "object",
+        "properties": {
+          "provider": {
+            "type": "string",
+            "enum": [
+              "BINANCE_PAY"
+            ],
+            "example": "BINANCE_PAY",
+            "description": "Credential provider"
+          },
+          "apiKey": {
+            "type": "string",
+            "example": "your-api-key",
+            "description": "API Key"
+          },
+          "apiSecret": {
+            "type": "string",
+            "example": "your-api-secret",
+            "description": "API Secret"
+          }
+        },
+        "required": [
+          "provider",
+          "apiKey",
+          "apiSecret"
+        ]
+      },
+      "StoreCredentialDto": {
+        "type": "object",
+        "properties": {
+          "provider": {
+            "type": "string",
+            "description": "Provider for the store",
+            "example": "BINANCE_PAY"
+          },
+          "apiKey": {
+            "type": "string",
+            "description": "API key for the store",
+            "example": "cuid_1234567890abcdef"
+          }
+        },
+        "required": [
+          "provider",
+          "apiKey"
         ]
       }
     }

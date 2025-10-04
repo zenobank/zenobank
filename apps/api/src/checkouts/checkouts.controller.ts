@@ -1,13 +1,13 @@
-import { Body, Controller, Param, Patch } from '@nestjs/common';
+import { Body, Controller, Param, Patch, Post } from '@nestjs/common';
 import { CheckoutsService } from './checkouts.service';
 
 @Controller('checkouts')
 export class CheckoutsController {
   constructor(private readonly checkoutsService: CheckoutsService) {}
-  //   @Post('')
-  //   async createCheckout(@Body() createCheckoutDto: CreateCheckoutDto) {
-  //     return this.checkoutsService.createCheckout(createCheckoutDto);
-  //   }
+  @Post('')
+  async createCheckout(@Body() createCheckoutDto: CreateCheckoutDto) {
+    return this.checkoutsService.createCheckout(createCheckoutDto);
+  }
 
   //   @Get(':id')
   //   async getCheckout(@Param('id') id: string) {
