@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { PaymentService as PaymentService } from './payment.service';
 import { PaymentController } from './payment.controller';
 import { PrismaModule } from 'src/prisma/prisma.module';
-import { AssetModule } from 'src/currencies/currency.module';
+import { AssetModule } from 'src/currencies/tokens.module';
 import { NetworksModule } from 'src/networks/networks.module';
 
 @Module({

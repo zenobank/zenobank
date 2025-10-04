@@ -25,7 +25,7 @@ import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts';
 import { WEBHOOKS_PATHS } from 'src/webhooks/webhooks.constants';
 import { AddressActivityWebhookDto } from 'src/wallets/dto/address-activity-webhook.dto';
 import { toDto } from 'src/lib/utils/to-dto';
-import { TokenService } from 'src/currencies/token/token.service';
+import { TokensService } from 'src/currencies/token/tokens.service';
 
 @Injectable()
 export class AlchemyService {
@@ -33,7 +33,7 @@ export class AlchemyService {
   constructor(
     private readonly db: PrismaService,
     @Inject(ALCHEMY_SDK) private readonly alchemy: Alchemy,
-    private readonly tokenService: TokenService,
+    private readonly tokenService: TokensService,
   ) {}
 
   async processAddressActivityWebhook(body: AddressActivityWebhookResponse) {

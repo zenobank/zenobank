@@ -10,7 +10,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { randomUUID } from 'crypto';
 import { PaymentResponseDto } from './dto/payment-response.dto';
 import { UpdateDepositSelectionDto } from './dto/update-payment-selection.dto';
-import { TokenService } from 'src/currencies/token/token.service';
+import { TokensService } from 'src/currencies/token/tokens.service';
 import { NetworksService } from 'src/networks/networks.service';
 import { ms } from 'src/lib/utils/ms';
 import { AttemptStatus, PaymentRail, PaymentStatus } from '@prisma/client';
@@ -28,7 +28,7 @@ export class PaymentService {
   private readonly logger = new Logger(PaymentService.name);
   constructor(
     private readonly db: PrismaService,
-    private readonly tokenService: TokenService,
+    private readonly tokenService: TokensService,
     private readonly networksService: NetworksService,
   ) {}
   // async getPayments(apiKey: string): Promise<PaymentResponseDto[]> {

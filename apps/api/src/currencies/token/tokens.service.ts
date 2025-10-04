@@ -11,11 +11,11 @@ import { TokenResponseDto } from '../dto/token-response.dto';
 import { toDto } from 'src/lib/utils/to-dto';
 
 @Injectable()
-export class TokenService {
-  private readonly logger = new Logger(TokenService.name);
+export class TokensService {
+  private readonly logger = new Logger(TokensService.name);
   constructor(private db: PrismaService) {}
 
-  async getSupportedTokens(): Promise<TokenResponseDto[]> {
+  async getTokens(): Promise<TokenResponseDto[]> {
     const tokens = await this.db.token.findMany({});
     const tokensDto = tokens.map((token) => toDto(TokenResponseDto, token));
     return tokensDto;

@@ -19,6 +19,6 @@ import { PaymentsModule } from 'src/payments/payment.module';
   ],
   controllers: [],
   exports: [AlchemyService],
-  imports: [PrismaModule, SvixModule, PaymentsModule],
+  imports: [PrismaModule, SvixModule, PaymentsModule, TokenModule],
 })
 export class AlchemyModule {}
