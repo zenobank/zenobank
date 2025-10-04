@@ -36,6 +36,9 @@ export class TokenService {
     });
     return tokens;
   }
+  getTokenAddresses(tokens: Token[]): string[] {
+    return tokens.map((t) => t.address.toLowerCase());
+  }
 
   async getTokenBalance(
     networkId: SupportedNetworksId,
