@@ -32,7 +32,7 @@ enum AttemptStatus {
   PROCESSING
   SUCCEEDED
   FAILED
-  EXPIRED
+  CANCELLED
 }
 
 enum PaymentStatus {
@@ -90,8 +90,10 @@ model Store {
  * Credenciales por proveedor (1 por store y proveedor)
  */
 model StoreCredential {
-  id        String   @id @default(uuid())
-  provider  Provider
+  id       String   @id @default(uuid())
+  provider Provider
+
+  accountId String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
