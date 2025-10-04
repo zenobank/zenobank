@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { SupportedNetworksId } from 'src/networks/network.interface';
-import { AlchemyService } from 'src/alchemy/alchemy.service';
+import { AlchemyService } from 'src/providers/alchemy/alchemy.service';
 import { Wallet, NetworkType } from '@prisma/client';
 import { toEnumValue } from 'src/lib/utils/to-enum';
 import { AddressActivityWebhookDto } from './dto/address-activity-webhook.dto';

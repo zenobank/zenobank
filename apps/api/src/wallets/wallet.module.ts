@@ -4,7 +4,7 @@ import { WalletFactory } from './wallet.factory';
 
 import { WalletController } from './wallet.controller';
 import { PrismaModule } from 'src/prisma/prisma.module';
-import { AlchemyModule } from 'src/alchemy/alchemy.module';
+import { AlchemyModule } from 'src/providers/alchemy/alchemy.module';
 import { AuthModule } from 'src/auth/auth.module';
 
 @Module({

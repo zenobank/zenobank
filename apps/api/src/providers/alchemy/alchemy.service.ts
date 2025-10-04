@@ -1,5 +1,5 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { PaymentStatus, WebhookProvider } from '@prisma/client';
+import { PaymentRail, PaymentStatus } from '@prisma/client';
 import { SupportedNetworksId } from 'src/networks/network.interface';
 import { Alchemy, WebhookType as AlchemyWebhookType } from 'alchemy-sdk';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -7,15 +7,13 @@ import { ALCHEMY_SDK } from './lib/alchemy.constants';
 import { Env, getEnv } from 'src/lib/utils/env';
 import { AddressActivityWebhookResponse } from './lib/alchemy.interface';
 import { isNumber } from 'class-validator';
-import { PaymentService } from 'src/payments/payment.service';
 import {
-  ALCHEMY_SDK_TO_NETWORK_MAP,
   ALCHEMY_WEBHOOK_TO_NETWORK_MAP,
   NETWORK_TO_ALCHEMY_SDK,
 } from './lib/alchemy.network-map';
 import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts';
 import { WEBHOOKS_PATHS } from 'src/webhooks/webhooks.constants';
-import { AddressActivityWebhookDto } from 'src/wallet/dto/address-activity-webhook.dto';
+import { AddressActivityWebhookDto } from 'src/wallets/dto/address-activity-webhook.dto';
 import { toDto } from 'src/lib/utils/to-dto';
 
 @Injectable()
@@ -24,7 +22,6 @@ export class AlchemyService {
   constructor(
     private readonly db: PrismaService,
     @Inject(ALCHEMY_SDK) private readonly alchemy: Alchemy,
-    private readonly paymentService: PaymentService,
   ) {}
 
   async processAddressActivityWebhook(body: AddressActivityWebhookResponse) {
@@ -60,6 +57,7 @@ export class AlchemyService {
       )
       .filter((a) => a.log?.removed === false);
     this.logger.log(`Filtered activities length ${filteredActivities.length}`);
+
     for (const activity of filteredActivities) {
       const tokenAmount = activity.value;
       const tokenId = supportedTokens.find(
@@ -76,39 +74,47 @@ export class AlchemyService {
         continue;
       }
 
-      const payment = await this.db.payment.findFirst({
+      const paymentAttempt = await this.db.paymentAttempt.findFirst({
         where: {
-          payAmount: tokenAmount.toString(),
-          payCurrencyId: tokenId,
-          networkId: network,
-          depositWallet: {
-            address: activity.toAddress,
-            networkId: network,
-          },
+          rail: PaymentRail.ONCHAIN,
           status: PaymentStatus.PENDING,
+          onchain: {
+            networkId: network,
+            wallet: {
+              address: {
+                equals: activity.toAddress,
+              },
+              network: {
+                id: network,
+              },
+            },
+          },
         },
       });
-      if (payment?.expiredAt && payment.expiredAt < new Date()) {
-        this.logger.warn(`Payment received but expired ${payment.id}`);
+      if (!paymentAttempt) {
+        this.logger.warn(
+          `Payment attempt not found ${JSON.stringify({
+            activity,
+          })}`,
+        );
+        continue;
+      }
+      const payment = await this.db.payment.findFirst({
+        where: {
+          attemptId: paymentAttempt.id,
+        },
+      });
+      if (!payment) {
+        this.logger.error(`Payment not found ${paymentAttempt.id}`);
+        continue;
+      }
+      if (payment.expiredAt < new Date()) {
+        this.logger.error(`Payment received but expired ${payment.id}`);
         await this.db.payment.update({
           where: { id: payment.id },
           data: { status: PaymentStatus.EXPIRED },
         });
         continue;
-      }
-      if (payment) {
-        await this.paymentService.markPaymentAsCompleted(payment.id);
-        // await this.paymentService.initiatePaymentProcessing(payment.id);
-      } else {
-        this.logger.warn(
-          `Payment not found ${JSON.stringify({
-            payAmount: tokenAmount,
-            payCurrencyId: tokenId,
-            depositWallet: activity.toAddress,
-            networkId: network,
-            tokenAddress: activity.rawContract?.address,
-          })}`,
-        );
       }
     }
 

@@ -67,7 +67,7 @@ model User {
 
 model Store {
   id        String   @id @default(cuid())
-  name      String
+  name      String   @default("Default Store")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   apiKey    String   @unique @default(cuid())
@@ -124,6 +124,7 @@ model Checkout {
 
   attempts      PaymentAttempt[]
   enabledTokens Token[]
+  enabledRails  PaymentRail[]
 
   // back-ref 1–1 desde Payment (relación nombrada)
   payment Payment? @relation("CheckoutPayment")
@@ -214,6 +215,8 @@ model Payment {
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt
 
+  expiredAt DateTime @default(dbgenerated("now() + interval '1 hour'"))
+
   // Intento ganador (inmutable) – relación 1–1 nombrada
   attemptId String         @unique
   attempt   PaymentAttempt @relation("AttemptPayment", fields: [attemptId], references: [id])
@@ -267,7 +270,7 @@ model Token {
   updatedAt        DateTime      @updatedAt
   networkId        String
   network          Network       @relation(fields: [networkId], references: [id])
-  Checkout         Checkout?     @relation(fields: [checkoutId], references: [id])
+  checkout         Checkout?     @relation(fields: [checkoutId], references: [id])
   checkoutId       String?
 
   @@unique([networkId, address])

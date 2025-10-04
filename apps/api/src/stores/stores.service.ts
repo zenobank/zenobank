@@ -5,7 +5,7 @@ import { StoreResponseDto } from './dtos/store-response.dto';
 import { toEnumValue } from 'src/lib/utils/to-enum';
 import { SupportedNetworksId } from 'src/networks/network.interface';
 import { toDto } from 'src/lib/utils/to-dto';
-import { WalletService } from 'src/wallet/wallet.service';
+import { WalletService } from 'src/wallets/wallet.service';
 
 @Injectable()
 export class StoresService {
@@ -14,10 +14,14 @@ export class StoresService {
     private readonly walletService: WalletService,
   ) {}
 
-  async createStore(createStoreDto: CreateStoreDto): Promise<StoreResponseDto> {
+  async createStore(
+    createStoreDto: CreateStoreDto,
+    userId: string,
+  ): Promise<StoreResponseDto> {
     const store = await this.db.store.create({
       data: {
         name: createStoreDto.name,
+        userId: userId,
       },
       include: {
         wallets: {

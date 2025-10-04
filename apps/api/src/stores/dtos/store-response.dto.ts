@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose, Type } from 'class-transformer';
-import { WalletResponseDto } from 'src/wallet/dto/wallet.response.dto';
+import { WalletResponseDto } from 'src/wallets/dto/wallet.response.dto';
 
 export class StoreResponseDto {
   @Expose()

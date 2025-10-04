@@ -3,7 +3,7 @@ import { toDto } from 'src/lib/utils/to-dto';
 import { toEnumValue } from 'src/lib/utils/to-enum';
 import { SupportedNetworksId } from 'src/networks/network.interface';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { WalletService } from 'src/wallet/wallet.service';
+import { WalletService } from 'src/wallets/wallet.service';
 
 import { CreateStoreDto } from '../stores/dtos/create-store.dto';
 import { StoreResponseDto } from '../stores/dtos/store-response.dto';
