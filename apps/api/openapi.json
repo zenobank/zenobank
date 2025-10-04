@@ -1,6 +1,27 @@
 {
   "openapi": "3.0.0",
   "paths": {
+    "/api/v1/payments/tutorial": {
+      "get": {
+        "operationId": "PaymentController_getTutorial_v1",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Payment"
+        ]
+      }
+    },
     "/api/v1/payments": {
       "post": {
         "operationId": "PaymentController_createPayment_v1",

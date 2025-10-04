@@ -25,6 +25,7 @@
     "db:seed": "pnpm ts-node -r tsconfig-paths/register prisma/seed.ts"
   },
   "dependencies": {
+    "@binance/pay": "^4.0.0",
     "@clerk/backend": "^2.15.0",
     "@nestjs/bullmq": "^11.0.3",
     "@nestjs/common": "^10.0.0",

@@ -16,10 +16,39 @@ import { ApiKeyGuard } from 'src/auth/api-key.guard';
 import { ApiKey } from 'src/auth/api-key.decorator';
 import { ApiHeader, ApiSecurity } from '@nestjs/swagger';
 import { API_KEY_HEADER } from 'src/auth/auth.constants';
+import { Pay, PayRestAPI } from '@binance/pay';
+import { ConfigService } from '@nestjs/config';
+import { ms } from 'src/lib/utils/ms';
 
 @Controller('payments')
 export class PaymentController {
-  constructor(private readonly paymentsService: PaymentService) {}
+  constructor(
+    private readonly paymentsService: PaymentService,
+    private readonly configService: ConfigService,
+  ) {}
+
+  @Get('tutorial')
+  async getTutorial(): Promise<any> {
+    const configurationRestAPI = {
+      apiKey: this.configService.get('BINANCE_PAY_API_KEY'),
+      apiSecret: this.configService.get('BINANCE_PAY_API_SECRET'),
+    };
+    const client = new Pay({ configurationRestAPI });
+    try {
+      const res = await client.restAPI.getPayTradeHistory({
+        recvWindow: ms('1m'),
+        startTime: Date.now() - ms('1h'), // 1 hour ago, same as the expiration time of the payment
+      });
+      const data: PayRestAPI.GetPayTradeHistoryResponse = await res.data();
+      console.log(data);
+      return data;
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
+
+    return 'Hello World';
+  }
 
   @Post('')
   @UseGuards(ApiKeyGuard)
