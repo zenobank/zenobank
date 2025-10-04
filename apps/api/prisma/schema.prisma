@@ -7,10 +7,56 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+/**
+ * ===== Enums =====
+ */
+
 enum PaymentRail {
   ONCHAIN
   BINANCE_PAY
 }
+
+enum CheckoutStatus {
+  OPEN
+  COMPLETED
+  EXPIRED
+  CANCELLED
+}
+
+enum AttemptStatus {
+  PENDING
+  PROCESSING
+  SUCCEEDED
+  FAILED
+  EXPIRED
+}
+
+enum PaymentStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  EXPIRED
+  CANCELLED
+}
+
+enum NetworkType {
+  EVM
+  SOLANA
+}
+
+enum TokenStandard {
+  NATIVE
+  ERC20
+  SPL
+}
+
+enum Provider {
+  BINANCE_PAY
+}
+
+/**
+ * ===== Usuarios & Tiendas =====
+ */
 
 model User {
   id        String   @id
@@ -20,81 +66,177 @@ model User {
 }
 
 model Store {
-  id               String         @id @default(cuid())
-  name             String
-  createdAt        DateTime       @default(now())
-  updatedAt        DateTime       @updatedAt
-  apiKey           String         @unique @default(cuid())
-  userId           String?
-  binanceId        String?
-  binanceApiKey    String?
-  binanceSecretKey String?
-  payments         Payment[]
-  user             User?          @relation(fields: [userId], references: [id])
-  wallets          Wallet[]
-  binanceConfig    BinanceConfig?
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  apiKey    String   @unique @default(cuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  // Credenciales por proveedor
+  credentials StoreCredential[]
+
+  // On-chain
+  wallets Wallet[]
+
+  // Pagos (finales) y checkouts
+  payments  Payment[]
+  checkouts Checkout[]
 }
 
-model BinanceConfig {
-  id               String @id @default(uuid())
-  binanceId        String
-  binanceApiKey    String
-  binanceSecretKey String
+/**
+ * Credenciales por proveedor (1 por store y proveedor)
+ */
+model StoreCredential {
+  id        String   @id @default(uuid())
+  provider  Provider
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  apiKey    String
+  apiSecret String
+
+  storeId String
+  store   Store  @relation(fields: [storeId], references: [id])
+
+  // back-ref correcto (antes estaba con ????????)
+  binancePayments BinancePayPayment[]
+
+  @@unique([storeId, provider])
+}
+
+/**
+ * ===== Checkout → Attempt → Payment =====
+ */
+
+model Checkout {
+  id            String         @id @default(cuid())
+  orderId       String         @unique
+  priceCurrency String
+  priceAmount   String
+  status        CheckoutStatus @default(OPEN)
+  expiresAt     DateTime?
+
+  storeId String
+  store   Store  @relation(fields: [storeId], references: [id])
+
+  attempts      PaymentAttempt[]
+  enabledTokens Token[]
+
+  // back-ref 1–1 desde Payment (relación nombrada)
+  payment Payment? @relation("CheckoutPayment")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  storeId String @unique
-  store   Store  @relation(fields: [storeId], references: [id])
+  @@index([storeId, status])
 }
 
-model Wallet {
-  id        String    @id @default(uuid())
-  address   String
-  networkId String
-  label     String?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  storeId   String?
-  payments  Payment[] @relation("DepositWallet")
-  network   Network   @relation(fields: [networkId], references: [id])
-  store     Store?    @relation(fields: [storeId], references: [id])
+/**
+ * Cada elección/reintento del usuario
+ */
+model PaymentAttempt {
+  id         String   @id @default(cuid())
+  checkoutId String
+  checkout   Checkout @relation(fields: [checkoutId], references: [id])
 
-  @@unique([networkId, address])
+  rail   PaymentRail
+  status AttemptStatus @default(PENDING)
+
+  // ONCHAIN
+  onchain OnchainAttempt?
+
+  // BINANCE_PAY
+  binancePay BinancePayPayment?
+
+  // back-ref al Payment final (1–1) si este attempt gana
+  payment Payment? @relation("AttemptPayment")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([checkoutId, status])
+  @@index([rail, status])
 }
 
+/**
+ * Detalle del intento ONCHAIN
+ */
+model OnchainAttempt {
+  id               String  @id @default(uuid())
+  attemptId        String  @unique
+  transactionHash  String?
+  confirmations    Int     @default(0)
+  minConfirmations Int     @default(3)
+
+  networkId       String
+  depositWalletId String
+
+  attempt PaymentAttempt @relation(fields: [attemptId], references: [id])
+  network Network        @relation(fields: [networkId], references: [id])
+  wallet  Wallet         @relation(fields: [depositWalletId], references: [id])
+}
+
+/**
+ * Detalle del intento BINANCE PAY
+ */
+model BinancePayPayment {
+  id              String    @id @default(uuid())
+  attemptId       String    @unique
+  credentialId    String
+  merchantTradeNo String    @unique // usa attemptId o checkout.orderId para idempotencia
+  prepayId        String?
+  transactionId   String?
+  nativeStatus    String // "PENDING" | "SUCCESS" | "CLOSED" | etc.
+  qrCodeUrl       String?
+  expireAt        DateTime?
+  lastRequest     Json?
+  lastResponse    Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  attempt    PaymentAttempt  @relation(fields: [attemptId], references: [id])
+  credential StoreCredential @relation(fields: [credentialId], references: [id])
+
+  @@index([nativeStatus])
+}
+
+/**
+ * Pago final, sólo cuando un intento SUCCEEDED
+ */
 model Payment {
-  id      String @id @default(cuid())
-  orderId String
+  id        String        @id @default(cuid())
+  status    PaymentStatus @default(PENDING)
+  paidAt    DateTime?
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
 
+  // Intento ganador (inmutable) – relación 1–1 nombrada
+  attemptId String         @unique
+  attempt   PaymentAttempt @relation("AttemptPayment", fields: [attemptId], references: [id])
+
+  // Relación directa al checkout (1–1) – nombrada
+  checkoutId String   @unique
+  checkout   Checkout @relation("CheckoutPayment", fields: [checkoutId], references: [id])
+
+  // Copias para reporting (foto histórica)
+  orderId       String
   priceCurrency String
   priceAmount   String
+  rail          PaymentRail
 
-  payAmount     String?
-  payCurrencyId String?
-  payCurrency   Token?  @relation(fields: [payCurrencyId], references: [id])
+  storeId String
+  store   Store  @relation(fields: [storeId], references: [id])
 
-  paidAt    DateTime?
-  expiredAt DateTime?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-
-  status PaymentStatus @default(PENDING)
-
-  networkId       String?
-  depositWalletId String?
-  storeId         String?
-
-  successUrl String?
-  webhookUrl String?
-
-  verificationToken    String?
-  transactionHash      String?
-  confirmationAttempts Int      @default(0)
-  depositWallet        Wallet?  @relation("DepositWallet", fields: [depositWalletId], references: [id])
-  network              Network? @relation(fields: [networkId], references: [id])
-  store                Store?   @relation(fields: [storeId], references: [id])
+  @@index([storeId, status])
 }
+
+/**
+ * ===== Infra on-chain existente =====
+ */
 
 model Network {
   id                      String      @id
@@ -107,9 +249,10 @@ model Network {
   confirmationRetryDelay  Int         @default(1000)
   maxConfirmationAttempts Int         @default(100)
   minBlockConfirmations   Int         @default(3)
-  payments                Payment[]
-  tokens                  Token[]
-  wallets                 Wallet[]
+
+  tokens          Token[]
+  wallets         Wallet[]
+  onchainAttempts OnchainAttempt[]
 }
 
 model Token {
@@ -123,47 +266,27 @@ model Token {
   createdAt        DateTime      @default(now())
   updatedAt        DateTime      @updatedAt
   networkId        String
-  payments         Payment[]
   network          Network       @relation(fields: [networkId], references: [id])
+  Checkout         Checkout?     @relation(fields: [checkoutId], references: [id])
+  checkoutId       String?
 
   @@unique([networkId, address])
   @@index([canonicalTokenId])
   @@index([networkId, symbol])
 }
 
-enum NetworkType {
-  EVM
-  SOLANA
-}
+model Wallet {
+  id        String   @id @default(uuid())
+  address   String
+  networkId String
+  label     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  storeId   String?
 
-enum PaymentStatus {
-  PENDING
-  UNDER_PAYMENT
-  COMPLETED
-  EXPIRED
-  CANCELLED
-  PROCESSING
-}
+  network         Network          @relation(fields: [networkId], references: [id])
+  store           Store?           @relation(fields: [storeId], references: [id])
+  onchainAttempts OnchainAttempt[]
 
-enum TokenStandard {
-  NATIVE
-  ERC20
-  BEP20
-  TRC20
-  SPL
-}
-
-enum AddressBindingType {
-  TOPUP
-  SINGLE_USE_PAYMENT
-}
-
-enum TransactionStatus {
-  PENDING
-  CONFIRMED
-  FAILED
-}
-
-enum WebhookProvider {
-  ALCHEMY
+  @@unique([networkId, address])
 }
