@@ -90,7 +90,7 @@ export class AlchemyService {
   ) {
     return supportedTokens.find(
       (t) =>
-        t.address.toLowerCase() ===
+        t.address?.toLowerCase() ===
         activity.rawContract?.address?.toLowerCase(),
     )?.id;
   }
@@ -123,25 +123,11 @@ export class AlchemyService {
       where: {
         rail: PaymentRail.ONCHAIN,
         status: AttemptStatus.PENDING,
-        onchain: {
-          is: {
-            networkId: network,
-            wallet: {
-              is: {
-                address: {
-                  equals: activity.toAddress,
-                },
-                network: {
-                  id: network,
-                },
-              },
-            },
-          },
+        networkId: network,
+        depositWallet: {
+          address: activity.toAddress,
+          networkId: network,
         },
-      },
-      include: {
-        onchain: { include: { wallet: true, network: true } },
-        checkout: true,
       },
     });
 
@@ -157,10 +143,10 @@ export class AlchemyService {
     return paymentAttempt;
   }
 
-  private async validateAndUpdateCheckout(
-    paymentAttempt: PaymentAttempt & { checkout: Checkout },
-  ) {
-    const { checkout } = paymentAttempt;
+  private async validateAndUpdateCheckout(paymentAttempt: PaymentAttempt) {
+    const checkout = await this.db.checkout.findUnique({
+      where: { id: paymentAttempt.checkoutId },
+    });
 
     if (!checkout) {
       this.logger.error(`Checkout not found ${paymentAttempt.id}`);
@@ -171,10 +157,6 @@ export class AlchemyService {
       this.logger.error(
         `Activity received but checkout expired ${checkout.id}`,
       );
-      await this.db.paymentAttempt.update({
-        where: { id: paymentAttempt.id },
-        data: { status: AttemptStatus.EXPIRED },
-      });
     }
   }
 

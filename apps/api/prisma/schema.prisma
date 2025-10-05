@@ -103,8 +103,6 @@ model StoreCredential {
   storeId String
   store   Store  @relation(fields: [storeId], references: [id])
 
-  binancePayments BinancePayPayment[]
-
   @@unique([storeId, provider])
 }
 
@@ -123,10 +121,9 @@ model Checkout {
   storeId String
   store   Store  @relation(fields: [storeId], references: [id])
 
-  attempts              PaymentAttempt[]
-  enabledTokens         Token[]
-  enabledProviderTokens ProviderToken[]
-  enabledRails          PaymentRail[]
+  attempts      PaymentAttempt[]
+  enabledTokens Token[]
+  enabledRails  PaymentRail[]
 
   // back-ref 1–1 desde Payment (relación nombrada)
   payment Payment? @relation("CheckoutPayment")
@@ -140,6 +137,7 @@ model Checkout {
 /**
  * Cada elección/reintento del usuario
  */
+
 model PaymentAttempt {
   id         String   @id @default(cuid())
   checkoutId String
@@ -148,57 +146,23 @@ model PaymentAttempt {
   rail   PaymentRail
   status AttemptStatus @default(PENDING)
 
-  // ONCHAIN
-  onchain OnchainAttempt?
+  networkId String?
 
-  // BINANCE_PAY
-  binancePay BinancePayPayment?
-
-  // back-ref al Payment final (1–1) si este attempt gana
-  payment Payment? @relation("AttemptPayment")
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([checkoutId, status])
-  @@index([rail, status])
-}
-
-/**
- * Detalle del intento ONCHAIN
- */
-model OnchainAttempt {
-  id              String  @id @default(uuid())
-  attemptId       String  @unique
   transactionHash String?
   tokenId         String
   tokenPayAmount  String
-
-  networkId       String
-  depositWalletId String
-
-  attempt PaymentAttempt @relation(fields: [attemptId], references: [id])
-  network Network        @relation(fields: [networkId], references: [id])
-  wallet  Wallet         @relation(fields: [depositWalletId], references: [id])
-  token   Token          @relation(fields: [tokenId], references: [id])
-}
-
-/**
- * Detalle del intento BINANCE PAY
- */
-model BinancePayPayment {
-  id        String @id @default(uuid())
-  attemptId String @unique
-
-  credentialId String
-
-  tokenPayAmount String
+  depositWalletId String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  attempt    PaymentAttempt  @relation(fields: [attemptId], references: [id])
-  credential StoreCredential @relation(fields: [credentialId], references: [id])
+  // back-ref al Payment final (1–1) si este attempt gana
+  payment       Payment? @relation("AttemptPayment")
+  network       Network? @relation(fields: [networkId], references: [id])
+  depositWallet Wallet?  @relation(fields: [depositWalletId], references: [id])
+
+  @@index([checkoutId, status])
+  @@index([rail, status])
 }
 
 /**
@@ -247,57 +211,37 @@ model Network {
   maxConfirmationAttempts Int         @default(100)
   minBlockConfirmations   Int         @default(3)
 
-  tokens          Token[]
-  wallets         Wallet[]
-  onchainAttempts OnchainAttempt[]
+  tokens         Token[]
+  wallets        Wallet[]
+  PaymentAttempt PaymentAttempt[]
 }
 
 /**
  * ProviderToken.id and Token.id must be different
  */
 
-/**
- * ProviderToken.id and Token.id must be different
- */
-/**
- * model for provider tokens
- */
-model ProviderToken {
-  id       String   @id
-  provider Provider
-
-  providerTokenId  String
-  canonicalTokenId String
-  logoUrl          String
-  checkoutId       String?
-
-  checkout Checkout? @relation(fields: [checkoutId], references: [id])
-
-  @@unique([provider, providerTokenId])
-}
-
-/**
- * Token.id and ProviderToken.id must be different
- */
 model Token {
   id               String        @id
   canonicalTokenId String
+  providerTokenId  String?
+  rail             PaymentRail?
+  provider         Provider?
   standard         TokenStandard
-  address          String
-  decimals         Int
+  address          String?
+  decimals         Int?
   symbol           String
   createdAt        DateTime      @default(now())
   updatedAt        DateTime      @updatedAt
-  networkId        String
+  networkId        String?
 
   checkoutId String?
   logoUrl    String
 
-  network         Network          @relation(fields: [networkId], references: [id])
-  checkout        Checkout?        @relation(fields: [checkoutId], references: [id])
-  onchainAttempts OnchainAttempt[]
+  network  Network?  @relation(fields: [networkId], references: [id])
+  checkout Checkout? @relation(fields: [checkoutId], references: [id])
 
   @@unique([networkId, address])
+  @@unique([provider, providerTokenId])
   @@index([canonicalTokenId])
   @@index([networkId, symbol])
 }
@@ -311,9 +255,9 @@ model Wallet {
   updatedAt DateTime @updatedAt
   storeId   String?
 
-  network         Network          @relation(fields: [networkId], references: [id])
-  store           Store?           @relation(fields: [storeId], references: [id])
-  onchainAttempts OnchainAttempt[]
+  network        Network          @relation(fields: [networkId], references: [id])
+  store          Store?           @relation(fields: [storeId], references: [id])
+  PaymentAttempt PaymentAttempt[]
 
   @@unique([networkId, address])
 }
