@@ -2,8 +2,8 @@ import { ApiProperty, getSchemaPath } from '@nestjs/swagger';
 import { AttemptStatus, CheckoutStatus, PaymentRail } from '@prisma/client';
 import { Expose } from 'class-transformer';
 import { BinancePayAttemptResponseDto } from './binance-pay-attempt-response.dto';
-import { OnchainAttemptResponseDto } from './onchain-attempt-response.dto';
 import { PaymentResponseDto } from 'src/payments/dto/payment-response.dto';
+import { PaymentAttemptResponseDto } from './payment-attempt-response.dto';
 
 export class CheckoutResponseDto {
   @Expose()
@@ -32,12 +32,6 @@ export class CheckoutResponseDto {
   @ApiProperty({
     description: 'Payments attempts',
     isArray: true,
-    oneOf: [
-      { $ref: getSchemaPath(BinancePayAttemptResponseDto) },
-      { $ref: getSchemaPath(OnchainAttemptResponseDto) },
-    ],
   })
-  paymentsAttempts: Array<
-    BinancePayAttemptResponseDto | OnchainAttemptResponseDto
-  >;
+  paymentsAttempts: Array<PaymentAttemptResponseDto>;
 }

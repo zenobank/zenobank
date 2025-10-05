@@ -11,13 +11,4 @@ export class CreateCheckoutAttemptDto {
   @MaxLength(256)
   @IsNotEmpty()
   tokenId: string;
-
-  @ApiProperty({
-    description: 'Payment rail to use for this attempt',
-    enum: PaymentRail,
-    example: PaymentRail.ONCHAIN,
-  })
-  @IsEnum(PaymentRail)
-  @IsNotEmpty()
-  rail: PaymentRail;
 }

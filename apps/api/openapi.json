@@ -316,8 +316,8 @@
       }
     },
     "/api/v1/checkouts/{id}/attempts": {
-      "get": {
-        "operationId": "CheckoutsController_getCheckoutAttempts_v1",
+      "post": {
+        "operationId": "CheckoutsController_createCheckoutAttempt_v1",
         "parameters": [
           {
             "name": "id",
@@ -326,35 +326,12 @@
             "schema": {
               "type": "string"
             }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/CheckoutAttemptResponseDto"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "summary": "Get checkout attempts by ID",
-        "tags": [
-          "Checkouts"
-        ]
-      },
-      "post": {
-        "operationId": "CheckoutsController_createCheckoutAttempt_v1",
-        "parameters": [
+          },
           {
-            "name": "id",
+            "name": "x-api-key",
             "required": true,
-            "in": "path",
+            "in": "header",
+            "description": "External API Key",
             "schema": {
               "type": "string"
             }
@@ -376,12 +353,17 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CheckoutAttemptResponseDto"
+                  "type": "object"
                 }
               }
             }
           }
         },
+        "security": [
+          {
+            "x-api-key": []
+          }
+        ],
         "summary": "Create a new checkout attempt",
         "tags": [
           "Checkouts"
@@ -419,6 +401,7 @@
           },
           "networkId": {
             "type": "string",
+            "nullable": true,
             "example": "ETHEREUM_MAINNET"
           },
           "standard": {
@@ -436,10 +419,12 @@
           },
           "address": {
             "type": "string",
+            "nullable": true,
             "example": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
           },
           "decimals": {
             "type": "number",
+            "nullable": true,
             "minimum": 0,
             "example": 6
           },
@@ -776,68 +761,9 @@
           "updatedAt"
         ]
       },
-      "CheckoutAttemptResponseDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "Unique identifier for the payment attempt"
-          },
-          "checkoutId": {
-            "type": "string",
-            "description": "Checkout ID this attempt belongs to"
-          },
-          "rail": {
-            "type": "string",
-            "description": "Payment rail used for this attempt",
-            "enum": [
-              "ONCHAIN",
-              "CUSTODIAL"
-            ]
-          },
-          "status": {
-            "type": "string",
-            "description": "Status of the payment attempt",
-            "enum": [
-              "PENDING",
-              "PROCESSING",
-              "SUCCEEDED",
-              "FAILED",
-              "EXPIRED"
-            ]
-          },
-          "createdAt": {
-            "format": "date-time",
-            "type": "string",
-            "description": "Timestamp when the attempt was created"
-          },
-          "updatedAt": {
-            "format": "date-time",
-            "type": "string",
-            "description": "Timestamp when the attempt was last updated"
-          }
-        },
-        "required": [
-          "id",
-          "checkoutId",
-          "rail",
-          "status",
-          "createdAt",
-          "updatedAt"
-        ]
-      },
       "CreateCheckoutAttemptDto": {
         "type": "object",
         "properties": {
-          "rail": {
-            "type": "string",
-            "description": "Payment rail to use for this attempt",
-            "enum": [
-              "ONCHAIN",
-              "CUSTODIAL"
-            ],
-            "example": "ONCHAIN"
-          },
           "tokenId": {
             "type": "string",
             "maxLength": 256,
@@ -846,7 +772,6 @@
           }
         },
         "required": [
-          "rail",
           "tokenId"
         ]
       }
