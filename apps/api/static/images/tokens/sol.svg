@@ -1,0 +1,10 @@
+<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="solana-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#9945FF"/>
+      <stop offset="100%" stop-color="#14F195"/>
+    </linearGradient>
+  </defs>
+  <circle cx="16" cy="16" r="16" fill="url(#solana-gradient)"/>
+  <path d="M6.5 22.5c0-.8.3-1.5.9-2L14 14c.6-.6 1.4-.9 2.2-.9h9.3c.8 0 1.2.9.7 1.4l-6.6 6.6c-.6.6-1.4.9-2.2.9H8.1c-.9 0-1.6-.7-1.6-1.5zm0-13c0 .8.3 1.5.9 2L14 18c.6.6 1.4.9 2.2.9h9.3c.8 0 1.2-.9.7-1.4L19.6 11c-.6-.6-1.4-.9-2.2-.9H8.1c-.9 0-1.6.7-1.6 1.5zm19 4.5c0-.8-.3-1.5-.9-2L18 5.5c-.6-.6-1.4-.9-2.2-.9H6.5c-.8 0-1.2.9-.7 1.4L12.4 12c.6.6 1.4.9 2.2.9h9.3c.9 0 1.6-.7 1.6-1.5z" fill="white"/>
+</svg>
