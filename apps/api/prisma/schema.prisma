@@ -129,18 +129,18 @@ model OnChainPaymentAttempt {
   network       Network      @relation(fields: [networkId], references: [id])
   depositWallet Wallet       @relation(fields: [depositWalletId], references: [id])
 
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  Payment   Payment[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  payment   Payment?
 }
 
 model BinancePayPaymentAttempt {
-  id     String        @id @default(cuid())
-  status AttemptStatus @default(PENDING)
-
-  checkoutId String
-  checkout   Checkout  @relation(fields: [checkoutId], references: [id])
-  Payment    Payment[]
+  id             String        @id @default(cuid())
+  status         AttemptStatus @default(PENDING)
+  tokenPayAmount String
+  checkoutId     String
+  checkout       Checkout      @relation(fields: [checkoutId], references: [id])
+  payment        Payment?
 }
 
 /**
@@ -153,8 +153,8 @@ model Payment {
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt
 
-  onchainAttemptId String?
-  binanceAttemptId String?
+  onchainAttemptId String? @unique
+  binanceAttemptId String? @unique
 
   onchainAttempt OnChainPaymentAttempt?    @relation(fields: [onchainAttemptId], references: [id])
   binanceAttempt BinancePayPaymentAttempt? @relation(fields: [binanceAttemptId], references: [id])
@@ -217,7 +217,7 @@ model OnchainToken {
 }
 
 model BinancePayCredential {
-  id        String   @id
+  id        String   @id @default(uuid())
   storeId   String
   store     Store    @relation(fields: [storeId], references: [id])
   createdAt DateTime @default(now())
@@ -235,6 +235,7 @@ model BinancePayToken {
   id               String @id
   canonicalTokenId String
   binanceTokenId   String
+  symbol           String
 
   name      String
   logoUrl   String

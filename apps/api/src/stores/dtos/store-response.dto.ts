@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose, Type } from 'class-transformer';
 import { WalletResponseDto } from 'src/wallets/dto/wallet.response.dto';
+import { BinancePayCredentialResponseDto } from './binance-pay-credential-response.dto';
 
 export class StoreResponseDto {
   @Expose()
@@ -23,6 +24,10 @@ export class StoreResponseDto {
     example: 'cuid_1234567890abcdef',
   })
   apiKey: string;
+
+  @Expose()
+  @Type(() => BinancePayCredentialResponseDto)
+  binancePayCredential: BinancePayCredentialResponseDto | null;
 
   @Expose()
   @Type(() => WalletResponseDto)

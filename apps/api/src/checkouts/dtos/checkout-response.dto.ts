@@ -1,7 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { CheckoutStatus, Rail } from '@prisma/client';
+import { CheckoutStatus } from '@prisma/client';
 import { Exclude, Expose, Type } from 'class-transformer';
-import { TokenResponseDto } from 'src/tokens/dto/on-chain-token-response';
+import { OnchainAttemptResponseDto } from '../attempts/dtos/onchain-attempt-response.dto';
+import { BinancePayAttemptResponseDto } from '../attempts/dtos/binance-pay-attempt-response.dto';
+import { BinancePayTokenResponseDto } from 'src/tokens/dto/binance-pay-token-response';
+import { OnChainTokenResponseDto } from 'src/tokens/dto/on-chain-token-response';
 
 @Exclude()
 export class CheckoutResponseDto {
@@ -62,14 +65,4 @@ export class CheckoutResponseDto {
     description: 'Creation date',
   })
   createdAt: Date;
-
-  @Expose()
-  @ApiProperty({
-    example: '2025-10-04T10:00:00Z',
-    description: 'Enabled tokens',
-    isArray: true,
-    type: TokenResponseDto,
-  })
-  @Type(() => TokenResponseDto)
-  enabledTokens: TokenResponseDto[];
 }

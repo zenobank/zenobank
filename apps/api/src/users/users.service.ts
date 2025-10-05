@@ -20,7 +20,7 @@ export class UsersService {
     // First, try to find the user
     let user = await this.db.user.findUnique({
       where: { id: userId },
-      include: { stores: true },
+      include: { stores: { include: { binancePayCredential: true } } },
     });
 
     // If user doesn't exist, create them
@@ -34,7 +34,7 @@ export class UsersService {
             },
           },
         },
-        include: { stores: true },
+        include: { stores: { include: { binancePayCredential: true } } },
       });
     } else if (user.stores.length === 0) {
       // If user exists but has no stores, create a default store
@@ -42,6 +42,9 @@ export class UsersService {
         data: {
           name: 'Default Store',
           userId: user.id,
+        },
+        include: {
+          binancePayCredential: true,
         },
       });
       user.stores.push(store);
@@ -52,6 +55,7 @@ export class UsersService {
       stores: user.stores.map((store) => ({
         ...store,
         apiKey: store.apiKey,
+        binancePayCredential: store.binancePayCredential,
         wallets: [],
       })),
     });
@@ -66,6 +70,13 @@ export class UsersService {
         stores: {
           select: {
             apiKey: true,
+            binancePayCredential: {
+              select: {
+                id: true,
+                accountId: true,
+                apiKey: true,
+              },
+            },
             wallets: {
               select: {
                 id: true,

@@ -13,7 +13,7 @@ import { CheckoutResponseDto } from './dtos/checkout-response.dto';
 import { ApiKeyAuth } from 'src/auth/api-key-auth.decorator';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { API_KEY_HEADER } from 'src/auth/auth.constants';
-import { CreateCheckoutAttemptDto } from './attempts/dtos/create-checkout-attempt.dto';
+import { CreatePaymentAttemptDto } from './attempts/dtos/create-payment-attempt.dto';
 import { AttemptsService } from './attempts/attempts.service';
 
 @ApiTags('Checkouts')
@@ -58,7 +58,7 @@ export class CheckoutsController {
   async createCheckoutAttempt(
     @Param('id') checkoutId: string,
     @Headers(API_KEY_HEADER) apiKey: string,
-    @Body() createCheckoutAttemptDto: CreateCheckoutAttemptDto,
+    @Body() createCheckoutAttemptDto: CreatePaymentAttemptDto,
   ): Promise<any> {
     return this.attemptsService.createCheckoutAttempt(
       { checkoutId, apiKey },

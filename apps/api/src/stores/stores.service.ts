@@ -1,14 +1,14 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateStoreDto } from './dtos/create-store.dto';
-import { CreateStoreCredentialDto } from './dtos/create-store-credential.dto';
+import { CreateBinancePayCredentialDto } from './dtos/create-binance-pay-credential.dto';
 import { StoreResponseDto } from './dtos/store-response.dto';
 import { toEnumValue } from 'src/lib/utils/to-enum';
 import { SupportedNetworksId } from 'src/networks/network.interface';
 import { toDto } from 'src/lib/utils/to-dto';
 import { WalletService } from 'src/wallets/wallet.service';
 import { Store } from '@prisma/client';
-import { StoreCredentialDto } from './dtos/store-credential.response.dto';
+import { BinancePayCredentialResponseDto } from './dtos/binance-pay-credential-response.dto';
 
 @Injectable()
 export class StoresService {
@@ -16,19 +16,6 @@ export class StoresService {
     private readonly db: PrismaService,
     private readonly walletService: WalletService,
   ) {}
-  async getStoreCredentials(apiKey: string): Promise<StoreCredentialDto[]> {
-    const credentials = await this.db.storeCredential.findMany({
-      where: {
-        apiKey,
-      },
-    });
-    if (!credentials) {
-      throw new NotFoundException('Store not found');
-    }
-    return credentials.map((credential) =>
-      toDto(StoreCredentialDto, credential),
-    );
-  }
 
   async createStore(
     createStoreDto: CreateStoreDto,
@@ -52,6 +39,13 @@ export class StoresService {
                 id: true,
               },
             },
+          },
+        },
+        binancePayCredential: {
+          select: {
+            id: true,
+            accountId: true,
+            apiKey: true,
           },
         },
       },
@@ -78,24 +72,24 @@ export class StoresService {
     return store;
   }
 
-  async createStoreCredential(
+  async createBinancePayCredential(
     apiKey: string,
-    createStoreCredentialDto: CreateStoreCredentialDto,
-  ): Promise<StoreCredentialDto> {
+    data: CreateBinancePayCredentialDto,
+  ): Promise<BinancePayCredentialResponseDto> {
     const store = await this.getStore(apiKey);
 
     if (!store) {
       throw new NotFoundException('Store not found');
     }
-    const credential = await this.db.storeCredential.create({
+    const credential = await this.db.binancePayCredential.create({
       data: {
         storeId: store.id,
-        provider: createStoreCredentialDto.provider,
-        apiKey: createStoreCredentialDto.apiKey,
-        apiSecret: createStoreCredentialDto.apiSecret,
+        apiKey: data.apiKey,
+        accountId: data.accountId,
+        apiSecret: data.apiSecret,
       },
     });
 
-    return toDto(StoreCredentialDto, credential);
+    return toDto(BinancePayCredentialResponseDto, credential);
   }
 }

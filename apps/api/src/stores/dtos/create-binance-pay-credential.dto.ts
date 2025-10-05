@@ -1,20 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
 
-enum Provider {
-  BINANCE_PAY = 'BINANCE_PAY',
-}
-
-export class CreateStoreCredentialDto {
-  @IsNotEmpty()
-  @IsEnum(Provider)
-  @ApiProperty({
-    enum: Provider,
-    example: Provider.BINANCE_PAY,
-    description: 'Credential provider',
-  })
-  provider: Provider;
-
+export class CreateBinancePayCredentialDto {
   @IsNotEmpty()
   @IsString()
   @ApiProperty({
@@ -30,4 +17,12 @@ export class CreateStoreCredentialDto {
     description: 'API Secret',
   })
   apiSecret: string;
+
+  @IsNotEmpty()
+  @IsString()
+  @ApiProperty({
+    example: 'your-account-id',
+    description: 'Account ID',
+  })
+  accountId: string;
 }

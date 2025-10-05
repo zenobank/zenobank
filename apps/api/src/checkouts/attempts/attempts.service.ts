@@ -6,11 +6,10 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 
-import { CreateCheckoutAttemptDto } from './dtos/create-checkout-attempt.dto';
+import { CreatePaymentAttemptDto } from './dtos/create-payment-attempt.dto';
 import { TokensService } from 'src/tokens/tokens.service';
-import { Rail } from '@prisma/client';
-import { PaymentAttemptResponseDto } from './dtos/payment-attempt-response.dto';
-import { toDto } from 'src/lib/utils/to-dto';
+
+import { MethodType } from '@prisma/client';
 
 @Injectable()
 export class AttemptsService {
@@ -21,8 +20,8 @@ export class AttemptsService {
 
   async createCheckoutAttempt(
     { checkoutId, apiKey }: { checkoutId: string; apiKey: string },
-    createCheckoutAttemptDto: CreateCheckoutAttemptDto,
-  ): Promise<PaymentAttemptResponseDto> {
+    createCheckoutAttemptDto: CreatePaymentAttemptDto,
+  ): Promise<void> {
     const checkout = await this.db.checkout.findUnique({
       where: { id: checkoutId },
     });
@@ -33,25 +32,23 @@ export class AttemptsService {
       where: { apiKey },
       include: {
         wallets: true,
-        credentials: true,
+        binancePayCredential: true,
       },
     });
     if (!store) {
       throw new NotFoundException('Store not found');
     }
-    const token = await this.tokensService.getToken(
-      createCheckoutAttemptDto.tokenId,
-    );
-    if (!token) {
-      throw new NotFoundException('Token not found');
-    }
-    if (token.rail === Rail.ONCHAIN) {
+    const { tokenId, methodType } = createCheckoutAttemptDto;
+    if (methodType === MethodType.CRYPTO_ONCHAIN) {
+      const token = await this.tokensService.getOnChainToken(tokenId);
+      if (!token) {
+        throw new NotFoundException('Token not found');
+      }
       if (store.wallets.length <= 0 || !store.wallets[0]) {
         throw new UnprocessableEntityException('Wallet not found');
       }
-      const paymentAttempt = await this.db.paymentAttempt.create({
+      const onChainPaymentAttempt = await this.db.onChainPaymentAttempt.create({
         data: {
-          rail: Rail.ONCHAIN,
           checkoutId,
           tokenId: token.id,
           tokenPayAmount: checkout.priceAmount,
@@ -59,29 +56,25 @@ export class AttemptsService {
           networkId: token.networkId,
         },
       });
-      return toDto(PaymentAttemptResponseDto, {
-        ...paymentAttempt,
-      });
-    } else if (token.rail === Rail.CUSTODIAL) {
-      const storeCredentials = store.credentials.find(
-        (credential) => credential.provider === token.provider,
-      );
-      if (!storeCredentials) {
-        throw new UnprocessableEntityException('Store credential not found');
+    } else if (methodType === MethodType.BINANCE_PAY) {
+      const token = await this.tokensService.getBinancePayToken(tokenId);
+      if (!token) {
+        throw new NotFoundException('Token not found');
       }
-      const paymentAttempt = await this.db.paymentAttempt.create({
-        data: {
-          rail: Rail.CUSTODIAL,
-          checkoutId,
-          tokenId: token.id,
-          tokenPayAmount: checkout.priceAmount,
-        },
-      });
-      return toDto(PaymentAttemptResponseDto, {
-        ...paymentAttempt,
-      });
+      if (!store.binancePayCredential) {
+        throw new UnprocessableEntityException(
+          'Binance pay credential not found',
+        );
+      }
+      const binancePayPaymentAttempt =
+        await this.db.binancePayPaymentAttempt.create({
+          data: {
+            checkoutId,
+            tokenPayAmount: checkout.priceAmount,
+          },
+        });
     } else {
-      throw new InternalServerErrorException('Invalid rail');
+      throw new InternalServerErrorException('Invalid method type');
     }
   }
 }

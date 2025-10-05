@@ -1,23 +1,50 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { publicClients } from 'src/lib/contants/client';
-import { ms } from 'src/lib/utils/ms';
-import { requestWithRepeatDelay } from 'src/lib/utils/request-with-repeat-delay';
-import { erc20Abi } from 'viem';
-import { isNativeToken, nativeTokenAddress } from './lib/utils';
+import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Token } from '@prisma/client';
-import { SupportedNetworksId } from 'src/networks/network.interface';
-import { TokenResponseDto } from './dto/on-chain-token-response';
+import { OnChainTokenResponseDto } from './dto/on-chain-token-response';
 import { toDto } from 'src/lib/utils/to-dto';
+import { BinancePayTokenResponseDto } from './dto/binance-pay-token-response';
 
 @Injectable()
 export class TokensService {
   private readonly logger = new Logger(TokensService.name);
   constructor(private db: PrismaService) {}
 
-  async getOnChainTokens(): Promise<TokenResponseDto[]> {
+  async getOnChainTokens(): Promise<OnChainTokenResponseDto[]> {
     const tokens = await this.db.onchainToken.findMany({});
-    const tokensDto = tokens.map((token) => toDto(TokenResponseDto, token));
+    const tokensDto = tokens.map((token) =>
+      toDto(OnChainTokenResponseDto, token),
+    );
     return tokensDto;
+  }
+  async getOnChainToken(
+    tokenId: string,
+  ): Promise<OnChainTokenResponseDto | null> {
+    const token = await this.db.onchainToken.findUnique({
+      where: { id: tokenId },
+    });
+    if (!token) {
+      return null;
+    }
+    return toDto(OnChainTokenResponseDto, token);
+  }
+
+  async getBinancePayTokens(): Promise<BinancePayTokenResponseDto[]> {
+    const tokens = await this.db.binancePayToken.findMany({});
+    const tokensDto = tokens.map((token) =>
+      toDto(BinancePayTokenResponseDto, token),
+    );
+    return tokensDto;
+  }
+
+  async getBinancePayToken(
+    tokenId: string,
+  ): Promise<BinancePayTokenResponseDto | null> {
+    const token = await this.db.binancePayToken.findUnique({
+      where: { id: tokenId },
+    });
+    if (!token) {
+      return null;
+    }
+    return toDto(BinancePayTokenResponseDto, token);
   }
 }

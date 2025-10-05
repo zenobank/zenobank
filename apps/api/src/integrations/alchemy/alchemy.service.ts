@@ -2,10 +2,8 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 import {
   AttemptStatus,
   Checkout,
-  PaymentAttempt,
-  Rail,
+  OnChainPaymentAttempt,
   PaymentStatus,
-  Token,
 } from '@prisma/client';
 import { SupportedNetworksId } from 'src/networks/network.interface';
 import { Alchemy, WebhookType as AlchemyWebhookType } from 'alchemy-sdk';
@@ -26,6 +24,7 @@ import { WEBHOOKS_PATHS } from 'src/webhooks/webhooks.constants';
 import { AddressActivityWebhookDto } from 'src/wallets/dto/address-activity-webhook.dto';
 import { toDto } from 'src/lib/utils/to-dto';
 import { TokensService } from 'src/tokens/tokens.service';
+import { OnChainTokenResponseDto } from 'src/tokens/dto/on-chain-token-response';
 
 @Injectable()
 export class AlchemyService {
@@ -47,9 +46,10 @@ export class AlchemyService {
       return;
     }
 
-    const supportedTokens = await this.tokenService.getNetworkTokens(network);
-    const supportedTokensAddresses =
-      this.tokenService.getTokenAddresses(supportedTokens);
+    const supportedTokens = await this.tokenService.getOnChainTokens();
+    const supportedTokensAddresses = supportedTokens.map(
+      (token) => token.address,
+    );
 
     const filteredActivities = this.filterSupportedTokenActivities(
       body.event.activity,
@@ -66,7 +66,7 @@ export class AlchemyService {
 
   private async processActivity(
     activity: AddressActivity,
-    supportedTokens: Token[],
+    supportedTokens: OnChainTokenResponseDto[],
     network: SupportedNetworksId,
   ) {
     const tokenAmount = activity.value;
@@ -86,7 +86,7 @@ export class AlchemyService {
 
   private findTokenIdFromActivity(
     activity: AddressActivity,
-    supportedTokens: Token[],
+    supportedTokens: OnChainTokenResponseDto[],
   ) {
     return supportedTokens.find(
       (t) =>
@@ -119,9 +119,8 @@ export class AlchemyService {
       this.logger.error('Invalid activity', { activity });
       return null;
     }
-    const paymentAttempt = await this.db.paymentAttempt.findFirst({
+    const paymentAttempt = await this.db.onChainPaymentAttempt.findFirst({
       where: {
-        rail: Rail.ONCHAIN,
         status: AttemptStatus.PENDING,
         networkId: network,
         depositWallet: {
@@ -143,7 +142,9 @@ export class AlchemyService {
     return paymentAttempt;
   }
 
-  private async validateAndUpdateCheckout(paymentAttempt: PaymentAttempt) {
+  private async validateAndUpdateCheckout(
+    paymentAttempt: OnChainPaymentAttempt,
+  ) {
     const checkout = await this.db.checkout.findUnique({
       where: { id: paymentAttempt.checkoutId },
     });

@@ -15,8 +15,6 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { StoresModule } from './stores/stores.module';
 import { CheckoutsModule } from './checkouts/checkouts.module';
-import { ProvidersModule } from './integrations/providers.module';
-import { ProvidersModule } from './providers/providers.module';
 
 @Module({
   imports: [
@@ -49,7 +47,6 @@ import { ProvidersModule } from './providers/providers.module';
     AuthModule,
     StoresModule,
     CheckoutsModule,
-    ProvidersModule,
   ],
   controllers: [],
   providers: [],

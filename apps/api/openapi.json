@@ -1,9 +1,9 @@
 {
   "openapi": "3.0.0",
   "paths": {
-    "/api/v1/tokens": {
+    "/api/v1/tokens/on-chain": {
       "get": {
-        "operationId": "TokensController_getTokens_v1",
+        "operationId": "TokensController_getOnChainTokens_v1",
         "parameters": [],
         "responses": {
           "200": {
@@ -13,7 +13,31 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/TokenResponseDto"
+                    "$ref": "#/components/schemas/OnChainTokenResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Tokens"
+        ]
+      }
+    },
+    "/api/v1/tokens/binance-pay": {
+      "get": {
+        "operationId": "TokensController_getBinancePayTokens_v1",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BinancePayTokenResponseDto"
                   }
                 }
               }
@@ -152,9 +176,9 @@
         ]
       }
     },
-    "/api/v1/stores/credentials": {
+    "/api/v1/stores/providers/binance-pay": {
       "post": {
-        "operationId": "StoresController_createStoreCredential_v1",
+        "operationId": "StoresController_createBinancePayCredential_v1",
         "parameters": [
           {
             "name": "x-api-key",
@@ -171,7 +195,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateStoreCredentialDto"
+                "$ref": "#/components/schemas/CreateBinancePayCredentialDto"
               }
             }
           }
@@ -182,7 +206,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/StoreCredentialDto"
+                  "$ref": "#/components/schemas/BinancePayCredentialResponseDto"
                 }
               }
             }
@@ -194,44 +218,6 @@
           }
         ],
         "summary": "Create a new store credential",
-        "tags": [
-          "Stores"
-        ]
-      },
-      "get": {
-        "operationId": "StoresController_getStoreCredentials_v1",
-        "parameters": [
-          {
-            "name": "x-api-key",
-            "required": true,
-            "in": "header",
-            "description": "External API Key",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/StoreCredentialDto"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "x-api-key": []
-          }
-        ],
-        "summary": "Get all store credentials",
         "tags": [
           "Stores"
         ]
@@ -342,7 +328,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateCheckoutAttemptDto"
+                "$ref": "#/components/schemas/CreatePaymentAttemptDto"
               }
             }
           }
@@ -388,7 +374,7 @@
       }
     },
     "schemas": {
-      "TokenResponseDto": {
+      "OnChainTokenResponseDto": {
         "type": "object",
         "properties": {
           "id": {
@@ -399,13 +385,51 @@
             "type": "string",
             "example": "USDC"
           },
-          "rail": {
+          "symbol": {
             "type": "string",
-            "enum": [
-              "ONCHAIN",
-              "CUSTODIAL"
-            ],
-            "example": "ONCHAIN"
+            "example": "USDC"
+          },
+          "logoUrl": {
+            "type": "string",
+            "example": "https://example.com/logo.png"
+          },
+          "address": {
+            "type": "string",
+            "example": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+          },
+          "decimals": {
+            "type": "number",
+            "example": 6
+          },
+          "networkId": {
+            "type": "string",
+            "example": "ETHEREUM_MAINNET"
+          }
+        },
+        "required": [
+          "id",
+          "canonicalTokenId",
+          "symbol",
+          "logoUrl",
+          "address",
+          "decimals",
+          "networkId"
+        ]
+      },
+      "BinancePayTokenResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "USDC_BINANCE_PAY"
+          },
+          "canonicalTokenId": {
+            "type": "string",
+            "example": "USDC"
+          },
+          "binanceTokenId": {
+            "type": "string",
+            "example": "USDC"
           },
           "symbol": {
             "type": "string",
@@ -413,50 +437,15 @@
           },
           "logoUrl": {
             "type": "string",
-            "format": "uri",
             "example": "https://example.com/logo.png"
-          },
-          "address": {
-            "type": "string",
-            "nullable": true,
-            "example": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
-          },
-          "decimals": {
-            "type": "number",
-            "nullable": true,
-            "minimum": 0,
-            "example": 6
-          },
-          "networkId": {
-            "type": "string",
-            "nullable": true,
-            "example": "ETHEREUM_MAINNET"
-          },
-          "providerTokenId": {
-            "type": "string",
-            "nullable": true,
-            "example": null
-          },
-          "provider": {
-            "type": "string",
-            "nullable": true,
-            "enum": [
-              "BINANCE_PAY"
-            ],
-            "example": null
           }
         },
         "required": [
           "id",
           "canonicalTokenId",
-          "rail",
+          "binanceTokenId",
           "symbol",
-          "logoUrl",
-          "address",
-          "decimals",
-          "networkId",
-          "providerTokenId",
-          "provider"
+          "logoUrl"
         ]
       },
       "NetworkResponseDto": {
@@ -560,6 +549,23 @@
           "label"
         ]
       },
+      "BinancePayCredentialResponseDto": {
+        "type": "object",
+        "properties": {
+          "apiKey": {
+            "type": "string",
+            "example": "cuid_1234567890abcdef"
+          },
+          "accountId": {
+            "type": "string",
+            "example": "568321"
+          }
+        },
+        "required": [
+          "apiKey",
+          "accountId"
+        ]
+      },
       "StoreResponseDto": {
         "type": "object",
         "properties": {
@@ -584,13 +590,22 @@
             "items": {
               "$ref": "#/components/schemas/WalletResponseDto"
             }
+          },
+          "binancePayCredential": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BinancePayCredentialResponseDto"
+              }
+            ]
           }
         },
         "required": [
           "id",
           "name",
           "apiKey",
-          "wallets"
+          "wallets",
+          "binancePayCredential"
         ]
       },
       "UserResponseDto": {
@@ -614,17 +629,9 @@
           "stores"
         ]
       },
-      "CreateStoreCredentialDto": {
+      "CreateBinancePayCredentialDto": {
         "type": "object",
         "properties": {
-          "provider": {
-            "type": "string",
-            "enum": [
-              "BINANCE_PAY"
-            ],
-            "example": "BINANCE_PAY",
-            "description": "Credential provider"
-          },
           "apiKey": {
             "type": "string",
             "example": "your-api-key",
@@ -634,31 +641,17 @@
             "type": "string",
             "example": "your-api-secret",
             "description": "API Secret"
-          }
-        },
-        "required": [
-          "provider",
-          "apiKey",
-          "apiSecret"
-        ]
-      },
-      "StoreCredentialDto": {
-        "type": "object",
-        "properties": {
-          "provider": {
-            "type": "string",
-            "description": "Provider for the store",
-            "example": "BINANCE_PAY"
           },
-          "apiKey": {
+          "accountId": {
             "type": "string",
-            "description": "API key for the store",
-            "example": "cuid_1234567890abcdef"
+            "example": "your-account-id",
+            "description": "Account ID"
           }
         },
         "required": [
-          "provider",
-          "apiKey"
+          "apiKey",
+          "apiSecret",
+          "accountId"
         ]
       },
       "CreateCheckoutDto": {
@@ -738,14 +731,6 @@
             "type": "string",
             "example": "2025-10-04T10:00:00Z",
             "description": "Creation date"
-          },
-          "enabledTokens": {
-            "example": "2025-10-04T10:00:00Z",
-            "description": "Enabled tokens",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/TokenResponseDto"
-            }
           }
         },
         "required": [
@@ -756,11 +741,10 @@
           "status",
           "expiresAt",
           "checkoutUrl",
-          "createdAt",
-          "enabledTokens"
+          "createdAt"
         ]
       },
-      "CreateCheckoutAttemptDto": {
+      "CreatePaymentAttemptDto": {
         "type": "object",
         "properties": {
           "tokenId": {
@@ -768,10 +752,23 @@
             "maxLength": 256,
             "description": "Token ID to use for this attempt",
             "example": "USDC_ETHEREUM_MAINNET"
+          },
+          "checkoutId": {
+            "type": "string",
+            "maxLength": 256,
+            "description": "Checkout ID to use for this attempt",
+            "example": "ckl1234567890"
+          },
+          "methodType": {
+            "type": "object",
+            "description": "Method type to use for this attempt",
+            "example": "CRYPTO_ONCHAIN"
           }
         },
         "required": [
-          "tokenId"
+          "tokenId",
+          "checkoutId",
+          "methodType"
         ]
       }
     }

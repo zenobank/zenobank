@@ -1,18 +1,11 @@
-import {
-  BadRequestException,
-  Injectable,
-  Logger,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateCheckoutDto } from './dtos/create-checkout.dto';
 import { CheckoutResponseDto } from './dtos/checkout-response.dto';
 import { toDto } from 'src/lib/utils/to-dto';
 import { StoresService } from 'src/stores/stores.service';
 import { TokensService } from 'src/tokens/tokens.service';
-import { Rail } from '@prisma/client';
 import { getCheckoutUrl } from 'src/payments/lib/utils';
-import { TokenResponseDto } from 'src/tokens/dto/on-chain-token-response';
 
 @Injectable()
 export class CheckoutsService {
@@ -35,7 +28,10 @@ export class CheckoutsService {
       throw new NotFoundException('Store not found');
     }
 
-    const tokens = await this.tokensService.getTokens();
+    const [onchainTokens, binancePayTokens] = await Promise.all([
+      this.tokensService.getOnChainTokens(),
+      this.tokensService.getBinancePayTokens(),
+    ]);
 
     const checkout = await this.db.checkout.create({
       data: {
@@ -43,9 +39,11 @@ export class CheckoutsService {
         priceAmount,
         priceCurrency,
         storeId: store.id,
-        enabledRails: [...Object.values(Rail)],
-        enabledTokens: {
-          connect: tokens.map((token) => ({ id: token.id })),
+        enabledOnchainTokens: {
+          connect: onchainTokens.map((token) => ({ id: token.id })),
+        },
+        enabledBinancePayTokens: {
+          connect: binancePayTokens.map((token) => ({ id: token.id })),
         },
       },
     });
@@ -57,7 +55,6 @@ export class CheckoutsService {
     return toDto(CheckoutResponseDto, {
       ...checkout,
       checkoutUrl: getCheckoutUrl(checkout.id),
-      enabledTokens: tokens.map((token) => toDto(TokenResponseDto, token)),
     });
   }
 
@@ -65,7 +62,8 @@ export class CheckoutsService {
     const checkout = await this.db.checkout.findUnique({
       where: { id },
       include: {
-        enabledTokens: true,
+        enabledOnchainTokens: true,
+        enabledBinancePayTokens: true,
       },
     });
 
@@ -76,9 +74,6 @@ export class CheckoutsService {
     return toDto(CheckoutResponseDto, {
       ...checkout,
       checkoutUrl: getCheckoutUrl(checkout.id),
-      enabledTokens: checkout.enabledTokens.map((token) =>
-        toDto(TokenResponseDto, token),
-      ),
     });
   }
 }
