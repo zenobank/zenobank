@@ -130,8 +130,6 @@ model Checkout {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  @@unique([storeId, orderId])
 }
 
 /**

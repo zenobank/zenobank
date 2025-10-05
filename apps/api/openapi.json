@@ -672,7 +672,6 @@
           },
           "priceAmount": {
             "type": "string",
-            "minimum": 1,
             "example": "100.12",
             "description": "Price amount in the specified currency"
           },
@@ -729,21 +728,6 @@
             "example": "2025-10-05T12:00:00Z",
             "description": "Expiration date"
           },
-          "enabledRails": {
-            "type": "array",
-            "example": [
-              "ONCHAIN",
-              "BINANCE_PAY"
-            ],
-            "description": "Enabled payment rails",
-            "items": {
-              "type": "string",
-              "enum": [
-                "ONCHAIN",
-                "CUSTODIAL"
-              ]
-            }
-          },
           "checkoutUrl": {
             "type": "string",
             "example": "https://pay.zenobank.io/ckl1234567890",
@@ -755,11 +739,13 @@
             "example": "2025-10-04T10:00:00Z",
             "description": "Creation date"
           },
-          "updatedAt": {
-            "format": "date-time",
-            "type": "string",
+          "enabledTokens": {
             "example": "2025-10-04T10:00:00Z",
-            "description": "Last update date"
+            "description": "Enabled tokens",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TokenResponseDto"
+            }
           }
         },
         "required": [
@@ -769,10 +755,9 @@
           "priceAmount",
           "status",
           "expiresAt",
-          "enabledRails",
           "checkoutUrl",
           "createdAt",
-          "updatedAt"
+          "enabledTokens"
         ]
       },
       "CreateCheckoutAttemptDto": {

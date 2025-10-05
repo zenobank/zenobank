@@ -12,6 +12,7 @@ import { StoresService } from 'src/stores/stores.service';
 import { TokensService } from 'src/tokens/tokens.service';
 import { Rail } from '@prisma/client';
 import { getCheckoutUrl } from 'src/payments/lib/utils';
+import { TokenResponseDto } from 'src/tokens/dto/token-response.dto';
 
 @Injectable()
 export class CheckoutsService {
@@ -56,12 +57,16 @@ export class CheckoutsService {
     return toDto(CheckoutResponseDto, {
       ...checkout,
       checkoutUrl: getCheckoutUrl(checkout.id),
+      enabledTokens: tokens.map((token) => toDto(TokenResponseDto, token)),
     });
   }
 
   async getCheckout(id: string): Promise<CheckoutResponseDto | null> {
     const checkout = await this.db.checkout.findUnique({
       where: { id },
+      include: {
+        enabledTokens: true,
+      },
     });
 
     if (!checkout) {
@@ -71,6 +76,9 @@ export class CheckoutsService {
     return toDto(CheckoutResponseDto, {
       ...checkout,
       checkoutUrl: getCheckoutUrl(checkout.id),
+      enabledTokens: checkout.enabledTokens.map((token) =>
+        toDto(TokenResponseDto, token),
+      ),
     });
   }
 }

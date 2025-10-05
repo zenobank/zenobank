@@ -15,12 +15,11 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/src/components/ui/pop
 import { CheckoutState } from '@/src/features/payments/types/state';
 import { ms } from '@/src/lib/ms';
 import {
-  useCurrenciesControllerGetSupportedTokensV1,
+  useCheckoutsControllerCreateCheckoutAttemptV1,
+  useCheckoutsControllerGetCheckoutV1,
   useNetworksControllerGetNetworksV1,
-  usePaymentControllerGetPaymentV1,
-  usePaymentControllerUpdatePaymentDepositSelectionV1,
 } from '@repo/api-client';
-import { NetworkId, TokenResponseDto } from '@repo/api-client/model';
+import { TokenResponseDto } from '@repo/api-client/model';
 import { cn } from '@/src/lib/utils';
 import { Check, ChevronsUpDown, TimerIcon } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
@@ -42,14 +41,13 @@ enum PopoverId {
 }
 
 export default function Payament({ id }: PaymentsProps) {
-  const { mutateAsync: updatePaymentDepositSelection } = usePaymentControllerUpdatePaymentDepositSelectionV1();
-  const { data: { data: paymentData } = {}, refetch: refetchPaymentData } = usePaymentControllerGetPaymentV1(id, {
+  const { mutateAsync: createPaymentAttemp } = useCheckoutsControllerCreateCheckoutAttemptV1();
+  const { data: { data: checkoutData } = {}, refetch: refetchPaymentData } = useCheckoutsControllerGetCheckoutV1(id, {
     query: {
       refetchInterval: ms('3s'),
     },
   });
-  const { data: { data: supportedTokens } = {} } = useCurrenciesControllerGetSupportedTokensV1();
-
+  // ver como me traigo lso tokens permitidos para este checkout
   const { data: { data: networks } = {} } = useNetworksControllerGetNetworksV1();
   const [isLoading, setIsLoading] = useState(false);
   const [activePopover, setActivePopover] = useState<PopoverId | null>(null);

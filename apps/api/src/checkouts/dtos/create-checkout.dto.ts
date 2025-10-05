@@ -22,7 +22,7 @@ export class CreateCheckoutDto {
 
   @IsNotEmpty()
   @IsNumberString()
-  @IsPositive()
+  // @IsPositive()
   @ApiProperty({
     example: '100.12',
     description: 'Price amount in the specified currency',

@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { CheckoutStatus, Rail } from '@prisma/client';
-import { Exclude, Expose } from 'class-transformer';
+import { Exclude, Expose, Type } from 'class-transformer';
+import { TokenResponseDto } from 'src/tokens/dto/token-response.dto';
 
 @Exclude()
 export class CheckoutResponseDto {
@@ -50,15 +51,6 @@ export class CheckoutResponseDto {
 
   @Expose()
   @ApiProperty({
-    example: ['ONCHAIN', 'BINANCE_PAY'],
-    description: 'Enabled payment rails',
-    enum: Rail,
-    isArray: true,
-  })
-  enabledRails: Rail[];
-
-  @Expose()
-  @ApiProperty({
     example: 'https://pay.zenobank.io/ckl1234567890',
     description: 'URL to complete the checkout',
   })
@@ -74,7 +66,10 @@ export class CheckoutResponseDto {
   @Expose()
   @ApiProperty({
     example: '2025-10-04T10:00:00Z',
-    description: 'Last update date',
+    description: 'Enabled tokens',
+    isArray: true,
+    type: TokenResponseDto,
   })
-  updatedAt: Date;
+  @Type(() => TokenResponseDto)
+  enabledTokens: TokenResponseDto[];
 }
