@@ -37,7 +37,7 @@ interface PaymentsProps {
 
 enum PopoverId {
   TOKEN = 'token',
-  NETWORK = 'network',
+  RAIL = 'rail',
 }
 
 export default function Payament({ id }: PaymentsProps) {
@@ -55,32 +55,39 @@ export default function Payament({ id }: PaymentsProps) {
   const [selectedTokenId, setSelectedTokenId] = useState<string | null>(null);
 
   const selectedTokenData: TokenResponseDto | null = useMemo(() => {
-    return supportedTokens?.find((t) => t.id === selectedTokenId) || null;
-  }, [supportedTokens, selectedTokenId]);
+    return checkoutData?.enabledTokens?.find((t) => t.id === selectedTokenId) || null;
+  }, [checkoutData?.enabledTokens, selectedTokenId]);
 
   const selectedNetworkId = useMemo(() => {
     return selectedTokenData?.networkId || null;
   }, [selectedTokenData]);
 
-  useEffect(() => {
-    if (paymentData?.depositDetails) {
-      setSelectedTokenId(paymentData?.depositDetails?.currencyId || null);
-    }
-  }, [paymentData?.depositDetails]);
+  // useEffect(() => {
+  //   if (checkoutData?.depositWallet) {
+  //     setSelectedTokenId(checkoutData?.depositWallet?.id || null);
+  //   }
+  // }, [checkoutData?.depositWallet]);
 
   const checkoutState = useMemo(() => {
-    if (!paymentData) return CheckoutState.AWAITING_DEPOSIT;
-    return getPaymentCheckoutState(paymentData);
-  }, [paymentData]);
+    if (!checkoutData) return CheckoutState.AWAITING_DEPOSIT;
+    return getPaymentCheckoutState(checkoutData);
+  }, [checkoutData]);
 
   const availableNetworksIdsForSelectedToken: string[] = useMemo(() => {
-    const tokens = supportedTokens?.filter((t) => t.canonicalTokenId === selectedTokenData?.canonicalTokenId);
+    const tokens = checkoutData?.enabledTokens?.filter(
+      (t) => t.canonicalTokenId === selectedTokenData?.canonicalTokenId && t.rail === 'ONCHAIN',
+    );
 
-    return tokens?.map((t) => t.networkId) || [];
-  }, [supportedTokens, selectedTokenData?.canonicalTokenId]);
+    return tokens?.map((t) => t.networkId).filter((id): id is string => id !== null) || [];
+  }, [checkoutData?.enabledTokens, selectedTokenData?.canonicalTokenId]);
 
-  console.log('!!availableNetworksIdsForSelectedToken', availableNetworksIdsForSelectedToken);
-  console.log('selectedTokenData?.id', selectedTokenData?.id);
+  const availableProvidersForSelectedToken = useMemo(() => {
+    const tokens = checkoutData?.enabledTokens?.filter(
+      (t) => t.canonicalTokenId === selectedTokenData?.canonicalTokenId && t.rail === 'CUSTODIAL',
+    );
+
+    return tokens || [];
+  }, [checkoutData?.enabledTokens, selectedTokenData?.canonicalTokenId]);
 
   // Calculate token amount and USD conversion
 
@@ -89,17 +96,33 @@ export default function Payament({ id }: PaymentsProps) {
     return networks?.find((n) => n.id.toString() === selectedNetworkId);
   }, [selectedNetworkId, networks]);
 
-  // Auto-select network if only one is available
+  // Auto-select network/provider if only one is available
   useEffect(() => {
-    if (selectedTokenId && availableNetworksIdsForSelectedToken.length === 1) {
-      const token = supportedTokens?.find(
-        (t) =>
-          t.canonicalTokenId === selectedTokenData?.canonicalTokenId &&
-          t.networkId === availableNetworksIdsForSelectedToken[0],
-      );
-      setSelectedTokenId(token?.id || null);
+    if (selectedTokenId) {
+      const totalOptions = availableNetworksIdsForSelectedToken.length + availableProvidersForSelectedToken.length;
+      if (totalOptions === 1) {
+        if (availableNetworksIdsForSelectedToken.length === 1) {
+          const token = checkoutData?.enabledTokens?.find(
+            (t) =>
+              t.canonicalTokenId === selectedTokenData?.canonicalTokenId &&
+              t.networkId === availableNetworksIdsForSelectedToken[0],
+          );
+          setSelectedTokenId(token?.id || null);
+        } else if (availableProvidersForSelectedToken.length === 1) {
+          const providerToken = availableProvidersForSelectedToken[0];
+          if (providerToken) {
+            setSelectedTokenId(providerToken.id);
+          }
+        }
+      }
     }
-  }, [selectedTokenId, availableNetworksIdsForSelectedToken, supportedTokens, selectedTokenData]);
+  }, [
+    selectedTokenId,
+    availableNetworksIdsForSelectedToken,
+    availableProvidersForSelectedToken,
+    checkoutData?.enabledTokens,
+    selectedTokenData,
+  ]);
 
   const [disabled, buttonText] = useMemo(() => {
     if (isLoading) {
@@ -108,20 +131,25 @@ export default function Payament({ id }: PaymentsProps) {
     if (!selectedTokenData) {
       return [true, 'Select cryptocurrency'];
     }
-    if (!selectedNetworkData) {
-      return [true, 'Select network'];
+    // Check if we have a valid selection (either network for ONCHAIN or provider for CUSTODIAL)
+    const hasValidSelection =
+      (selectedTokenData.rail === 'ONCHAIN' && selectedNetworkData) ||
+      (selectedTokenData.rail === 'CUSTODIAL' && selectedTokenData.provider);
+
+    if (!hasValidSelection) {
+      return [true, 'Select payment method'];
     }
     return [false, 'Next'];
   }, [selectedTokenData, selectedNetworkData, isLoading]);
 
   const handleDepositSelectionSubmit = async () => {
-    if (disabled || !paymentData?.id) return;
+    if (disabled || !checkoutData?.id) return;
 
-    if (!selectedTokenId || !selectedNetworkId) return;
+    if (!selectedTokenId) return;
     setIsLoading(true);
     try {
-      await updatePaymentDepositSelection({
-        id: paymentData.id,
+      await createPaymentAttemp({
+        id: checkoutData.id,
         data: {
           tokenId: selectedTokenId,
         },
@@ -135,6 +163,7 @@ export default function Payament({ id }: PaymentsProps) {
       setIsLoading(false);
     }
   };
+  console.log('checkoutData', checkoutData);
 
   return (
     <div className="flex min-h-screen items-center justify-center px-4 py-8">
@@ -145,11 +174,11 @@ export default function Payament({ id }: PaymentsProps) {
               <div className="flex items-center">
                 <CardTitle className="text-lg">Send Payment</CardTitle>
               </div>
-              {paymentData?.expiredAt && checkoutState === CheckoutState.AWAITING_DEPOSIT && (
+              {checkoutData?.expiresAt && checkoutState === CheckoutState.AWAITING_DEPOSIT && (
                 <Badge variant="secondary" data-testid="countdown">
                   <TimerIcon />
                   <Countdown
-                    date={new Date(paymentData.expiredAt)}
+                    date={new Date(checkoutData.expiresAt)}
                     daysInHours
                     overtime={false}
                     renderer={({ hours, minutes, seconds }) => (
@@ -167,26 +196,37 @@ export default function Payament({ id }: PaymentsProps) {
           <CardContent className="space-y-3">
             <div className="py-4 text-center">
               <div>
-                {checkoutState === CheckoutState.AWAITING_DEPOSIT && selectedTokenData && selectedNetworkData ? (
-                  // Show token amount with copy button when both token and network are selected
+                {checkoutState === CheckoutState.AWAITING_DEPOSIT &&
+                selectedTokenData &&
+                (selectedTokenData.rail === 'ONCHAIN' ? selectedNetworkData : selectedTokenData.provider) ? (
+                  // Show token amount with copy button when token and payment method are selected
                   <>
                     <div className="flex items-center justify-center gap-3 text-3xl font-bold">
                       <span className="relative flex items-center gap-2">
                         <span data-testid="currency-amount" className="select-all">
-                          {paymentData?.depositDetails?.amount}
+                          {checkoutData?.depositDetails?.amount || checkoutData?.priceAmount}
                         </span>{' '}
                         {selectedTokenData.symbol}
-                        <CopyButton text={`${paymentData?.depositDetails?.amount} ${selectedTokenData.symbol}`} />
+                        <CopyButton
+                          text={`${checkoutData?.depositDetails?.amount || checkoutData?.priceAmount} ${selectedTokenData.symbol}`}
+                        />
                       </span>
                     </div>
                     <div className="mt-1 text-sm">
-                      <Badge variant="secondary">Network: {selectedNetworkData.displayName}</Badge>
+                      <Badge variant="secondary">
+                        Method:{' '}
+                        {selectedTokenData.rail === 'ONCHAIN'
+                          ? selectedNetworkData?.displayName
+                          : selectedTokenData.provider === 'BINANCE_PAY'
+                            ? 'Binance Pay'
+                            : selectedTokenData.provider}
+                      </Badge>
                     </div>
                   </>
                 ) : (
-                  // Show currency amount when no token/network selected yet
+                  // Show currency amount when no token/payment method selected yet
                   <div className="flex items-center justify-center gap-3 text-3xl font-bold">
-                    {paymentData?.priceCurrency} {paymentData?.priceAmount}
+                    {checkoutData?.priceCurrency} {checkoutData?.priceAmount}
                   </div>
                 )}
               </div>
@@ -231,11 +271,11 @@ export default function Payament({ id }: PaymentsProps) {
                     </PopoverTrigger>
                     <PopoverContent className="w-96 p-0">
                       <Command>
-                        <CommandInput placeholder="Search cryptocurrency..." className="h-9" />
+                        <CommandInput placeholder="Search token..." className="h-9" />
                         <CommandList>
-                          <CommandEmpty>No cryptocurrency found.</CommandEmpty>
+                          <CommandEmpty>No token found.</CommandEmpty>
                           <CommandGroup>
-                            {supportedTokens
+                            {checkoutData?.enabledTokens
                               ?.filter(
                                 (t, i, arr) => i === arr.findIndex((u) => u.canonicalTokenId === t.canonicalTokenId),
                               )
@@ -244,7 +284,7 @@ export default function Payament({ id }: PaymentsProps) {
                                   key={supportedToken.id}
                                   value={supportedToken.id}
                                   onSelect={(currentValue: string) => {
-                                    const token = supportedTokens?.find((t) => t.id === currentValue);
+                                    const token = checkoutData?.enabledTokens?.find((t) => t.id === currentValue);
                                     if (token) {
                                       setSelectedTokenId(token.id);
                                     }
@@ -279,78 +319,121 @@ export default function Payament({ id }: PaymentsProps) {
                   </Popover>
                 </div>
 
-                {/* Network Selector - Always visible but disabled when only one network */}
+                {/* Payment Method Selector (Networks & Others) - Always visible but disabled when only one option */}
                 <div className="space-y-2">
                   <Popover
-                    open={activePopover === PopoverId.NETWORK}
+                    open={activePopover === PopoverId.RAIL}
                     onOpenChange={(open: boolean) => {
-                      // Only allow opening if multiple networks available
-                      if (open && availableNetworksIdsForSelectedToken.length <= 1) return;
-                      setActivePopover(open ? PopoverId.NETWORK : null);
+                      // Only allow opening if multiple options available
+                      const totalOptions =
+                        availableNetworksIdsForSelectedToken.length + availableProvidersForSelectedToken.length;
+                      if (open && totalOptions <= 1) return;
+                      setActivePopover(open ? PopoverId.RAIL : null);
                     }}
                   >
                     <PopoverTrigger asChild>
                       <Button
                         variant="outline"
                         role="combobox"
-                        aria-expanded={activePopover === PopoverId.NETWORK}
+                        aria-expanded={activePopover === PopoverId.RAIL}
                         className="mx-auto h-12 w-full max-w-md justify-between"
-                        disabled={!selectedTokenData || availableNetworksIdsForSelectedToken.length <= 1}
+                        disabled={
+                          !selectedTokenData ||
+                          availableNetworksIdsForSelectedToken.length + availableProvidersForSelectedToken.length <= 1
+                        }
                       >
-                        {selectedNetworkData ? (
+                        {selectedTokenData?.rail === 'ONCHAIN' && selectedNetworkData ? (
                           <div className="">
                             <span className="text-muted-foreground text-xs">Network: </span>
                             <span className="">{selectedNetworkData.displayName}</span>
                           </div>
+                        ) : selectedTokenData?.rail === 'CUSTODIAL' && selectedTokenData?.provider ? (
+                          <div className="">
+                            <span className="text-muted-foreground text-xs">Method: </span>
+                            <span className="">
+                              {selectedTokenData.provider === 'BINANCE_PAY'
+                                ? 'Binance Pay'
+                                : selectedTokenData.provider}
+                            </span>
+                          </div>
                         ) : (
-                          'Select network...'
+                          'Select payment method...'
                         )}
-                        {availableNetworksIdsForSelectedToken.length > 1 && (
-                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                        )}
+                        {availableNetworksIdsForSelectedToken.length + availableProvidersForSelectedToken.length >
+                          1 && <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />}
                       </Button>
                     </PopoverTrigger>
-                    {availableNetworksIdsForSelectedToken.length > 1 && (
+                    {availableNetworksIdsForSelectedToken.length + availableProvidersForSelectedToken.length > 1 && (
                       <PopoverContent className="w-96 p-0">
                         <Command>
-                          <CommandInput placeholder="Search network..." className="h-9" />
+                          <CommandInput placeholder="Search payment method..." className="h-9" />
                           <CommandList>
-                            <CommandEmpty>No network found.</CommandEmpty>
-                            <CommandGroup>
-                              {availableNetworksIdsForSelectedToken.map((networkId) => {
-                                const network = networks?.find((n) => n.id.toString() === networkId);
-                                if (!network) return null;
-                                return (
+                            <CommandEmpty>No payment method found.</CommandEmpty>
+
+                            {/* Others Section (Binance Pay, etc.) */}
+                            {availableProvidersForSelectedToken.length > 0 && (
+                              <CommandGroup heading="Others">
+                                {availableProvidersForSelectedToken.map((token) => (
                                   <CommandItem
-                                    key={network.id.toString()}
-                                    value={network.id.toString()}
+                                    key={token.id}
+                                    value={token.id}
                                     onSelect={(currentValue: string) => {
-                                      if (currentValue !== selectedNetworkData?.id.toString()) {
-                                        const token = supportedTokens?.find(
-                                          (t) =>
-                                            t.canonicalTokenId === selectedTokenData?.canonicalTokenId &&
-                                            t.networkId === currentValue,
-                                        );
-                                        if (token) {
-                                          setSelectedTokenId(token.id);
-                                        }
-                                      }
+                                      setSelectedTokenId(currentValue);
                                       setActivePopover(null);
                                     }}
                                   >
                                     <div className="flex items-center gap-3">
-                                      {network.displayName}
+                                      {token.provider === 'BINANCE_PAY' ? 'Binance Pay' : token.provider}
                                       <Check
                                         className={cn(
                                           'ml-auto h-4 w-4',
-                                          selectedNetworkData?.id === network.id ? 'opacity-100' : 'opacity-0',
+                                          selectedTokenData?.id === token.id ? 'opacity-100' : 'opacity-0',
                                         )}
                                       />
                                     </div>
                                   </CommandItem>
-                                );
-                              })}
-                            </CommandGroup>
+                                ))}
+                              </CommandGroup>
+                            )}
+
+                            {/* Networks Section */}
+                            {availableNetworksIdsForSelectedToken.length > 0 && (
+                              <CommandGroup heading="Networks">
+                                {availableNetworksIdsForSelectedToken.map((networkId) => {
+                                  const network = networks?.find((n) => n.id.toString() === networkId);
+                                  if (!network) return null;
+                                  return (
+                                    <CommandItem
+                                      key={network.id.toString()}
+                                      value={network.id.toString()}
+                                      onSelect={(currentValue: string) => {
+                                        if (currentValue !== selectedNetworkData?.id.toString()) {
+                                          const token = checkoutData?.enabledTokens?.find(
+                                            (t) =>
+                                              t.canonicalTokenId === selectedTokenData?.canonicalTokenId &&
+                                              t.networkId === currentValue,
+                                          );
+                                          if (token) {
+                                            setSelectedTokenId(token.id);
+                                          }
+                                        }
+                                        setActivePopover(null);
+                                      }}
+                                    >
+                                      <div className="flex items-center gap-3">
+                                        {network.displayName}
+                                        <Check
+                                          className={cn(
+                                            'ml-auto h-4 w-4',
+                                            selectedNetworkData?.id === network.id ? 'opacity-100' : 'opacity-0',
+                                          )}
+                                        />
+                                      </div>
+                                    </CommandItem>
+                                  );
+                                })}
+                              </CommandGroup>
+                            )}
                           </CommandList>
                         </Command>
                       </PopoverContent>
@@ -370,8 +453,8 @@ export default function Payament({ id }: PaymentsProps) {
               </>
             )}
 
-            {checkoutState === CheckoutState.AWAITING_DEPOSIT && paymentData?.depositDetails?.address && (
-              <PaymentDetails walletAddress={paymentData?.depositDetails?.address} />
+            {checkoutState === CheckoutState.AWAITING_DEPOSIT && checkoutData?.depositDetails?.address && (
+              <PaymentDetails walletAddress={checkoutData.depositDetails.address} />
             )}
 
             {checkoutState === CheckoutState.COMPLETED && <SuccessScreen />}
@@ -396,7 +479,7 @@ const Footer = () => {
       <p className="text-xs font-normal">Open Source Crypto Payment Gateway</p>
       <p className="text-xs font-light italic">
         Powered by{' '}
-        <a href="https://zenobank.io" target="_blank" rel="noreferrer">
+        <a href={`${process.env.NEXT_PUBLIC_MAIN_DOMAIN_URL}`} target="_blank" rel="noreferrer">
           <span className="font-semibold underline">Zenobank</span>
         </a>
       </p>

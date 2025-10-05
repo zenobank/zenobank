@@ -1,16 +1,18 @@
 import { isAfter } from 'date-fns';
-import { PaymentResponseDto, PaymentStatus } from '@repo/api-client/model';
-import { CheckoutState } from '@/src/features/payments/types/state';
+import { CheckoutResponseDto } from '@repo/api-client/model';
+import { CheckoutState } from '../types/state';
 
-export const getPaymentCheckoutState = (payment: PaymentResponseDto): CheckoutState => {
-  if (!payment.depositDetails) return CheckoutState.AWAITING_SELECTION;
-  if (payment.status === PaymentStatus.COMPLETED) return CheckoutState.COMPLETED;
-  if (payment.status === PaymentStatus.CANCELLED) return CheckoutState.EXPIRED;
-  if (
-    payment.status === PaymentStatus.EXPIRED ||
-    (payment.expiredAt && isAfter(new Date(), new Date(payment.expiredAt)))
-  ) {
-    return CheckoutState.EXPIRED;
-  }
-  return CheckoutState.AWAITING_DEPOSIT;
+export const getPaymentCheckoutState = (checkout: CheckoutResponseDto): CheckoutState => {
+  // if (checkout.status === CheckoutStatus.COMPLETED) return CheckoutState.COMPLETED;
+  // if (checkout.status === CheckoutStatus.CANCELLED) return CheckoutState.EXPIRED;
+  // if (
+  //   checkout.status === CheckoutStatus.EXPIRED ||
+  //   (checkout.expiresAt && isAfter(new Date(), new Date(checkout.expiresAt)))
+  // ) {
+  //   return CheckoutState.EXPIRED;
+  // }
+  // // If deposit details are available, we're awaiting deposit
+  // // if (checkout.depositWallet) return CheckoutState.AWAITING_DEPOSIT;
+  // // Otherwise, we're awaiting selection
+  return CheckoutState.AWAITING_SELECTION;
 };
