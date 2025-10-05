@@ -28,8 +28,10 @@ import PaymentDetails from './components/details-screen';
 import ExpiredScreen from './components/expired-screen';
 import SuccessScreen from './components/success-screen';
 import { getPaymentCheckoutState } from './utils/payment-checkout-state';
-import PayHeader from './components/pay-header';
+import CheckoutHeader from './components/checkout-header';
 import { TokenSelector } from './components/token-selector';
+import { CheckoutPrice } from './components/checkout-price';
+import PayFooter from './components/pay-footer';
 
 export enum PopoverId {
   TOKEN = 'token',
@@ -135,13 +137,9 @@ export default function Payament({ id }: { id: string }) {
     <div className="flex min-h-screen items-center justify-center px-4 py-8">
       <div className="mx-auto max-w-md flex-1">
         <Card className="">
-          <PayHeader expiresAt={checkoutData?.expiresAt} checkoutState={checkoutState} />
+          <CheckoutHeader expiresAt={checkoutData?.expiresAt} checkoutState={checkoutState} />
           <CardContent className="space-y-3">
-            <div className="flex items-center justify-center gap-3 py-4 text-center text-3xl font-bold">
-              {checkoutData.priceAmount} {checkoutData.priceCurrency}
-            </div>
-
-            {/* Token Selector */}
+            <CheckoutPrice amount={checkoutData.priceAmount} currency={checkoutData.priceCurrency} />
             <TokenSelector
               activePopover={activePopover}
               setActivePopover={setActivePopover}
@@ -293,22 +291,8 @@ export default function Payament({ id }: { id: string }) {
           <CardFooter className="w-full space-y-3 pt-4"></CardFooter>
         </Card>
 
-        <Footer />
+        <PayFooter />
       </div>
     </div>
   );
 }
-
-const Footer = () => {
-  return (
-    <div className="mt-6 text-center">
-      <p className="text-xs font-normal">Open Source Crypto Payment Gateway</p>
-      <p className="text-xs font-light italic">
-        Powered by{' '}
-        <a href={`${process.env.NEXT_PUBLIC_MAIN_DOMAIN_URL}`} target="_blank" rel="noreferrer">
-          <span className="font-semibold underline">Zenobank</span>
-        </a>
-      </p>
-    </div>
-  );
-};

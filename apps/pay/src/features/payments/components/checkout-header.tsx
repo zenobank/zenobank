@@ -3,7 +3,7 @@ import { CheckoutState } from '../types/state';
 import BadgerTimerCountdown from './badger-timer-countdown';
 import { CheckoutResponseDto } from '@repo/api-client/model';
 
-export default function PayHeader({
+export default function CheckoutHeader({
   expiresAt,
   checkoutState,
 }: {
