@@ -36,7 +36,7 @@ import MethodSelector from './components/method-selector';
 
 export enum PopoverId {
   TOKEN = 'token',
-  RAIL = 'rail',
+  METHOD = 'method',
 }
 
 export default function Payament({ id }: { id: string }) {
@@ -80,11 +80,12 @@ export default function Payament({ id }: { id: string }) {
     return tokens || [];
   }, [checkoutData?.enabledTokens, selectedTokenData?.canonicalTokenId]);
 
-  const availableMethodsForSelectedToken = {
+  const availableMethods: {
+    [key: string]: string[];
+  } = {
     ['ONCHAIN']: availableNetworksIdsForSelectedToken,
-    ['CUSTODIAL']: availableProvidersForSelectedToken,
+    ['CUSTODIAL']: availableProvidersForSelectedToken.map((t) => t.provider).filter((p) => p !== null),
   };
-  console.log('availableMethodsForSelectedToken', availableMethodsForSelectedToken);
 
   const checkoutState = useMemo(() => {
     if (!checkoutData) return CheckoutState.AWAITING_DEPOSIT;
@@ -148,14 +149,14 @@ export default function Payament({ id }: { id: string }) {
               checkoutData={checkoutData}
               setSelectedTokenId={setSelectedTokenId}
             />
-            {/* ------- */}
-            {/* Payment Method Selector (Networks & Others) - Always visible but disabled when only one option */}
             <MethodSelector
               activePopover={activePopover}
+              availableMethods={availableMethods}
               setActivePopover={setActivePopover}
               selectedTokenData={selectedTokenData}
-              availableNetworksIdsForSelectedToken={availableNetworksIdsForSelectedToken}
-              availableProvidersForSelectedToken={availableProvidersForSelectedToken}
+              selectedNetworkData={selectedNetworkData}
+              setSelectedTokenId={setSelectedTokenId}
+              networks={networks || []}
             />
 
             <Button

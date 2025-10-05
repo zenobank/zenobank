@@ -7,7 +7,7 @@ import { BullModule } from '@nestjs/bullmq';
 import { TransactionsModule } from './transactions/transactions.module';
 import { BlockchainModule } from './blockchain/blockchain.module';
 import { PaymentsModule } from './payments/payment.module';
-import { AlchemyModule } from './providers/alchemy/alchemy.module';
+import { AlchemyModule } from './integrations/alchemy/alchemy.module';
 import { NetworksModule } from './networks/networks.module';
 import { WebhooksModule } from './webhooks/webhooks.module';
 import { SvixModule } from './webhooks/svix.module';
@@ -15,6 +15,8 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { StoresModule } from './stores/stores.module';
 import { CheckoutsModule } from './checkouts/checkouts.module';
+import { ProvidersModule } from './integrations/providers.module';
+import { ProvidersModule } from './providers/providers.module';
 
 @Module({
   imports: [
@@ -47,6 +49,7 @@ import { CheckoutsModule } from './checkouts/checkouts.module';
     AuthModule,
     StoresModule,
     CheckoutsModule,
+    ProvidersModule,
   ],
   controllers: [],
   providers: [],

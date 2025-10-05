@@ -7,7 +7,7 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { AlchemyService } from 'src/providers/alchemy/alchemy.service';
+import { AlchemyService } from 'src/integrations/alchemy/alchemy.service';
 import { AlchemySignatureGuard } from './guards/alchemy-signature.guard';
 import { ApiOperation } from '@nestjs/swagger';
 

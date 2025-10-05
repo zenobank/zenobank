@@ -16,10 +16,6 @@ enum Rail {
   CUSTODIAL
 }
 
-enum Provider {
-  BINANCE_PAY
-}
-
 enum CheckoutStatus {
   OPEN
   COMPLETED
@@ -90,8 +86,9 @@ model Store {
  * Credenciales por proveedor (1 por store y proveedor)
  */
 model StoreCredential {
-  id       String   @id @default(uuid())
-  provider Provider
+  id         String @id @default(uuid())
+  providerId String
+  storeId    String
 
   accountId String?
   createdAt DateTime @default(now())
@@ -100,10 +97,10 @@ model StoreCredential {
   apiKey    String
   apiSecret String
 
-  storeId String
-  store   Store  @relation(fields: [storeId], references: [id])
+  store    Store    @relation(fields: [storeId], references: [id])
+  provider Provider @relation(fields: [providerId], references: [id])
 
-  @@unique([storeId, provider])
+  @@unique([storeId, providerId])
 }
 
 /**
@@ -193,6 +190,16 @@ model Payment {
   @@index([storeId, status])
 }
 
+model Provider {
+  id              String            @id
+  name            String
+  displayName     String
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  StoreCredential StoreCredential[]
+  Token           Token[]
+}
+
 /**
  * ===== Infra on-chain existente =====
  */
@@ -223,7 +230,6 @@ model Token {
   canonicalTokenId String
   providerTokenId  String?
   rail             Rail
-  provider         Provider?
   standard         TokenStandard
   address          String?
   decimals         Int?
@@ -232,13 +238,15 @@ model Token {
   updatedAt        DateTime      @updatedAt
   networkId        String?
 
-  checkouts Checkout[]
-  logoUrl   String
+  checkouts  Checkout[]
+  logoUrl    String
+  providerId String?
 
-  network Network? @relation(fields: [networkId], references: [id])
+  network  Network?  @relation(fields: [networkId], references: [id])
+  provider Provider? @relation(fields: [providerId], references: [id])
 
   @@unique([networkId, address])
-  @@unique([provider, providerTokenId])
+  @@unique([providerId, providerTokenId])
   @@index([canonicalTokenId])
   @@index([networkId, symbol])
 }
