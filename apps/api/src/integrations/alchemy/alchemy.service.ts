@@ -24,7 +24,7 @@ import { WEBHOOKS_PATHS } from 'src/webhooks/webhooks.constants';
 import { AddressActivityWebhookDto } from 'src/wallets/dto/address-activity-webhook.dto';
 import { toDto } from 'src/lib/utils/to-dto';
 import { TokensService } from 'src/tokens/tokens.service';
-import { OnChainTokenResponseDto } from 'src/tokens/dto/on-chain-token-response';
+import { OnChainTokenResponseDto } from 'src/tokens/dto/onchain-token-response';
 
 @Injectable()
 export class AlchemyService {

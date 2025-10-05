@@ -1,7 +1,7 @@
 {
   "openapi": "3.0.0",
   "paths": {
-    "/api/v1/tokens/on-chain": {
+    "/api/v1/tokens/onchain": {
       "get": {
         "operationId": "TokensController_getOnChainTokens_v1",
         "parameters": [],
@@ -20,9 +20,7 @@
             }
           }
         },
-        "tags": [
-          "Tokens"
-        ]
+        "tags": ["Tokens"]
       }
     },
     "/api/v1/tokens/binance-pay": {
@@ -44,9 +42,7 @@
             }
           }
         },
-        "tags": [
-          "Tokens"
-        ]
+        "tags": ["Tokens"]
       }
     },
     "/api/v1/wallet/external": {
@@ -85,9 +81,7 @@
           }
         ],
         "summary": "Register an external wallet for a store.",
-        "tags": [
-          "Wallet"
-        ]
+        "tags": ["Wallet"]
       }
     },
     "/api/v1/networks": {
@@ -111,9 +105,7 @@
           }
         },
         "summary": "Get all networks",
-        "tags": [
-          "Networks"
-        ]
+        "tags": ["Networks"]
       }
     },
     "/api/v1/webhooks/alchemy": {
@@ -127,9 +119,7 @@
           }
         },
         "summary": "Receive Alchemy webhook",
-        "tags": [
-          "Webhooks"
-        ]
+        "tags": ["Webhooks"]
       }
     },
     "/api/v1/users/me": {
@@ -149,9 +139,7 @@
           }
         },
         "summary": "Get the current user data",
-        "tags": [
-          "Users"
-        ]
+        "tags": ["Users"]
       }
     },
     "/api/v1/users/me/bootstrap": {
@@ -171,9 +159,7 @@
           }
         },
         "summary": "Create initial backend resources for the newly signed-up user",
-        "tags": [
-          "Users"
-        ]
+        "tags": ["Users"]
       }
     },
     "/api/v1/stores/providers/binance-pay": {
@@ -218,9 +204,7 @@
           }
         ],
         "summary": "Create a new store credential",
-        "tags": [
-          "Stores"
-        ]
+        "tags": ["Stores"]
       }
     },
     "/api/v1/checkouts": {
@@ -265,9 +249,7 @@
           }
         ],
         "summary": "Create a new checkout",
-        "tags": [
-          "Checkouts"
-        ]
+        "tags": ["Checkouts"]
       }
     },
     "/api/v1/checkouts/{id}": {
@@ -296,9 +278,7 @@
           }
         },
         "summary": "Get checkout by ID",
-        "tags": [
-          "Checkouts"
-        ]
+        "tags": ["Checkouts"]
       }
     },
     "/api/v1/checkouts/{id}/attempts": {
@@ -309,15 +289,6 @@
             "name": "id",
             "required": true,
             "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "x-api-key",
-            "required": true,
-            "in": "header",
-            "description": "External API Key",
             "schema": {
               "type": "string"
             }
@@ -335,25 +306,11 @@
         },
         "responses": {
           "201": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object"
-                }
-              }
-            }
+            "description": ""
           }
         },
-        "security": [
-          {
-            "x-api-key": []
-          }
-        ],
         "summary": "Create a new checkout attempt",
-        "tags": [
-          "Checkouts"
-        ]
+        "tags": ["Checkouts"]
       }
     }
   },
@@ -455,9 +412,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "address"
-        ]
+        "required": ["address"]
       },
       "NetworkResponseDto": {
         "type": "object",
@@ -477,10 +432,7 @@
           "networkType": {
             "type": "string",
             "example": "EVM",
-            "enum": [
-              "EVM",
-              "SOLANA"
-            ]
+            "enum": ["EVM", "SOLANA"]
           },
           "isTestnet": {
             "type": "boolean",
@@ -542,12 +494,7 @@
             "example": "Main Wallet"
           }
         },
-        "required": [
-          "id",
-          "address",
-          "network",
-          "label"
-        ]
+        "required": ["id", "address", "network", "label"]
       },
       "BinancePayCredentialResponseDto": {
         "type": "object",
@@ -561,10 +508,7 @@
             "example": "568321"
           }
         },
-        "required": [
-          "apiKey",
-          "accountId"
-        ]
+        "required": ["apiKey", "accountId"]
       },
       "StoreResponseDto": {
         "type": "object",
@@ -600,13 +544,7 @@
             ]
           }
         },
-        "required": [
-          "id",
-          "name",
-          "apiKey",
-          "wallets",
-          "binancePayCredential"
-        ]
+        "required": ["id", "name", "apiKey", "wallets", "binancePayCredential"]
       },
       "UserResponseDto": {
         "type": "object",
@@ -624,10 +562,7 @@
             }
           }
         },
-        "required": [
-          "id",
-          "stores"
-        ]
+        "required": ["id", "stores"]
       },
       "CreateBinancePayCredentialDto": {
         "type": "object",
@@ -648,11 +583,7 @@
             "description": "Account ID"
           }
         },
-        "required": [
-          "apiKey",
-          "apiSecret",
-          "accountId"
-        ]
+        "required": ["apiKey", "apiSecret", "accountId"]
       },
       "CreateCheckoutDto": {
         "type": "object",
@@ -674,11 +605,7 @@
             "description": "ISO 4217 currency code"
           }
         },
-        "required": [
-          "orderId",
-          "priceAmount",
-          "priceCurrency"
-        ]
+        "required": ["orderId", "priceAmount", "priceCurrency"]
       },
       "CheckoutResponseDto": {
         "type": "object",
@@ -705,12 +632,7 @@
           },
           "status": {
             "type": "string",
-            "enum": [
-              "OPEN",
-              "COMPLETED",
-              "EXPIRED",
-              "CANCELLED"
-            ],
+            "enum": ["OPEN", "COMPLETED", "EXPIRED", "CANCELLED"],
             "example": "OPEN",
             "description": "Current status of the checkout"
           },
@@ -758,18 +680,9 @@
             "maxLength": 256,
             "description": "Checkout ID to use for this attempt",
             "example": "ckl1234567890"
-          },
-          "methodType": {
-            "type": "object",
-            "description": "Method type to use for this attempt",
-            "example": "CRYPTO_ONCHAIN"
           }
         },
-        "required": [
-          "tokenId",
-          "checkoutId",
-          "methodType"
-        ]
+        "required": ["tokenId", "checkoutId"]
       }
     }
   }

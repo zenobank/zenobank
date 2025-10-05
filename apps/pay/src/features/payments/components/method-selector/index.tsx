@@ -59,7 +59,7 @@ export default function MethodSelector({
           >
             {selectedMethod ? (
               <span className="">
-                {selectedMethod === MethodType.CRYPTO_ONCHAIN
+                {selectedMethod === MethodType.ONCHAIN
                   ? networks.find((n) => n.id === (selectedTokenData as OnChainTokenResponseDto)?.['networkId'])
                       ?.displayName
                   : 'Binance Pay'}

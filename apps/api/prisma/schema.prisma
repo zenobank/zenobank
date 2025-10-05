@@ -12,7 +12,7 @@ datasource db {
  */
 
 enum MethodType {
-  CRYPTO_ONCHAIN
+  ONCHAIN
   BINANCE_PAY
 }
 
@@ -67,7 +67,7 @@ model Store {
 
   // Credenciales por proveedor
 
-  // On-chain
+  // onchain
   wallets Wallet[]
 
   // Pagos (finales) y checkouts
@@ -133,15 +133,23 @@ model OnChainPaymentAttempt {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   payment   Payment?
+
+  @@unique([checkoutId, tokenId])
 }
 
 model BinancePayPaymentAttempt {
-  id             String        @id @default(cuid())
-  status         AttemptStatus @default(PENDING)
+  id             String          @id @default(cuid())
+  status         AttemptStatus   @default(PENDING)
   tokenPayAmount String
+  tokenId        String
   checkoutId     String
-  checkout       Checkout      @relation(fields: [checkoutId], references: [id])
+  checkout       Checkout        @relation(fields: [checkoutId], references: [id])
   payment        Payment?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  token          BinancePayToken @relation(fields: [tokenId], references: [id])
+
+  @@unique([checkoutId, tokenId])
 }
 
 /**
@@ -170,7 +178,7 @@ model Payment {
 }
 
 /**
- * ===== Infra on-chain existente =====
+ * ===== Infra onchain existente =====
  */
 
 model Network {
@@ -243,7 +251,8 @@ model BinancePayToken {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  checkouts Checkout[]
+  checkouts                Checkout[]
+  BinancePayPaymentAttempt BinancePayPaymentAttempt[]
 
   @@unique([canonicalTokenId])
 }

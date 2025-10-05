@@ -10,6 +10,9 @@ import { CreatePaymentAttemptDto } from './dtos/create-payment-attempt.dto';
 import { TokensService } from 'src/tokens/tokens.service';
 
 import { MethodType } from '@prisma/client';
+import { OnchainAttemptResponseDto } from './dtos/onchain-attempt-response.dto';
+import { toDto } from 'src/lib/utils/to-dto';
+import { BinancePayAttemptResponseDto } from './dtos/binance-pay-attempt-response.dto';
 
 @Injectable()
 export class AttemptsService {
@@ -17,64 +20,91 @@ export class AttemptsService {
     private readonly db: PrismaService,
     private readonly tokensService: TokensService,
   ) {}
-
-  async createCheckoutAttempt(
-    { checkoutId, apiKey }: { checkoutId: string; apiKey: string },
-    createCheckoutAttemptDto: CreatePaymentAttemptDto,
-  ): Promise<void> {
+  private async getCheckoutContextOrThrow(checkoutId: string) {
     const checkout = await this.db.checkout.findUnique({
       where: { id: checkoutId },
-    });
-    if (!checkout) {
-      throw new NotFoundException('Checkout not found');
-    }
-    const store = await this.db.store.findUnique({
-      where: { apiKey },
       include: {
-        wallets: true,
-        binancePayCredential: true,
+        store: { include: { wallets: true, binancePayCredential: true } },
       },
     });
-    if (!store) {
-      throw new NotFoundException('Store not found');
-    }
-    const { tokenId, methodType } = createCheckoutAttemptDto;
-    if (methodType === MethodType.CRYPTO_ONCHAIN) {
+    if (!checkout) throw new NotFoundException('Checkout not found');
+
+    const store = checkout.store;
+    if (!store) throw new NotFoundException('Store not found');
+
+    const wallet = store.wallets[0];
+    if (!wallet) throw new UnprocessableEntityException('Wallet not found');
+
+    return { checkout, store, wallet };
+  }
+  private async getTokenOrThrow(method: MethodType, tokenId: string) {
+    if (method === MethodType.ONCHAIN) {
       const token = await this.tokensService.getOnChainToken(tokenId);
-      if (!token) {
-        throw new NotFoundException('Token not found');
-      }
-      if (store.wallets.length <= 0 || !store.wallets[0]) {
-        throw new UnprocessableEntityException('Wallet not found');
-      }
-      const onChainPaymentAttempt = await this.db.onChainPaymentAttempt.create({
-        data: {
+      if (!token) throw new NotFoundException('Token not found');
+      return token;
+    }
+    if (method === MethodType.BINANCE_PAY) {
+      const token = await this.tokensService.getBinancePayToken(tokenId);
+      if (!token) throw new NotFoundException('Token not found');
+      return token;
+    }
+    throw new UnprocessableEntityException('Unsupported payment method');
+  }
+  async createOnChainCheckoutAttempt(
+    checkoutId: string,
+    createCheckoutAttemptDto: CreatePaymentAttemptDto,
+  ): Promise<OnchainAttemptResponseDto> {
+    const { checkout, wallet } =
+      await this.getCheckoutContextOrThrow(checkoutId);
+    const token = await this.getTokenOrThrow(
+      MethodType.ONCHAIN,
+      createCheckoutAttemptDto.tokenId,
+    );
+    const onChainPaymentAttempt = await this.db.onChainPaymentAttempt.upsert({
+      where: {
+        checkoutId_tokenId: { checkoutId, tokenId: token.id },
+      },
+      update: {},
+      create: {
+        checkoutId,
+        tokenId: token.id,
+        tokenPayAmount: checkout.priceAmount,
+        depositWalletId: wallet.id,
+        networkId: token.networkId,
+      },
+      include: {
+        depositWallet: {
+          include: {
+            network: true,
+          },
+        },
+      },
+    });
+
+    return toDto(OnchainAttemptResponseDto, onChainPaymentAttempt);
+  }
+
+  async createBinancePayCheckoutAttempt(
+    checkoutId: string,
+    createCheckoutAttemptDto: CreatePaymentAttemptDto,
+  ): Promise<BinancePayAttemptResponseDto> {
+    const { checkout } = await this.getCheckoutContextOrThrow(checkoutId);
+    const token = await this.getTokenOrThrow(
+      MethodType.BINANCE_PAY,
+      createCheckoutAttemptDto.tokenId,
+    );
+    const binancePayPaymentAttempt =
+      await this.db.binancePayPaymentAttempt.upsert({
+        where: {
+          checkoutId_tokenId: { checkoutId, tokenId: token.id },
+        },
+        update: {},
+        create: {
           checkoutId,
           tokenId: token.id,
           tokenPayAmount: checkout.priceAmount,
-          depositWalletId: store.wallets[0].id,
-          networkId: token.networkId,
         },
       });
-    } else if (methodType === MethodType.BINANCE_PAY) {
-      const token = await this.tokensService.getBinancePayToken(tokenId);
-      if (!token) {
-        throw new NotFoundException('Token not found');
-      }
-      if (!store.binancePayCredential) {
-        throw new UnprocessableEntityException(
-          'Binance pay credential not found',
-        );
-      }
-      const binancePayPaymentAttempt =
-        await this.db.binancePayPaymentAttempt.create({
-          data: {
-            checkoutId,
-            tokenPayAmount: checkout.priceAmount,
-          },
-        });
-    } else {
-      throw new InternalServerErrorException('Invalid method type');
-    }
+    return toDto(BinancePayAttemptResponseDto, binancePayPaymentAttempt);
   }
 }

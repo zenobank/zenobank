@@ -20,12 +20,4 @@ export class CreatePaymentAttemptDto {
   @MaxLength(256)
   @IsNotEmpty()
   checkoutId: string;
-
-  @ApiProperty({
-    description: 'Method type to use for this attempt',
-    example: MethodType.CRYPTO_ONCHAIN,
-  })
-  @IsEnum(MethodType)
-  @IsNotEmpty()
-  methodType: MethodType;
 }

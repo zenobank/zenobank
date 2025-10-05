@@ -52,16 +52,37 @@ export class CheckoutsController {
   //     return attempts;
   //   }
   // TODO: CAMBIAR EL ANY
-  @ApiKeyAuth()
-  @Post(':id/attempts')
-  @ApiOperation({ summary: 'Create a new checkout attempt' })
-  async createCheckoutAttempt(
+  // @Post(':id/attempts')
+  // @ApiOperation({ summary: 'Create a new checkout attempt' })
+  // async createCheckoutAttempt(
+  //   @Param('id') checkoutId: string,
+  //   @Body() createCheckoutAttemptDto: CreatePaymentAttemptDto,
+  // ): Promise<void> {
+  //   return this.attemptsService.createCheckoutAttempt(
+  //     checkoutId,
+  //     createCheckoutAttemptDto,
+  //   );
+  // }
+  @Post(':id/attempts/binance-pay')
+  @ApiOperation({ summary: 'Create a new binance pay checkout attempt' })
+  async createCheckoutAttemptBinancePay(
     @Param('id') checkoutId: string,
-    @Headers(API_KEY_HEADER) apiKey: string,
     @Body() createCheckoutAttemptDto: CreatePaymentAttemptDto,
-  ): Promise<any> {
-    return this.attemptsService.createCheckoutAttempt(
-      { checkoutId, apiKey },
+  ): Promise<void> {
+    return this.attemptsService.createBinancePayCheckoutAttempt(
+      checkoutId,
+      createCheckoutAttemptDto,
+    );
+  }
+
+  @Post(':id/attempts/onchain')
+  @ApiOperation({ summary: 'Create a new onchain checkout attempt' })
+  async createCheckoutAttemptOnchain(
+    @Param('id') checkoutId: string,
+    @Body() createCheckoutAttemptDto: CreatePaymentAttemptDto,
+  ): Promise<void> {
+    return this.attemptsService.createOnChainCheckoutAttempt(
+      checkoutId,
       createCheckoutAttemptDto,
     );
   }

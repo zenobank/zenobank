@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { OnChainTokenResponseDto } from './dto/on-chain-token-response';
+import { OnChainTokenResponseDto } from './dto/onchain-token-response';
 import { toDto } from 'src/lib/utils/to-dto';
 import { BinancePayTokenResponseDto } from './dto/binance-pay-token-response';
 

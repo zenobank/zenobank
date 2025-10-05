@@ -28,12 +28,12 @@ export enum PopoverId {
 
 // this should come from the backend
 export enum MethodType {
-  CRYPTO_ONCHAIN = 'CRYPTO_ONCHAIN',
+  ONCHAIN = 'ONCHAIN',
   BINANCE_PAY = 'BINANCE_PAY',
 }
 export type TokenResponseDto = BinancePayTokenResponseDto | OnChainTokenResponseDto;
 export default function Payament({ id }: { id: string }) {
-  const { mutateAsync: createPaymentAttemp } = useCheckoutsControllerCreateCheckoutAttemptV1();
+  const { mutateAsync: createCheckoutAttempt } = useCheckoutsControllerCreateCheckoutAttemptV1();
   const { data: { data: checkoutData } = {}, refetch: refetchPaymentData } = useCheckoutsControllerGetCheckoutV1(id, {
     query: {
       refetchInterval: ms('3s'),
@@ -60,7 +60,7 @@ export default function Payament({ id }: { id: string }) {
   const selectedMethod: MethodType | null = useMemo(() => {
     const isBinancePayToken = binancePayTokens?.find((t) => t.id === selectedTokenData?.id);
     const isOnChainToken = onchainTokens?.find((t) => t.id === selectedTokenData?.id);
-    return isBinancePayToken ? MethodType.BINANCE_PAY : isOnChainToken ? MethodType.CRYPTO_ONCHAIN : null;
+    return isBinancePayToken ? MethodType.BINANCE_PAY : isOnChainToken ? MethodType.ONCHAIN : null;
   }, [selectedTokenData]);
 
   const checkoutState = useMemo(() => {
@@ -87,27 +87,28 @@ export default function Payament({ id }: { id: string }) {
       .otherwise(() => [false, 'Next']);
   }, [selectedTokenData, isLoading]);
 
-  // const handleDepositSelectionSubmit = async () => {
-  //   if (disabled || !checkoutData?.id) return;
+  const handleDepositSelectionSubmit = async () => {
+    if (disabled || !checkoutData?.id) return;
 
-  //   if (!selectedTokenId) return;
-  //   setIsLoading(true);
-  //   try {
-  //     await createPaymentAttemp({
-  //       id: checkoutData.id,
-  //       data: {
-  //         tokenId: selectedTokenId,
-  //       },
-  //     });
-  //     await refetchPaymentData();
-  //   } catch (error) {
-  //     console.log('error', error);
-  //     toast.error('Failed to update payment deposit selection');
-  //     console.error(error);
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
+    if (!selectedTokenId) return;
+    setIsLoading(true);
+    try {
+      await createCheckoutAttempt({
+        id: checkoutData.id,
+        data: {
+          tokenId: selectedTokenId,
+          checkoutId: checkoutData.id,
+        },
+      });
+      await refetchPaymentData();
+    } catch (error) {
+      console.log('error', error);
+      toast.error('Failed to update payment deposit selection');
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
   if (!checkoutData) return null;
 
   return (
@@ -139,7 +140,7 @@ export default function Payament({ id }: { id: string }) {
 
             <Button
               onClick={() => {
-                // handleDepositSelectionSubmit();
+                handleDepositSelectionSubmit();
               }}
               disabled={!!disabled}
               className={`mx-auto w-full ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}

@@ -4,7 +4,7 @@ import { Exclude, Expose, Type } from 'class-transformer';
 import { OnchainAttemptResponseDto } from '../attempts/dtos/onchain-attempt-response.dto';
 import { BinancePayAttemptResponseDto } from '../attempts/dtos/binance-pay-attempt-response.dto';
 import { BinancePayTokenResponseDto } from 'src/tokens/dto/binance-pay-token-response';
-import { OnChainTokenResponseDto } from 'src/tokens/dto/on-chain-token-response';
+import { OnChainTokenResponseDto } from 'src/tokens/dto/onchain-token-response';
 
 @Exclude()
 export class CheckoutResponseDto {
