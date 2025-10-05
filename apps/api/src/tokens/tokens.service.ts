@@ -7,7 +7,7 @@ import { isNativeToken, nativeTokenAddress } from './lib/utils';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Token } from '@prisma/client';
 import { SupportedNetworksId } from 'src/networks/network.interface';
-import { TokenResponseDto } from './dto/token-response.dto';
+import { TokenResponseDto } from './dto/on-chain-token-response';
 import { toDto } from 'src/lib/utils/to-dto';
 
 @Injectable()
@@ -15,17 +15,10 @@ export class TokensService {
   private readonly logger = new Logger(TokensService.name);
   constructor(private db: PrismaService) {}
 
-  async getTokens(): Promise<TokenResponseDto[]> {
-    const tokens = await this.db.token.findMany({});
+  async getOnChainTokens(): Promise<TokenResponseDto[]> {
+    const tokens = await this.db.onchainToken.findMany({});
     const tokensDto = tokens.map((token) => toDto(TokenResponseDto, token));
     return tokensDto;
-  }
-
-  async getToken(id: string): Promise<Token | null> {
-    const token = await this.db.token.findUnique({
-      where: { id },
-    });
-    return token;
   }
 
   async getNetworkTokens(networkId: SupportedNetworksId): Promise<Token[]> {

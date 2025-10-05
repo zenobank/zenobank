@@ -1,20 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Provider, Rail, TokenStandard } from '@prisma/client';
-import { SupportedNetworksId } from 'src/networks/network.interface';
 import { Expose } from 'class-transformer';
-import {
-  IsBoolean,
-  IsEnum,
-  IsInt,
-  IsString,
-  IsUrl,
-  Min,
-} from 'class-validator';
+import { IsString, IsUrl } from 'class-validator';
 
-export class TokenResponseDto {
+export class BinancePayTokenResponseDto {
   @Expose()
   @IsString()
-  @ApiProperty({ example: 'USDC_ETHEREUM_MAINNET' })
+  @ApiProperty({ example: 'USDC_BINANCE_PAY' })
   id: string;
 
   @Expose()
@@ -23,9 +14,9 @@ export class TokenResponseDto {
   canonicalTokenId: string;
 
   @Expose()
-  @IsEnum(Rail)
-  @ApiProperty({ enum: Rail, example: Rail.ONCHAIN })
-  rail: Rail;
+  @IsString()
+  @ApiProperty({ example: 'USDC' })
+  binanceTokenId: string;
 
   @Expose()
   @IsString()
@@ -36,34 +27,6 @@ export class TokenResponseDto {
   @IsUrl()
   @ApiProperty({ example: 'https://example.com/logo.png' })
   logoUrl: string;
-
-  /* On-chain */
-  @Expose()
-  @IsString()
-  @ApiProperty({ example: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48' })
-  address: string | null;
-
-  @Expose()
-  @IsInt()
-  @Min(0)
-  @ApiProperty({ example: 6 })
-  decimals: number | null;
-
-  @Expose()
-  @IsString()
-  @ApiProperty({ example: SupportedNetworksId.ETHEREUM_MAINNET })
-  networkId: string | null;
-
-  /* Custodial */
-  @Expose()
-  @IsString()
-  @ApiProperty({ example: null })
-  providerTokenId: string | null;
-
-  @Expose()
-  @IsEnum(Provider)
-  @ApiProperty({ enum: Provider, example: null })
-  provider: Provider | null;
 }
 
 // export class OnChainTokenResponseDto extends TokenResponseDto {

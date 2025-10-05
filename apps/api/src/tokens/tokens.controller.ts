@@ -1,13 +1,13 @@
 import { Controller, Get } from '@nestjs/common';
 import { TokensService } from './tokens.service';
-import { TokenResponseDto } from './dto/token-response.dto';
+import { TokenResponseDto } from './dto/on-chain-token-response';
 
 @Controller('tokens')
 export class TokensController {
   constructor(private readonly tokenService: TokensService) {}
 
-  @Get('')
-  async getTokens(): Promise<TokenResponseDto[]> {
-    return this.tokenService.getTokens();
-  }
+  // @Get('/canonical')
+  // async getCanonicalTokens(): Promise<TokenResponseDto[]> {
+  //   return this.tokenService.getCanonicalTokens();
+  // }
 }

@@ -12,7 +12,7 @@ import { StoresService } from 'src/stores/stores.service';
 import { TokensService } from 'src/tokens/tokens.service';
 import { Rail } from '@prisma/client';
 import { getCheckoutUrl } from 'src/payments/lib/utils';
-import { TokenResponseDto } from 'src/tokens/dto/token-response.dto';
+import { TokenResponseDto } from 'src/tokens/dto/on-chain-token-response';
 
 @Injectable()
 export class CheckoutsService {

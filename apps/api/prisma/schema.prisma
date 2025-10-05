@@ -11,9 +11,9 @@ datasource db {
  * ===== Enums =====
  */
 
-enum Rail {
-  ONCHAIN
-  CUSTODIAL
+enum MethodType {
+  CRYPTO_ONCHAIN
+  BINANCE_PAY
 }
 
 enum CheckoutStatus {
@@ -44,12 +44,6 @@ enum NetworkType {
   SOLANA
 }
 
-enum TokenStandard {
-  NATIVE
-  ERC20
-  SPL
-}
-
 /**
  * ===== Usuarios & Tiendas =====
  */
@@ -72,36 +66,19 @@ model Store {
   user   User   @relation(fields: [userId], references: [id])
 
   // Credenciales por proveedor
-  credentials StoreCredential[]
 
   // On-chain
   wallets Wallet[]
 
   // Pagos (finales) y checkouts
-  payments  Payment[]
-  checkouts Checkout[]
+  payments             Payment[]
+  checkouts            Checkout[]
+  binancePayCredential BinancePayCredential?
 }
 
 /**
  * Credenciales por proveedor (1 por store y proveedor)
  */
-model StoreCredential {
-  id         String @id @default(uuid())
-  providerId String
-  storeId    String
-
-  accountId String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  apiKey    String
-  apiSecret String
-
-  store    Store    @relation(fields: [storeId], references: [id])
-  provider Provider @relation(fields: [providerId], references: [id])
-
-  @@unique([storeId, providerId])
-}
 
 /**
  * ===== Checkout → Attempt → Payment =====
@@ -118,9 +95,11 @@ model Checkout {
   storeId String
   store   Store  @relation(fields: [storeId], references: [id])
 
-  attempts      PaymentAttempt[]
-  enabledTokens Token[]
-  enabledRails  Rail[]
+  onChainPaymentAttempts OnChainPaymentAttempt[]
+  binancePayAttempts     BinancePayPaymentAttempt[]
+
+  enabledOnchainTokens    OnchainToken[]
+  enabledBinancePayTokens BinancePayToken[]
 
   // back-ref 1–1 desde Payment (relación nombrada)
   payment Payment? @relation("CheckoutPayment")
@@ -133,31 +112,35 @@ model Checkout {
  * Cada elección/reintento del usuario
  */
 
-model PaymentAttempt {
-  id         String   @id @default(cuid())
-  checkoutId String
-  checkout   Checkout @relation(fields: [checkoutId], references: [id])
+model OnChainPaymentAttempt {
+  id              String        @id @default(cuid())
+  status          AttemptStatus @default(PENDING)
+  transactionHash String?
+  tokenPayAmount  String
 
-  rail   Rail
+  tokenId String
+
+  depositWalletId String
+  checkoutId      String
+  networkId       String
+
+  checkout      Checkout     @relation(fields: [checkoutId], references: [id])
+  token         OnchainToken @relation(fields: [tokenId], references: [id])
+  network       Network      @relation(fields: [networkId], references: [id])
+  depositWallet Wallet       @relation(fields: [depositWalletId], references: [id])
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  Payment   Payment[]
+}
+
+model BinancePayPaymentAttempt {
+  id     String        @id @default(cuid())
   status AttemptStatus @default(PENDING)
 
-  networkId String?
-
-  transactionHash String?
-  tokenId         String
-  tokenPayAmount  String
-  depositWalletId String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // back-ref al Payment final (1–1) si este attempt gana
-  payment       Payment? @relation("AttemptPayment")
-  network       Network? @relation(fields: [networkId], references: [id])
-  depositWallet Wallet?  @relation(fields: [depositWalletId], references: [id])
-
-  @@index([checkoutId, status])
-  @@index([rail, status])
+  checkoutId String
+  checkout   Checkout  @relation(fields: [checkoutId], references: [id])
+  Payment    Payment[]
 }
 
 /**
@@ -170,34 +153,19 @@ model Payment {
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt
 
-  // Intento ganador (inmutable) – relación 1–1 nombrada
-  attemptId String         @unique
-  attempt   PaymentAttempt @relation("AttemptPayment", fields: [attemptId], references: [id])
+  onchainAttemptId String?
+  binanceAttemptId String?
 
-  // Relación directa al checkout (1–1) – nombrada
+  onchainAttempt OnChainPaymentAttempt?    @relation(fields: [onchainAttemptId], references: [id])
+  binanceAttempt BinancePayPaymentAttempt? @relation(fields: [binanceAttemptId], references: [id])
+
   checkoutId String   @unique
   checkout   Checkout @relation("CheckoutPayment", fields: [checkoutId], references: [id])
-
-  // Copias para reporting (foto histórica)
-  orderId       String
-  priceCurrency String
-  priceAmount   String
-  rail          Rail
 
   storeId String
   store   Store  @relation(fields: [storeId], references: [id])
 
   @@index([storeId, status])
-}
-
-model Provider {
-  id              String            @id
-  name            String
-  displayName     String
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
-  StoreCredential StoreCredential[]
-  Token           Token[]
 }
 
 /**
@@ -216,39 +184,66 @@ model Network {
   maxConfirmationAttempts Int         @default(100)
   minBlockConfirmations   Int         @default(3)
 
-  tokens         Token[]
-  wallets        Wallet[]
-  PaymentAttempt PaymentAttempt[]
+  onChainTokens          OnchainToken[]
+  wallets                Wallet[]
+  onChainPaymentAttempts OnChainPaymentAttempt[]
 }
 
 /**
  * ProviderToken.id and Token.id must be different
  */
 
-model Token {
-  id               String        @id
+model OnchainToken {
+  id               String @id
   canonicalTokenId String
-  providerTokenId  String?
-  rail             Rail
-  standard         TokenStandard
-  address          String?
-  decimals         Int?
+  address          String
+  decimals         Int
   symbol           String
-  createdAt        DateTime      @default(now())
-  updatedAt        DateTime      @updatedAt
-  networkId        String?
 
-  checkouts  Checkout[]
-  logoUrl    String
-  providerId String?
+  networkId String
 
-  network  Network?  @relation(fields: [networkId], references: [id])
-  provider Provider? @relation(fields: [providerId], references: [id])
+  checkouts Checkout[]
+  logoUrl   String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  network               Network                 @relation(fields: [networkId], references: [id])
+  OnChainPaymentAttempt OnChainPaymentAttempt[]
 
   @@unique([networkId, address])
-  @@unique([providerId, providerTokenId])
   @@index([canonicalTokenId])
   @@index([networkId, symbol])
+}
+
+model BinancePayCredential {
+  id        String   @id
+  storeId   String
+  store     Store    @relation(fields: [storeId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  apiKey    String
+  apiSecret String
+
+  accountId String
+
+  @@unique([storeId])
+}
+
+model BinancePayToken {
+  id               String @id
+  canonicalTokenId String
+  binanceTokenId   String
+
+  name      String
+  logoUrl   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  checkouts Checkout[]
+
+  @@unique([canonicalTokenId])
 }
 
 model Wallet {
@@ -260,9 +255,9 @@ model Wallet {
   updatedAt DateTime @updatedAt
   storeId   String?
 
-  network        Network          @relation(fields: [networkId], references: [id])
-  store          Store?           @relation(fields: [storeId], references: [id])
-  PaymentAttempt PaymentAttempt[]
+  network                Network                 @relation(fields: [networkId], references: [id])
+  store                  Store?                  @relation(fields: [storeId], references: [id])
+  onChainPaymentAttempts OnChainPaymentAttempt[]
 
   @@unique([networkId, address])
 }

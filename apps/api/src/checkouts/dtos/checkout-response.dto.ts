@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { CheckoutStatus, Rail } from '@prisma/client';
 import { Exclude, Expose, Type } from 'class-transformer';
-import { TokenResponseDto } from 'src/tokens/dto/token-response.dto';
+import { TokenResponseDto } from 'src/tokens/dto/on-chain-token-response';
 
 @Exclude()
 export class CheckoutResponseDto {
