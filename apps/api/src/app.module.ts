@@ -6,7 +6,6 @@ import { PrismaModule } from './prisma/prisma.module';
 import { BullModule } from '@nestjs/bullmq';
 import { TransactionsModule } from './transactions/transactions.module';
 import { BlockchainModule } from './blockchain/blockchain.module';
-import { PaymentsModule } from './payments/payment.module';
 import { AlchemyModule } from './integrations/alchemy/alchemy.module';
 import { NetworksModule } from './networks/networks.module';
 import { WebhooksModule } from './webhooks/webhooks.module';
@@ -19,7 +18,6 @@ import { CheckoutsModule } from './checkouts/checkouts.module';
 @Module({
   imports: [
     AlchemyModule,
-    PaymentsModule,
     WalletModule,
     ConfigModule.forRoot({
       cache: true,
@@ -39,7 +37,6 @@ import { CheckoutsModule } from './checkouts/checkouts.module';
     TransactionsModule,
     BlockchainModule,
     AlchemyModule,
-    PaymentsModule,
     NetworksModule,
     WebhooksModule,
     SvixModule,

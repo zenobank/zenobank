@@ -1,22 +1,14 @@
 import { Processor, WorkerHost } from '@nestjs/bullmq';
 import { Injectable, Logger } from '@nestjs/common';
-import { BlockchainFactory } from 'src/blockchain/adapters/blockchain-adapter.factory';
 import { TX_CONFIRMATION_QUEUE_NAME } from '../lib/transactions.constants';
 import { TransactionConfirmationJob } from '../lib/transactions.interface';
 import { Job } from 'bullmq';
-import { PaymentService } from 'src/payments/payment.service';
-import { NetworksService } from 'src/networks/networks.service';
-import { PaymentStatus } from '@prisma/client';
 
 @Injectable()
 @Processor(TX_CONFIRMATION_QUEUE_NAME)
 export class TransactionConfirmationWorker extends WorkerHost {
   private readonly logger = new Logger(TransactionConfirmationWorker.name);
-  constructor(
-    private readonly blockchainAdapterFactory: BlockchainFactory,
-    private readonly paymentService: PaymentService,
-    private readonly networksService: NetworksService,
-  ) {
+  constructor() {
     super();
   }
 

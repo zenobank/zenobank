@@ -5,7 +5,7 @@ import { CheckoutResponseDto } from './dtos/checkout-response.dto';
 import { toDto } from 'src/lib/utils/to-dto';
 import { StoresService } from 'src/stores/stores.service';
 import { TokensService } from 'src/tokens/tokens.service';
-import { getCheckoutUrl } from 'src/payments/lib/utils';
+import { getCheckoutUrl } from 'src/checkouts/lib/utils';
 
 @Injectable()
 export class CheckoutsService {

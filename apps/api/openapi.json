@@ -49,32 +49,6 @@
         ]
       }
     },
-    "/api/v1/networks": {
-      "get": {
-        "description": "Get all networks",
-        "operationId": "NetworksController_getNetworks_v1",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/NetworkResponseDto"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "summary": "Get all networks",
-        "tags": [
-          "Networks"
-        ]
-      }
-    },
     "/api/v1/wallet/external": {
       "post": {
         "description": "An Externall wallet is an non-custodial wallet. Address must be an EVM address.",
@@ -113,6 +87,32 @@
         "summary": "Register an external wallet for a store.",
         "tags": [
           "Wallet"
+        ]
+      }
+    },
+    "/api/v1/networks": {
+      "get": {
+        "description": "Get all networks",
+        "operationId": "NetworksController_getNetworks_v1",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NetworkResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get all networks",
+        "tags": [
+          "Networks"
         ]
       }
     },
@@ -448,6 +448,17 @@
           "logoUrl"
         ]
       },
+      "RegisterExternalWalletDto": {
+        "type": "object",
+        "properties": {
+          "address": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "address"
+        ]
+      },
       "NetworkResponseDto": {
         "type": "object",
         "properties": {
@@ -497,17 +508,6 @@
           "minBlockConfirmations",
           "maxConfirmationAttempts",
           "confirmationRetryDelay"
-        ]
-      },
-      "RegisterExternalWalletDto": {
-        "type": "object",
-        "properties": {
-          "address": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "address"
         ]
       },
       "WalletResponseDto": {
