@@ -24,13 +24,14 @@ import { Check, ChevronsUpDown } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import Image from 'next/image';
-import PaymentDetails from './components/DetailsScreen';
-import ExpiredScreen from './components/ExpiredScreen';
-import SuccessScreen from './components/SuccessScreen';
+import PaymentDetails from './components/details-screen';
+import ExpiredScreen from './components/expired-screen';
+import SuccessScreen from './components/success-screen';
 import { getPaymentCheckoutState } from './utils/payment-checkout-state';
-import PayHeader from './components/PayHeader';
+import PayHeader from './components/pay-header';
+import { TokenSelector } from './components/token-selector';
 
-enum PopoverId {
+export enum PopoverId {
   TOKEN = 'token',
   RAIL = 'rail',
 }
@@ -141,87 +142,13 @@ export default function Payament({ id }: { id: string }) {
             </div>
 
             {/* Token Selector */}
-            <div className="space-y-2">
-              <Popover
-                open={activePopover === PopoverId.TOKEN}
-                onOpenChange={(open: boolean) => {
-                  setActivePopover(open ? PopoverId.TOKEN : null);
-                }}
-              >
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    role="combobox"
-                    aria-expanded={activePopover === PopoverId.TOKEN}
-                    className="mx-auto h-12 w-full max-w-md justify-between"
-                  >
-                    {selectedTokenData ? (
-                      <div className="flex items-center gap-3">
-                        <Image
-                          width={24}
-                          height={24}
-                          src={`/images/tokens/${selectedTokenData.canonicalTokenId.toLowerCase()}.png`}
-                          alt={selectedTokenData.symbol}
-                          className="h-6 w-6 rounded-full"
-                        />
-                        <div className="text-left">
-                          <div className="text-sm font-bold">{selectedTokenData.symbol}</div>
-                          <div className="text-xs">{selectedTokenData.symbol}</div>
-                        </div>
-                      </div>
-                    ) : (
-                      'Select token...'
-                    )}
-                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-96 p-0">
-                  <Command>
-                    <CommandInput placeholder="Search token..." className="h-9" />
-                    <CommandList>
-                      <CommandEmpty>No token found.</CommandEmpty>
-                      <CommandGroup>
-                        {checkoutData?.enabledTokens
-                          ?.filter((t, i, arr) => i === arr.findIndex((u) => u.canonicalTokenId === t.canonicalTokenId))
-                          ?.map((supportedToken) => (
-                            <CommandItem
-                              key={supportedToken.id}
-                              value={supportedToken.id}
-                              onSelect={(currentValue: string) => {
-                                const token = checkoutData?.enabledTokens?.find((t) => t.id === currentValue);
-                                if (token) {
-                                  setSelectedTokenId(token.id);
-                                }
-                                setActivePopover(null);
-                              }}
-                            >
-                              <div className="flex w-full items-center gap-3">
-                                <Image
-                                  width={24}
-                                  height={24}
-                                  src={`/images/tokens/${supportedToken.canonicalTokenId.toLowerCase()}.png`}
-                                  alt={supportedToken.symbol}
-                                  className="h-6 w-6 rounded-full"
-                                />
-                                <div className="flex-1">
-                                  <div className="text-sm font-bold">{supportedToken.symbol}</div>
-                                  <div className="text-xs">{supportedToken.symbol}</div>
-                                </div>
-                                <Check
-                                  className={cn(
-                                    'ml-auto h-4 w-4',
-                                    selectedTokenData?.id === supportedToken.id ? 'opacity-100' : 'opacity-0',
-                                  )}
-                                />
-                              </div>
-                            </CommandItem>
-                          ))}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
-                </PopoverContent>
-              </Popover>
-            </div>
+            <TokenSelector
+              activePopover={activePopover}
+              setActivePopover={setActivePopover}
+              selectedTokenData={selectedTokenData}
+              checkoutData={checkoutData}
+              setSelectedTokenId={setSelectedTokenId}
+            />
             {/* ------- */}
             {/* Payment Method Selector (Networks & Others) - Always visible but disabled when only one option */}
             <div className="space-y-2">
