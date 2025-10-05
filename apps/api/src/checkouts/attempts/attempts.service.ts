@@ -8,7 +8,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 
 import { CreateCheckoutAttemptDto } from './dtos/create-checkout-attempt.dto';
 import { TokensService } from 'src/tokens/tokens.service';
-import { PaymentRail } from '@prisma/client';
+import { Rail } from '@prisma/client';
 import { PaymentAttemptResponseDto } from './dtos/payment-attempt-response.dto';
 import { toDto } from 'src/lib/utils/to-dto';
 
@@ -45,13 +45,13 @@ export class AttemptsService {
     if (!token) {
       throw new NotFoundException('Token not found');
     }
-    if (token.rail === PaymentRail.ONCHAIN) {
+    if (token.rail === Rail.ONCHAIN) {
       if (store.wallets.length <= 0 || !store.wallets[0]) {
         throw new UnprocessableEntityException('Wallet not found');
       }
       const paymentAttempt = await this.db.paymentAttempt.create({
         data: {
-          rail: PaymentRail.ONCHAIN,
+          rail: Rail.ONCHAIN,
           checkoutId,
           tokenId: token.id,
           tokenPayAmount: checkout.priceAmount,
@@ -62,7 +62,7 @@ export class AttemptsService {
       return toDto(PaymentAttemptResponseDto, {
         ...paymentAttempt,
       });
-    } else if (token.rail === PaymentRail.CUSTODIAL) {
+    } else if (token.rail === Rail.CUSTODIAL) {
       const storeCredentials = store.credentials.find(
         (credential) => credential.provider === token.provider,
       );
@@ -71,7 +71,7 @@ export class AttemptsService {
       }
       const paymentAttempt = await this.db.paymentAttempt.create({
         data: {
-          rail: PaymentRail.CUSTODIAL,
+          rail: Rail.CUSTODIAL,
           checkoutId,
           tokenId: token.id,
           tokenPayAmount: checkout.priceAmount,

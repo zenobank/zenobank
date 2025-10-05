@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { PaymentRail } from '@prisma/client';
+import { Rail } from '@prisma/client';
 import { Expose } from 'class-transformer';
 import { SupportedNetworksId } from 'src/networks/network.interface';
 
@@ -14,14 +14,14 @@ export class PaymentAttemptResponseDto {
   @Expose()
   @ApiProperty({
     description: 'Payment rail for the payment attempt',
-    enum: PaymentRail,
-    example: PaymentRail.ONCHAIN,
+    enum: Rail,
+    example: Rail.ONCHAIN,
   })
-  rail: PaymentRail;
+  rail: Rail;
 
   //   depositDetails: {
 
-  //     // si es PaymentRail.ONCHAIN, estos
+  //     // si es Rail.ONCHAIN, estos
   //  @Expose()
   //   @ApiProperty({
   //     description: 'Token ID for the payment attempt',

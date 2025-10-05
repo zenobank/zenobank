@@ -13,7 +13,7 @@ import { UpdateDepositSelectionDto } from './dto/update-payment-selection.dto';
 import { TokensService } from 'src/tokens/tokens.service';
 import { NetworksService } from 'src/networks/networks.service';
 import { ms } from 'src/lib/utils/ms';
-import { AttemptStatus, PaymentRail, PaymentStatus } from '@prisma/client';
+import { AttemptStatus, Rail, PaymentStatus } from '@prisma/client';
 import { SupportedNetworksId } from 'src/networks/network.interface';
 import { Convert } from 'easy-currencies';
 import { toBN } from 'src/lib/utils/numbers';
@@ -180,13 +180,13 @@ export class PaymentService {
   //     throw new BadRequestException('Invalid currency');
   //   }
   //   let usdAmount = checkout.priceAmount;
-  //   if (rail === PaymentRail.ONCHAIN && checkout.priceCurrency !== 'USD') {
+  //   if (rail === Rail.ONCHAIN && checkout.priceCurrency !== 'USD') {
   //     const convertedAmount = await Convert(+checkout.priceAmount)
   //       .from(checkout.priceCurrency)
   //       .to('USD');
   //     usdAmount = convertedAmount.toString();
   //   }
-  //   if (rail === PaymentRail.ONCHAIN && toBN(usdAmount).lte(0)) {
+  //   if (rail === Rail.ONCHAIN && toBN(usdAmount).lte(0)) {
   //     throw new InternalServerErrorException('Conversion failed');
   //   }
 
@@ -205,7 +205,7 @@ export class PaymentService {
   //   });
 
   //   // 6) Rail específico
-  //   if (rail === PaymentRail.ONCHAIN) {
+  //   if (rail === Rail.ONCHAIN) {
   //     if (!tokenId) {
   //       throw new BadRequestException(
   //         'tokenId es requerido para pagos ONCHAIN',
@@ -367,7 +367,7 @@ export class PaymentService {
   //           networkId,
   //         },
   //         status: { in: [AttemptStatus.PENDING] },
-  //         rail: PaymentRail.ONCHAIN,
+  //         rail: Rail.ONCHAIN,
   //         payment: {
   //           priceCurrency: payCurrencyId,
   //           priceAmount: candidateAmountStr,

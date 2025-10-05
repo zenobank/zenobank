@@ -1,7 +1,7 @@
 // // dto/attempt-selection-response.dto.ts
 // // ————————————————————————————————————————————————————————————————
 // import { ApiProperty } from '@nestjs/swagger';
-// import { AttemptStatus, PaymentRail, Token } from '@prisma/client';
+// import { AttemptStatus, Rail, Token } from '@prisma/client';
 // import { Expose, Type } from 'class-transformer';
 // import {
 //   IsDate,
@@ -98,8 +98,8 @@
 //   attemptId: string;
 
 //   @Expose()
-//   @IsEnum(PaymentRail)
-//   @ApiProperty({ enum: PaymentRail, example: PaymentRail.ONCHAIN })
+//   @IsEnum(Rail)
+//   @ApiProperty({ enum: Rail, example: Rail.ONCHAIN })
 //   rail: PaymentRail;
 
 //   @Expose()

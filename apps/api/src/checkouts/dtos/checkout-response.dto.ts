@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { CheckoutStatus, PaymentRail } from '@prisma/client';
+import { CheckoutStatus, Rail } from '@prisma/client';
 import { Exclude, Expose } from 'class-transformer';
 
 @Exclude()
@@ -52,10 +52,10 @@ export class CheckoutResponseDto {
   @ApiProperty({
     example: ['ONCHAIN', 'BINANCE_PAY'],
     description: 'Enabled payment rails',
-    enum: PaymentRail,
+    enum: Rail,
     isArray: true,
   })
-  enabledRails: PaymentRail[];
+  enabledRails: Rail[];
 
   @Expose()
   @ApiProperty({

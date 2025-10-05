@@ -3,7 +3,7 @@ import {
   AttemptStatus,
   Checkout,
   PaymentAttempt,
-  PaymentRail,
+  Rail,
   PaymentStatus,
   Token,
 } from '@prisma/client';
@@ -121,7 +121,7 @@ export class AlchemyService {
     }
     const paymentAttempt = await this.db.paymentAttempt.findFirst({
       where: {
-        rail: PaymentRail.ONCHAIN,
+        rail: Rail.ONCHAIN,
         status: AttemptStatus.PENDING,
         networkId: network,
         depositWallet: {

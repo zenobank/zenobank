@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { PaymentRail } from '@prisma/client';
+import { Rail } from '@prisma/client';
 import { IsEnum, IsNotEmpty, IsString, MaxLength } from 'class-validator';
 
 export class CreateCheckoutAttemptDto {

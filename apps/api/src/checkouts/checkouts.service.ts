@@ -10,7 +10,7 @@ import { CheckoutResponseDto } from './dtos/checkout-response.dto';
 import { toDto } from 'src/lib/utils/to-dto';
 import { StoresService } from 'src/stores/stores.service';
 import { TokensService } from 'src/tokens/tokens.service';
-import { PaymentRail } from '@prisma/client';
+import { Rail } from '@prisma/client';
 import { getCheckoutUrl } from 'src/payments/lib/utils';
 
 @Injectable()
@@ -42,7 +42,7 @@ export class CheckoutsService {
         priceAmount,
         priceCurrency,
         storeId: store.id,
-        enabledRails: [...Object.values(PaymentRail)],
+        enabledRails: [...Object.values(Rail)],
         enabledTokens: {
           connect: tokens.map((token) => ({ id: token.id })),
         },

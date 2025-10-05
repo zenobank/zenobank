@@ -1,5 +1,5 @@
 import { ApiProperty, getSchemaPath } from '@nestjs/swagger';
-import { AttemptStatus, CheckoutStatus, PaymentRail } from '@prisma/client';
+import { AttemptStatus, CheckoutStatus, Rail } from '@prisma/client';
 import { Expose } from 'class-transformer';
 import { BinancePayAttemptResponseDto } from './binance-pay-attempt-response.dto';
 import { PaymentResponseDto } from 'src/payments/dto/payment-response.dto';

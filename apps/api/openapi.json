@@ -399,23 +399,22 @@
             "type": "string",
             "example": "USDC"
           },
-          "networkId": {
-            "type": "string",
-            "nullable": true,
-            "example": "ETHEREUM_MAINNET"
-          },
-          "standard": {
+          "rail": {
             "type": "string",
             "enum": [
-              "NATIVE",
-              "ERC20",
-              "SPL"
+              "ONCHAIN",
+              "CUSTODIAL"
             ],
-            "example": "ERC20"
+            "example": "ONCHAIN"
           },
           "symbol": {
             "type": "string",
             "example": "USDC"
+          },
+          "logoUrl": {
+            "type": "string",
+            "format": "uri",
+            "example": "https://example.com/logo.png"
           },
           "address": {
             "type": "string",
@@ -428,21 +427,36 @@
             "minimum": 0,
             "example": 6
           },
-          "logoUrl": {
+          "networkId": {
             "type": "string",
-            "format": "uri",
-            "example": "https://example.com/logo.png"
+            "nullable": true,
+            "example": "ETHEREUM_MAINNET"
+          },
+          "providerTokenId": {
+            "type": "string",
+            "nullable": true,
+            "example": null
+          },
+          "provider": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              "BINANCE_PAY"
+            ],
+            "example": null
           }
         },
         "required": [
           "id",
           "canonicalTokenId",
-          "networkId",
-          "standard",
+          "rail",
           "symbol",
+          "logoUrl",
           "address",
           "decimals",
-          "logoUrl"
+          "networkId",
+          "providerTokenId",
+          "provider"
         ]
       },
       "NetworkResponseDto": {

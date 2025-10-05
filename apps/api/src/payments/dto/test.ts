@@ -6,11 +6,11 @@
 //   IsDefined,
 //   IsEmpty,
 // } from 'class-validator';
-// import { PaymentRail } from '@prisma/client';
+// import { Rail } from '@prisma/client';
 
 // export class UpdateDepositSelectionDto {
-//   @ApiProperty({ enum: PaymentRail, example: PaymentRail.ONCHAIN })
-//   @IsEnum(PaymentRail)
+//   @ApiProperty({ enum: Rail, example: Rail.ONCHAIN })
+//   @IsEnum(Rail)
 //   rail: PaymentRail;
 
 //   @ApiPropertyOptional({
@@ -18,11 +18,11 @@
 //     description: 'Required only when rail = ONCHAIN',
 //   })
 //   // tokenId is required only when rail is ONCHAIN
-//   @ValidateIf((o) => o.rail === PaymentRail.ONCHAIN)
+//   @ValidateIf((o) => o.rail === Rail.ONCHAIN)
 //   @IsDefined({ message: 'tokenId is required when rail = ONCHAIN' })
 //   @IsString()
 //   // tokenId must be empty when rail is not ONCHAIN
-//   @ValidateIf((o) => o.rail !== PaymentRail.ONCHAIN)
+//   @ValidateIf((o) => o.rail !== Rail.ONCHAIN)
 //   @IsEmpty({ message: 'tokenId only applies when rail = ONCHAIN' })
 //   tokenId?: string;
 // }
