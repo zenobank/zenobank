@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useAuth, UserButton } from '@clerk/clerk-react'
 import { Copy, Edit3, Check, Loader2 } from 'lucide-react'
-import { usePayments } from '@/lib/state/payments/hooks'
+// import { usePayments } from '@/lib/state/payments/hooks'
 import { useActiveStore } from '@/lib/state/store/hooks'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -16,13 +16,13 @@ import { paymentListSchema } from '../transactions/data/schema'
 import { ChangeWalletDialog } from '../wallets/components/change-wallet-dialog'
 
 export default function Dashboard() {
-  const { payments, isLoading: isPaymentsLoading } = usePayments()
+  // const { payments, isLoading: isPaymentsLoading } = usePayments()
   const { activeStore, isLoading } = useActiveStore()
 
-  const paymentList = useMemo(() => {
-    if (!payments) return []
-    return paymentListSchema.parse(payments)
-  }, [payments])
+  // const paymentList = useMemo(() => {
+  //   if (!payments) return []
+  //   return paymentListSchema.parse(payments)
+  // }, [payments])
 
   const paymentWallet = useMemo(() => {
     return activeStore?.wallets[0] || null
@@ -134,7 +134,7 @@ export default function Dashboard() {
           </div>
         </div>
       </Main>
-      <Main>
+      {/* <Main>
         <TransactionsProvider>
           <div className='mb-2 flex flex-wrap items-center justify-between space-y-2'>
             <div>
@@ -154,7 +154,7 @@ export default function Dashboard() {
             )}
           </div>
         </TransactionsProvider>
-      </Main>
+      </Main> */}
 
       <ChangeWalletDialog
         open={isWalletDialogOpen}
