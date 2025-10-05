@@ -113,6 +113,28 @@ async function seedTokensOnNetworks() {
       // },
     ],
   });
+
+  await prisma.binancePayToken.createMany({
+    skipDuplicates: true,
+    data: [
+      {
+        id: 'USDT_BINANCE_PAY',
+        logoUrl: 'https://example.com/logo.png',
+        name: 'USDT',
+        canonicalTokenId: 'USDT',
+        binanceTokenId: 'USDT',
+        symbol: 'USDT',
+      },
+      {
+        id: 'USDC_BINANCE_PAY',
+        logoUrl: 'https://example.com/logo.png',
+        name: 'USDC',
+        canonicalTokenId: 'USDC',
+        binanceTokenId: 'USDC',
+        symbol: 'USDC',
+      },
+    ],
+  });
 }
 
 async function main() {
