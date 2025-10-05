@@ -1,31 +1,34 @@
 import { CommandGroup, CommandItem } from '@/src/components/ui/command';
-import { CheckoutResponseDto, TokenResponseDto } from '@repo/api-client/model';
+import { BinancePayTokenResponseDto, CheckoutResponseDto, OnChainTokenResponseDto } from '@repo/api-client/model';
 import Image from 'next/image';
-import { PopoverId } from '../..';
+import { PopoverId, TokenResponseDto } from '../..';
 import { Check } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
 
 export function TokenList({
-  checkoutData,
+  binancePayTokens,
+  onchainTokens,
   setSelectedTokenId,
   setActivePopover,
   selectedTokenData,
 }: {
-  checkoutData: CheckoutResponseDto;
+  binancePayTokens: BinancePayTokenResponseDto[];
+  onchainTokens: OnChainTokenResponseDto[];
   setSelectedTokenId: (tokenId: string | null) => void;
   setActivePopover: (open: PopoverId | null) => void;
   selectedTokenData: TokenResponseDto | null;
 }) {
+  const tokens = [...binancePayTokens, ...onchainTokens];
   return (
     <CommandGroup>
-      {checkoutData?.enabledTokens
+      {tokens
         ?.filter((t, i, arr) => i === arr.findIndex((u) => u.canonicalTokenId === t.canonicalTokenId))
         ?.map((supportedToken) => (
           <CommandItem
             key={supportedToken.id}
             value={supportedToken.id}
             onSelect={(currentValue: string) => {
-              const token = checkoutData?.enabledTokens?.find((t) => t.id === currentValue);
+              const token = tokens?.find((t) => t.id === currentValue);
               if (token) {
                 setSelectedTokenId(token.id);
               }

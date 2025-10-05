@@ -1,15 +1,6 @@
 'use client';
 import { Button } from '@/src/components/ui/button';
 import { Card, CardContent, CardFooter } from '@/src/components/ui/card';
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from '@/src/components/ui/command';
-import { Popover, PopoverContent, PopoverTrigger } from '@/src/components/ui/popover';
 import { CheckoutState } from '@/src/features/payments/types/state';
 import { ms } from '@/src/lib/ms';
 import { match } from 'ts-pattern';
@@ -17,28 +8,30 @@ import {
   useCheckoutsControllerCreateCheckoutAttemptV1,
   useCheckoutsControllerGetCheckoutV1,
   useNetworksControllerGetNetworksV1,
+  useTokensControllerGetBinancePayTokensV1,
+  useTokensControllerGetOnChainTokensV1,
 } from '@repo/api-client';
-import { TokenResponseDto } from '@repo/api-client/model';
-import { cn } from '@/src/lib/utils';
-import { Check, ChevronsUpDown } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
-import Image from 'next/image';
-import PaymentDetails from './components/details-screen';
-import ExpiredScreen from './components/expired-screen';
-import SuccessScreen from './components/success-screen';
 import { getPaymentCheckoutState } from './utils/payment-checkout-state';
 import CheckoutHeader from './components/checkout-header';
 import { TokenSelector } from './components/token-selector';
 import { CheckoutPrice } from './components/checkout-price';
 import PayFooter from './components/pay-footer';
 import MethodSelector from './components/method-selector';
+import { BinancePayTokenResponseDto, OnChainTokenResponseDto } from '@repo/api-client/model';
 
 export enum PopoverId {
   TOKEN = 'token',
   METHOD = 'method',
 }
 
+// this should come from the backend
+export enum MethodType {
+  CRYPTO_ONCHAIN = 'CRYPTO_ONCHAIN',
+  BINANCE_PAY = 'BINANCE_PAY',
+}
+export type TokenResponseDto = BinancePayTokenResponseDto | OnChainTokenResponseDto;
 export default function Payament({ id }: { id: string }) {
   const { mutateAsync: createPaymentAttemp } = useCheckoutsControllerCreateCheckoutAttemptV1();
   const { data: { data: checkoutData } = {}, refetch: refetchPaymentData } = useCheckoutsControllerGetCheckoutV1(id, {
@@ -46,93 +39,75 @@ export default function Payament({ id }: { id: string }) {
       refetchInterval: ms('3s'),
     },
   });
+  const { data: { data: binancePayTokens } = {} } = useTokensControllerGetBinancePayTokensV1();
+  const { data: { data: onchainTokens } = {} } = useTokensControllerGetOnChainTokensV1();
   const { data: { data: networks } = {} } = useNetworksControllerGetNetworksV1();
+
+  const enabledTokens: TokenResponseDto[] = useMemo(() => {
+    return [...(binancePayTokens || []), ...(onchainTokens || [])];
+  }, [binancePayTokens, onchainTokens]);
   const [isLoading, setIsLoading] = useState(false);
   const [activePopover, setActivePopover] = useState<PopoverId | null>(null);
   const [selectedTokenId, setSelectedTokenId] = useState<string | null>(null);
-
   const selectedTokenData: TokenResponseDto | null = useMemo(() => {
-    return checkoutData?.enabledTokens?.find((t) => t.id === selectedTokenId) || null;
-  }, [checkoutData?.enabledTokens, selectedTokenId]);
+    return enabledTokens?.find((t) => t.id === selectedTokenId) || null;
+  }, [enabledTokens, selectedTokenId]);
 
-  const selectedNetworkId = useMemo(() => {
-    return selectedTokenData?.networkId || null;
+  const isBinancePayAvailableForSelectedCanonicalToken = useMemo(() => {
+    return !!binancePayTokens?.find((t) => t.canonicalTokenId === selectedTokenData?.canonicalTokenId);
+  }, [binancePayTokens, selectedTokenData]);
+
+  const selectedMethod: MethodType | null = useMemo(() => {
+    const isBinancePayToken = binancePayTokens?.find((t) => t.id === selectedTokenData?.id);
+    const isOnChainToken = onchainTokens?.find((t) => t.id === selectedTokenData?.id);
+    return isBinancePayToken ? MethodType.BINANCE_PAY : isOnChainToken ? MethodType.CRYPTO_ONCHAIN : null;
   }, [selectedTokenData]);
-
-  // useEffect(() => {
-  //   if (checkoutData?.depositWallet) {
-  //     setSelectedTokenId(checkoutData?.depositWallet?.id || null);
-  //   }
-  // }, [checkoutData?.depositWallet]);
-  const availableNetworksIdsForSelectedToken: string[] = useMemo(() => {
-    const tokens = checkoutData?.enabledTokens?.filter(
-      (t) => t.canonicalTokenId === selectedTokenData?.canonicalTokenId && t.rail === 'ONCHAIN',
-    );
-
-    return tokens?.map((t) => t.networkId).filter((id): id is string => id !== null) || [];
-  }, [checkoutData?.enabledTokens, selectedTokenData?.canonicalTokenId]);
-
-  const availableProvidersForSelectedToken: TokenResponseDto[] = useMemo(() => {
-    const tokens = checkoutData?.enabledTokens?.filter(
-      (t) => t.canonicalTokenId === selectedTokenData?.canonicalTokenId && t.rail === 'CUSTODIAL',
-    );
-
-    return tokens || [];
-  }, [checkoutData?.enabledTokens, selectedTokenData?.canonicalTokenId]);
-
-  const availableMethods: {
-    [key: string]: string[];
-  } = {
-    ['ONCHAIN']: availableNetworksIdsForSelectedToken,
-    ['CUSTODIAL']: availableProvidersForSelectedToken.map((t) => t.provider).filter((p) => p !== null),
-  };
 
   const checkoutState = useMemo(() => {
     if (!checkoutData) return CheckoutState.AWAITING_DEPOSIT;
     return getPaymentCheckoutState(checkoutData);
   }, [checkoutData]);
 
+  const networksAvailableForSelectedToken = useMemo(() => {
+    return networks?.filter((network) =>
+      onchainTokens?.find(
+        (t) => t.networkId === network.id && t.canonicalTokenId === selectedTokenData?.canonicalTokenId,
+      ),
+    );
+  }, [networks, selectedTokenData]);
   // Calculate token amount and USD conversion
-
-  const selectedNetworkData = useMemo(() => {
-    if (!selectedNetworkId) return null;
-    return networks?.find((n) => n.id.toString() === selectedNetworkId);
-  }, [selectedNetworkId, networks]);
 
   const [disabled, buttonText] = useMemo(() => {
     return match({
       isLoading,
       selectedTokenData,
-      selectedNetworkData,
     })
       .with({ isLoading: true }, () => [true, 'Loading...'])
-      .with({ selectedTokenData: null }, () => [true, 'Select cryptocurrency'])
-      .with({ selectedTokenData: { rail: 'ONCHAIN' }, selectedNetworkData: null }, () => [true, 'Select method'])
-      .with({ selectedTokenData: { rail: 'CUSTODIAL', provider: null } }, () => [true, 'Select method'])
+      .with({ selectedTokenData: null }, () => [true, 'Select token'])
       .otherwise(() => [false, 'Next']);
-  }, [selectedTokenData, selectedNetworkData, isLoading]);
+  }, [selectedTokenData, isLoading]);
 
-  const handleDepositSelectionSubmit = async () => {
-    if (disabled || !checkoutData?.id) return;
+  // const handleDepositSelectionSubmit = async () => {
+  //   if (disabled || !checkoutData?.id) return;
 
-    if (!selectedTokenId) return;
-    setIsLoading(true);
-    try {
-      await createPaymentAttemp({
-        id: checkoutData.id,
-        data: {
-          tokenId: selectedTokenId,
-        },
-      });
-      await refetchPaymentData();
-    } catch (error) {
-      console.log('error', error);
-      toast.error('Failed to update payment deposit selection');
-      console.error(error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  //   if (!selectedTokenId) return;
+  //   setIsLoading(true);
+  //   try {
+  //     await createPaymentAttemp({
+  //       id: checkoutData.id,
+  //       data: {
+  //         tokenId: selectedTokenId,
+  //       },
+  //     });
+  //     await refetchPaymentData();
+  //   } catch (error) {
+  //     console.log('error', error);
+  //     toast.error('Failed to update payment deposit selection');
+  //     console.error(error);
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
   if (!checkoutData) return null;
 
   return (
@@ -146,22 +121,25 @@ export default function Payament({ id }: { id: string }) {
               activePopover={activePopover}
               setActivePopover={setActivePopover}
               selectedTokenData={selectedTokenData}
-              checkoutData={checkoutData}
+              binancePayTokens={binancePayTokens || []}
+              onchainTokens={onchainTokens || []}
               setSelectedTokenId={setSelectedTokenId}
             />
             <MethodSelector
               activePopover={activePopover}
-              availableMethods={availableMethods}
+              selectedMethod={selectedMethod}
+              onChainTokens={onchainTokens || []}
+              binancePayTokens={binancePayTokens || []}
               setActivePopover={setActivePopover}
               selectedTokenData={selectedTokenData}
-              selectedNetworkData={selectedNetworkData}
               setSelectedTokenId={setSelectedTokenId}
-              networks={networks || []}
+              networks={networksAvailableForSelectedToken || []}
+              isBinancePayAvailableForSelectedCanonicalToken={isBinancePayAvailableForSelectedCanonicalToken}
             />
 
             <Button
               onClick={() => {
-                handleDepositSelectionSubmit();
+                // handleDepositSelectionSubmit();
               }}
               disabled={!!disabled}
               className={`mx-auto w-full ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}

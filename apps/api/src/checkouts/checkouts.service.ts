@@ -28,23 +28,12 @@ export class CheckoutsService {
       throw new NotFoundException('Store not found');
     }
 
-    const [onchainTokens, binancePayTokens] = await Promise.all([
-      this.tokensService.getOnChainTokens(),
-      this.tokensService.getBinancePayTokens(),
-    ]);
-
     const checkout = await this.db.checkout.create({
       data: {
         orderId,
         priceAmount,
         priceCurrency,
         storeId: store.id,
-        enabledOnchainTokens: {
-          connect: onchainTokens.map((token) => ({ id: token.id })),
-        },
-        enabledBinancePayTokens: {
-          connect: binancePayTokens.map((token) => ({ id: token.id })),
-        },
       },
     });
 
@@ -61,10 +50,6 @@ export class CheckoutsService {
   async getCheckout(id: string): Promise<CheckoutResponseDto | null> {
     const checkout = await this.db.checkout.findUnique({
       where: { id },
-      include: {
-        enabledOnchainTokens: true,
-        enabledBinancePayTokens: true,
-      },
     });
 
     if (!checkout) {

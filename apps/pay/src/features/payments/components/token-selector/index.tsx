@@ -1,5 +1,6 @@
-import { CheckoutResponseDto, TokenResponseDto } from '@repo/api-client/model';
+import { BinancePayTokenResponseDto, CheckoutResponseDto, OnChainTokenResponseDto } from '@repo/api-client/model';
 import { PopoverId } from '../..';
+import { TokenResponseDto } from '../..';
 import { Button } from '@/src/components/ui/button';
 import { Popover, PopoverTrigger, PopoverContent } from '@/src/components/ui/popover';
 import { SelectedToken } from './selected-token';
@@ -11,13 +12,15 @@ export function TokenSelector({
   activePopover,
   setActivePopover,
   selectedTokenData,
-  checkoutData,
+  binancePayTokens,
+  onchainTokens,
   setSelectedTokenId,
 }: {
   activePopover: PopoverId | null;
   setActivePopover: (open: PopoverId | null) => void;
   selectedTokenData: TokenResponseDto | null;
-  checkoutData: CheckoutResponseDto;
+  binancePayTokens: BinancePayTokenResponseDto[];
+  onchainTokens: OnChainTokenResponseDto[];
   setSelectedTokenId: (tokenId: string | null) => void;
 }) {
   return (
@@ -45,7 +48,8 @@ export function TokenSelector({
             <CommandList>
               <CommandEmpty>No token found.</CommandEmpty>
               <TokenList
-                checkoutData={checkoutData}
+                binancePayTokens={binancePayTokens}
+                onchainTokens={onchainTokens}
                 setSelectedTokenId={setSelectedTokenId}
                 setActivePopover={setActivePopover}
                 selectedTokenData={selectedTokenData}

@@ -1,5 +1,5 @@
-import { TokenResponseDto } from '@repo/api-client/model';
 import Image from 'next/image';
+import { TokenResponseDto } from '../..';
 
 export function SelectedToken({ selectedTokenData }: { selectedTokenData: TokenResponseDto }) {
   return (

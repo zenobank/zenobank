@@ -1,4 +1,4 @@
-import { Popover, PopoverTrigger, PopoverContent, PopoverAnchor } from '@/src/components/ui/popover';
+import { Popover, PopoverTrigger, PopoverContent } from '@/src/components/ui/popover';
 import { Button } from '@/src/components/ui/button';
 import {
   Command,
@@ -11,34 +11,35 @@ import {
 import { ChevronsUpDown } from 'lucide-react';
 import { Check } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
-import { PopoverId } from '../..';
-import { CheckoutResponseDto, NetworkResponseDto, TokenResponseDto } from '@repo/api-client/model';
+import { MethodType, PopoverId, TokenResponseDto } from '../..';
+import { NetworkResponseDto, BinancePayTokenResponseDto, OnChainTokenResponseDto } from '@repo/api-client/model';
 import { useMemo } from 'react';
 
 export default function MethodSelector({
   activePopover,
   setActivePopover,
   selectedTokenData,
-  availableMethods,
-  selectedNetworkData,
   setSelectedTokenId,
   networks,
+  isBinancePayAvailableForSelectedCanonicalToken,
+  selectedMethod,
+  onChainTokens,
+  binancePayTokens,
 }: {
   activePopover: PopoverId | null;
   setActivePopover: (open: PopoverId | null) => void;
   selectedTokenData: TokenResponseDto | null;
-  availableMethods: {
-    [key: string]: string[];
-  };
-  selectedNetworkData: NetworkResponseDto | null | undefined;
   setSelectedTokenId: (tokenId: string | null) => void;
   networks: NetworkResponseDto[];
+  isBinancePayAvailableForSelectedCanonicalToken: boolean;
+  selectedMethod: MethodType | null;
+  onChainTokens: OnChainTokenResponseDto[];
+  binancePayTokens: BinancePayTokenResponseDto[];
 }) {
   const methodsChoicesLength = useMemo(() => {
-    return Object.values(availableMethods).reduce((total, arr) => total + arr.length, 0);
-  }, [availableMethods]);
+    return isBinancePayAvailableForSelectedCanonicalToken ? networks.length + 1 : networks.length;
+  }, [networks]);
 
-  console.log('availableMethods', availableMethods);
   return (
     <div className="space-y-2">
       <Popover
@@ -56,7 +57,16 @@ export default function MethodSelector({
             className="mx-auto h-12 w-full max-w-md justify-between"
             disabled={!selectedTokenData || methodsChoicesLength <= 1}
           >
-            {selectedTokenData ? <span className="">{selectedNetworkData?.displayName}</span> : 'Select method...'}
+            {selectedMethod ? (
+              <span className="">
+                {selectedMethod === MethodType.CRYPTO_ONCHAIN
+                  ? networks.find((n) => n.id === (selectedTokenData as OnChainTokenResponseDto)?.['networkId'])
+                      ?.displayName
+                  : 'Binance Pay'}
+              </span>
+            ) : (
+              'Select method...'
+            )}
             {methodsChoicesLength > 1 && <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />}
           </Button>
         </PopoverTrigger>
@@ -65,44 +75,49 @@ export default function MethodSelector({
             <CommandInput placeholder="Search payment method..." className="h-9" />
             <CommandList>
               <CommandEmpty>No payment method found.</CommandEmpty>
-              <CommandGroup heading="Others">
-                {availableMethods['CUSTODIAL']?.map((method) => (
+              <CommandGroup heading="">
+                {isBinancePayAvailableForSelectedCanonicalToken && (
                   <CommandItem
-                    key={method}
-                    value={method}
-                    onSelect={(currentValue: string) => {
-                      setSelectedTokenId(currentValue);
+                    key="binance-pay"
+                    value="binance-pay"
+                    onSelect={() => {
+                      const binancePayToken = binancePayTokens.find(
+                        (t) => t.canonicalTokenId === selectedTokenData?.canonicalTokenId,
+                      );
+                      if (binancePayToken) {
+                        setSelectedTokenId(binancePayToken.id);
+                      }
                       setActivePopover(null);
                     }}
                   >
                     <div className="flex items-center gap-3">
-                      {method}
+                      Binance Pay
                       <Check
                         className={cn(
                           'ml-auto h-4 w-4',
-                          selectedTokenData?.id === method ? 'opacity-100' : 'opacity-0',
+                          selectedMethod === MethodType.BINANCE_PAY ? 'opacity-100' : 'opacity-0',
                         )}
                       />
                     </div>
                   </CommandItem>
-                ))}
+                )}
               </CommandGroup>
 
-              {availableMethods['ONCHAIN']?.length && (
-                <CommandGroup heading="Networks">
-                  {availableMethods['ONCHAIN']?.map((networkId) => {
-                    const network = networks?.find((n) => n.id.toString() === networkId);
-                    if (!network) return null;
+              {networks?.length && (
+                <CommandGroup heading={`${networks.length > 1 ? 'Networks' : ''}`}>
+                  {networks?.map((network) => {
                     return (
                       <CommandItem
-                        key={network.id.toString()}
-                        value={network.id.toString()}
-                        onSelect={(currentValue: string) => {
-                          if (currentValue !== selectedNetworkData?.id.toString()) {
-                            const token = networks?.find((t) => t.id === currentValue);
-                            if (token) {
-                              setSelectedTokenId(token.id);
-                            }
+                        key={network.id}
+                        value={network.id}
+                        onSelect={() => {
+                          const token = onChainTokens?.find(
+                            (token) =>
+                              token.networkId === network.id &&
+                              token.canonicalTokenId === selectedTokenData?.canonicalTokenId,
+                          );
+                          if (token) {
+                            setSelectedTokenId(token.id);
                           }
                           setActivePopover(null);
                         }}
@@ -112,7 +127,7 @@ export default function MethodSelector({
                           <Check
                             className={cn(
                               'ml-auto h-4 w-4',
-                              selectedNetworkData?.id === network.id ? 'opacity-100' : 'opacity-0',
+                              selectedTokenData?.id === network.id ? 'opacity-100' : 'opacity-0',
                             )}
                           />
                         </div>
