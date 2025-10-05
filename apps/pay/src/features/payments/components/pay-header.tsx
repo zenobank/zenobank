@@ -1,6 +1,6 @@
 import { CardHeader, CardTitle } from '@/src/components/ui/card';
 import { CheckoutState } from '../types/state';
-import BadgerTimerCountdown from './BadgerTimerCountdown';
+import BadgerTimerCountdown from './badger-timer-countdown';
 import { CheckoutResponseDto } from '@repo/api-client/model';
 
 export default function PayHeader({
