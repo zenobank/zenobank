@@ -16,6 +16,38 @@ export class CheckoutsService {
     private readonly storesService: StoresService,
     private readonly tokensService: TokensService,
   ) {}
+  async getEnabledTokens(checkoutId: string): Promise<any> {
+    const checkout = await this.db.checkout.findUnique({
+      where: { id: checkoutId },
+      include: {
+        store: {
+          include: {
+            wallets: true,
+            binancePayCredential: true,
+          },
+        },
+      },
+    });
+    if (!checkout) {
+      throw new NotFoundException('Checkout not found');
+    }
+    if (checkout.store.binancePayCredential) {
+      const binancePayTokens = await this.tokensService.getBinancePayTokens();
+      return {
+        binancePayTokens,
+      };
+    }
+    if (checkout.store.wallets.length > 0) {
+      const onchainTokens = await this.tokensService.getOnChainTokens();
+      return {
+        onchainTokens,
+      };
+    }
+    return {
+      onchainTokens: [],
+      binancePayTokens: [],
+    };
+  }
 
   async createCheckout(
     createCheckoutDto: CreateCheckoutDto,

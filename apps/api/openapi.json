@@ -1,51 +1,26 @@
 {
   "openapi": "3.0.0",
   "paths": {
-    "/api/v1/tokens/onchain": {
+    "/api/v1/tokens/canonical": {
       "get": {
-        "operationId": "TokensController_getOnChainTokens_v1",
+        "description": "Returns all available tokens grouped by payment method (on-chain and Binance Pay)",
+        "operationId": "TokensController_getCanonicalTokens_v1",
         "parameters": [],
         "responses": {
           "200": {
-            "description": "",
+            "description": "Successfully retrieved canonical tokens",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/OnChainTokenResponseDto"
-                  }
+                  "$ref": "#/components/schemas/CanonicalTokensResponseDto"
                 }
               }
             }
           }
         },
+        "summary": "Get all canonical tokens",
         "tags": [
-          "Tokens"
-        ]
-      }
-    },
-    "/api/v1/tokens/binance-pay": {
-      "get": {
-        "operationId": "TokensController_getBinancePayTokens_v1",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/BinancePayTokenResponseDto"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Tokens"
+          "tokens"
         ]
       }
     },
@@ -396,6 +371,40 @@
           "Checkouts"
         ]
       }
+    },
+    "/api/v1/checkouts/{id}/enabled-tokens": {
+      "get": {
+        "operationId": "CheckoutsController_getEnabledTokens_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get enabled tokens for a checkout",
+        "tags": [
+          "Checkouts"
+        ]
+      }
     }
   },
   "info": {
@@ -487,6 +496,29 @@
           "binanceTokenId",
           "symbol",
           "logoUrl"
+        ]
+      },
+      "CanonicalTokensResponseDto": {
+        "type": "object",
+        "properties": {
+          "ONCHAIN": {
+            "description": "On-chain tokens available for payments",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OnChainTokenResponseDto"
+            }
+          },
+          "BINANCE_PAY": {
+            "description": "Binance Pay tokens available for payments",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BinancePayTokenResponseDto"
+            }
+          }
+        },
+        "required": [
+          "ONCHAIN",
+          "BINANCE_PAY"
         ]
       },
       "RegisterExternalWalletDto": {

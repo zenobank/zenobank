@@ -88,4 +88,10 @@ export class CheckoutsController {
       createCheckoutAttemptDto,
     );
   }
+
+  @Get(':id/enabled-tokens')
+  @ApiOperation({ summary: 'Get enabled tokens for a checkout' })
+  async getEnabledTokens(@Param('id') checkoutId: string): Promise<string[]> {
+    return this.checkoutsService.getEnabledTokens(checkoutId);
+  }
 }
