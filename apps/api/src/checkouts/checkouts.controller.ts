@@ -15,6 +15,8 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { API_KEY_HEADER } from 'src/auth/auth.constants';
 import { CreatePaymentAttemptDto } from './attempts/dtos/create-payment-attempt.dto';
 import { AttemptsService } from './attempts/attempts.service';
+import { BinancePayAttemptResponseDto } from './attempts/dtos/binance-pay-attempt-response.dto';
+import { OnchainAttemptResponseDto } from './attempts/dtos/onchain-attempt-response.dto';
 
 @ApiTags('Checkouts')
 @Controller('checkouts')
@@ -55,7 +57,7 @@ export class CheckoutsController {
   // @Post(':id/attempts')
   // @ApiOperation({ summary: 'Create a new checkout attempt' })
   // async createCheckoutAttempt(
-  //   @Param('id') checkoutId: string,
+  //   @Param('id') Compruebas sícheckoutId: string,
   //   @Body() createCheckoutAttemptDto: CreatePaymentAttemptDto,
   // ): Promise<void> {
   //   return this.attemptsService.createCheckoutAttempt(
@@ -68,7 +70,7 @@ export class CheckoutsController {
   async createCheckoutAttemptBinancePay(
     @Param('id') checkoutId: string,
     @Body() createCheckoutAttemptDto: CreatePaymentAttemptDto,
-  ): Promise<void> {
+  ): Promise<BinancePayAttemptResponseDto> {
     return this.attemptsService.createBinancePayCheckoutAttempt(
       checkoutId,
       createCheckoutAttemptDto,
@@ -80,7 +82,7 @@ export class CheckoutsController {
   async createCheckoutAttemptOnchain(
     @Param('id') checkoutId: string,
     @Body() createCheckoutAttemptDto: CreatePaymentAttemptDto,
-  ): Promise<void> {
+  ): Promise<OnchainAttemptResponseDto> {
     return this.attemptsService.createOnChainCheckoutAttempt(
       checkoutId,
       createCheckoutAttemptDto,
