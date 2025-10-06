@@ -5,11 +5,13 @@ import { CheckoutState } from '@/src/features/payments/types/state';
 import { ms } from '@/src/lib/ms';
 import { match } from 'ts-pattern';
 import {
-  useCheckoutsControllerCreateCheckoutAttemptV1,
+  useCheckoutsControllerCreateCheckoutV1,
   useCheckoutsControllerGetCheckoutV1,
   useNetworksControllerGetNetworksV1,
   useTokensControllerGetBinancePayTokensV1,
   useTokensControllerGetOnChainTokensV1,
+  useCheckoutsControllerCreateCheckoutAttemptBinancePayV1,
+  useCheckoutsControllerCreateCheckoutAttemptOnchainV1,
 } from '@repo/api-client';
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
@@ -19,7 +21,14 @@ import { TokenSelector } from './components/token-selector';
 import { CheckoutPrice } from './components/checkout-price';
 import PayFooter from './components/pay-footer';
 import MethodSelector from './components/method-selector';
-import { BinancePayTokenResponseDto, OnChainTokenResponseDto } from '@repo/api-client/model';
+import {
+  BinancePayTokenResponseDto,
+  OnChainTokenResponseDto,
+  BinancePayAttemptResponseDto,
+  OnchainAttemptResponseDto,
+} from '@repo/api-client/model';
+import { OnchainPayAttemp } from './components/pay-attemp/onchain-pay-attemp';
+import { BinancePayAttemp } from './components/pay-attemp/binance-pay-attemp';
 
 export enum PopoverId {
   TOKEN = 'token',
@@ -31,9 +40,17 @@ export enum MethodType {
   ONCHAIN = 'ONCHAIN',
   BINANCE_PAY = 'BINANCE_PAY',
 }
+type AttemptPayload = {
+  id: string;
+  data: { tokenId: string; checkoutId: string };
+};
+type AttemptCreator = (p: AttemptPayload) => Promise<void>;
+
 export type TokenResponseDto = BinancePayTokenResponseDto | OnChainTokenResponseDto;
 export default function Payament({ id }: { id: string }) {
-  const { mutateAsync: createCheckoutAttempt } = useCheckoutsControllerCreateCheckoutAttemptV1();
+  const { mutateAsync: createCheckoutAttemptBinancePay } = useCheckoutsControllerCreateCheckoutAttemptBinancePayV1();
+  const { mutateAsync: createCheckoutAttemptOnchain } = useCheckoutsControllerCreateCheckoutAttemptOnchainV1();
+
   const { data: { data: checkoutData } = {}, refetch: refetchPaymentData } = useCheckoutsControllerGetCheckoutV1(id, {
     query: {
       refetchInterval: ms('3s'),
@@ -49,6 +66,8 @@ export default function Payament({ id }: { id: string }) {
   const [isLoading, setIsLoading] = useState(false);
   const [activePopover, setActivePopover] = useState<PopoverId | null>(null);
   const [selectedTokenId, setSelectedTokenId] = useState<string | null>(null);
+  const [onchainAttempt, setOnchainAttempt] = useState<OnchainAttemptResponseDto | null>(null);
+  const [binancePayAttempt, setBinancePayAttempt] = useState<BinancePayAttemptResponseDto | null>(null);
   const selectedTokenData: TokenResponseDto | null = useMemo(() => {
     return enabledTokens?.find((t) => t.id === selectedTokenId) || null;
   }, [enabledTokens, selectedTokenId]);
@@ -93,17 +112,28 @@ export default function Payament({ id }: { id: string }) {
     if (!selectedTokenId) return;
     setIsLoading(true);
     try {
-      await createCheckoutAttempt({
-        id: checkoutData.id,
-        data: {
-          tokenId: selectedTokenId,
-          checkoutId: checkoutData.id,
-        },
-      });
-      await refetchPaymentData();
+      if (selectedMethod === MethodType.BINANCE_PAY) {
+        const { data } = await createCheckoutAttemptBinancePay({
+          id: checkoutData.id,
+          data: {
+            tokenId: selectedTokenId,
+            checkoutId: checkoutData.id,
+          },
+        });
+        setBinancePayAttempt(data);
+      } else if (selectedMethod === MethodType.ONCHAIN) {
+        const { data } = await createCheckoutAttemptOnchain({
+          id: checkoutData.id,
+          data: {
+            tokenId: selectedTokenId,
+            checkoutId: checkoutData.id,
+          },
+        });
+        setOnchainAttempt(data);
+      }
     } catch (error) {
       console.log('error', error);
-      toast.error('Failed to update payment deposit selection');
+      toast.error('Failed to create payment attempt');
       console.error(error);
     } finally {
       setIsLoading(false);
@@ -111,6 +141,36 @@ export default function Payament({ id }: { id: string }) {
   };
   if (!checkoutData) return null;
 
+  const handleBack = () => {
+    setOnchainAttempt(null);
+    setBinancePayAttempt(null);
+  };
+
+  // Show Onchain attempt component with its own complete card
+  if (onchainAttempt) {
+    return (
+      <OnchainPayAttemp
+        attempt={onchainAttempt}
+        expiresAt={checkoutData.expiresAt}
+        checkoutState={checkoutState}
+        onBack={handleBack}
+      />
+    );
+  }
+
+  // Show Binance Pay attempt component with its own complete card
+  if (binancePayAttempt) {
+    return (
+      <BinancePayAttemp
+        attempt={binancePayAttempt}
+        expiresAt={checkoutData.expiresAt}
+        checkoutState={checkoutState}
+        onBack={handleBack}
+      />
+    );
+  }
+
+  // Show token/method selection screen
   return (
     <div className="flex min-h-screen items-center justify-center px-4 py-8">
       <div className="mx-auto max-w-md flex-1">
@@ -147,14 +207,6 @@ export default function Payament({ id }: { id: string }) {
             >
               {buttonText}
             </Button>
-
-            {/* {match(checkoutState)
-              .with(CheckoutState.AWAITING_DEPOSIT, () => (
-                <PaymentDetails walletAddress={checkoutData?.depositDetails?.address || ''} />
-              ))
-              .with(CheckoutState.COMPLETED, () => <SuccessScreen />)
-              .with(CheckoutState.EXPIRED, () => <ExpiredScreen />)
-              .otherwise(() => null)} */}
           </CardContent>
 
           <CardFooter className="w-full space-y-3 pt-4"></CardFooter>
