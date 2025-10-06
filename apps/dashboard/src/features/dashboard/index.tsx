@@ -9,10 +9,6 @@ import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
 import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
-import { paymentColumns } from '../transactions/components/users-columns'
-import { UsersTable } from '../transactions/components/users-table'
-import TransactionsProvider from '../transactions/context/transactions-context'
-import { paymentListSchema } from '../transactions/data/schema'
 import { ChangeWalletDialog } from '../wallets/components/change-wallet-dialog'
 
 export default function Dashboard() {
