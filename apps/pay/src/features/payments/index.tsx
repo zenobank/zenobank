@@ -1,7 +1,6 @@
 'use client';
 import { Button } from '@/src/components/ui/button';
 import { Card, CardContent, CardFooter } from '@/src/components/ui/card';
-import { CheckoutState } from '@/src/features/payments/types/state';
 import { ms } from '@/src/lib/ms';
 import { match } from 'ts-pattern';
 import {
@@ -80,11 +79,6 @@ export default function Payament({ id }: { id: string }) {
     return isBinancePayToken ? MethodType.BINANCE_PAY : isOnChainToken ? MethodType.ONCHAIN : null;
   }, [selectedTokenData]);
 
-  const checkoutState = useMemo(() => {
-    if (!checkoutData) return CheckoutState.AWAITING_DEPOSIT;
-    return getPaymentCheckoutState(checkoutData);
-  }, [checkoutData]);
-
   const networksAvailableForSelectedToken = useMemo(() => {
     return networks?.filter((network) =>
       onchainTokens?.find(
@@ -150,7 +144,6 @@ export default function Payament({ id }: { id: string }) {
       <OnchainPayAttemp
         attempt={onchainAttempt}
         expiresAt={checkoutData.expiresAt}
-        checkoutState={checkoutState}
         onBack={handleBack}
         networks={networksAvailableForSelectedToken || []}
       />
@@ -159,14 +152,7 @@ export default function Payament({ id }: { id: string }) {
 
   // Show Binance Pay attempt component with its own complete card
   if (binancePayAttempt) {
-    return (
-      <BinancePayAttemp
-        attempt={binancePayAttempt}
-        expiresAt={checkoutData.expiresAt}
-        checkoutState={checkoutState}
-        onBack={handleBack}
-      />
-    );
+    return <BinancePayAttemp attempt={binancePayAttempt} expiresAt={checkoutData.expiresAt} onBack={handleBack} />;
   }
 
   // Show token/method selection screen
@@ -174,7 +160,7 @@ export default function Payament({ id }: { id: string }) {
     <div className="flex min-h-screen items-center justify-center px-4 py-8">
       <div className="mx-auto max-w-md flex-1">
         <Card className="">
-          <CheckoutHeader expiresAt={checkoutData?.expiresAt} checkoutState={checkoutState} />
+          <CheckoutHeader expiresAt={checkoutData?.expiresAt} />
           <CardContent className="space-y-3">
             <CheckoutPrice amount={checkoutData.priceAmount} currency={checkoutData.priceCurrency} />
             <TokenSelector

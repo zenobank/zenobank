@@ -2,7 +2,6 @@ import { NetworkResponseDto, OnchainAttemptResponseDto } from '@repo/api-client/
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/src/components/ui/card';
 import { Button } from '@/src/components/ui/button';
 import { Badge } from '@/src/components/ui/badge';
-import { CheckoutState } from '../../types/state';
 import BadgerTimerCountdown from '../badger-timer-countdown';
 import PayFooter from '../pay-footer';
 import { QRCodeCanvas } from 'qrcode.react';
@@ -13,12 +12,11 @@ import copy from 'copy-to-clipboard';
 interface OnchainPayAttempProps {
   attempt: OnchainAttemptResponseDto;
   expiresAt?: string | null;
-  checkoutState: CheckoutState;
   onBack: () => void;
   networks: NetworkResponseDto[];
 }
 
-export function OnchainPayAttemp({ attempt, expiresAt, checkoutState, onBack, networks }: OnchainPayAttempProps) {
+export function OnchainPayAttemp({ attempt, expiresAt, onBack, networks }: OnchainPayAttempProps) {
   const handleCopy = (text: string) => {
     copy(text);
     toast.success('Copied to clipboard!');
@@ -28,13 +26,11 @@ export function OnchainPayAttemp({ attempt, expiresAt, checkoutState, onBack, ne
       <div className="mx-auto max-w-md flex-1">
         <Card className="">
           <CardHeader className="">
-            <div className="flex items-center justify-between">
+            <div className="flex items-baseline justify-between">
               <Button variant="ghost" size="icon" onClick={onBack} className="h-9 w-9">
                 <ArrowLeft className="h-5 w-5" />
               </Button>
-              {expiresAt && checkoutState === CheckoutState.AWAITING_DEPOSIT && (
-                <BadgerTimerCountdown expiresAt={expiresAt} />
-              )}
+              {expiresAt && <BadgerTimerCountdown expiresAt={expiresAt} />}
             </div>
           </CardHeader>
 

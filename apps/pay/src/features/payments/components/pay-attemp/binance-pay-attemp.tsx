@@ -2,7 +2,6 @@ import { BinancePayAttemptResponseDto } from '@repo/api-client/model';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/src/components/ui/card';
 import { Button } from '@/src/components/ui/button';
 import { Badge } from '@/src/components/ui/badge';
-import { CheckoutState } from '../../types/state';
 import BadgerTimerCountdown from '../badger-timer-countdown';
 import PayFooter from '../pay-footer';
 import { QRCodeCanvas } from 'qrcode.react';
@@ -13,11 +12,10 @@ import copy from 'copy-to-clipboard';
 interface BinancePayAttempProps {
   attempt: BinancePayAttemptResponseDto;
   expiresAt?: string | null;
-  checkoutState: CheckoutState;
   onBack: () => void;
 }
 
-export function BinancePayAttemp({ attempt, expiresAt, checkoutState, onBack }: BinancePayAttempProps) {
+export function BinancePayAttemp({ attempt, expiresAt, onBack }: BinancePayAttempProps) {
   const handleCopy = (text: string) => {
     copy(text);
     toast.success('Copied to clipboard!');
@@ -28,13 +26,11 @@ export function BinancePayAttemp({ attempt, expiresAt, checkoutState, onBack }: 
       <div className="mx-auto max-w-md flex-1">
         <Card className="">
           <CardHeader className="">
-            <div className="flex items-center justify-between">
+            <div className="flex items-baseline justify-between">
               <Button variant="ghost" size="icon" onClick={onBack} className="h-9 w-9">
                 <ArrowLeft className="h-5 w-5" />
               </Button>
-              {expiresAt && checkoutState === CheckoutState.AWAITING_DEPOSIT && (
-                <BadgerTimerCountdown expiresAt={expiresAt} />
-              )}
+              {expiresAt && <BadgerTimerCountdown expiresAt={expiresAt} />}
             </div>
           </CardHeader>
 
@@ -54,7 +50,7 @@ export function BinancePayAttemp({ attempt, expiresAt, checkoutState, onBack }: 
             <div className="space-y-2">
               <div className="flex w-full justify-center">
                 <span className="text-muted-foreground text-center text-xs font-light">
-                  Send Exact Amount to this Account ID
+                  Send Exact Amount to this Binance ID
                 </span>
               </div>
 
@@ -80,7 +76,11 @@ export function BinancePayAttemp({ attempt, expiresAt, checkoutState, onBack }: 
             </div>
           </CardContent>
 
-          <CardFooter className="pt-4"></CardFooter>
+          <CardFooter className="w-full">
+            <span className="text-muted-foreground flex w-full justify-center text-center text-xs font-extralight italic">
+              Confirmation may take up to 1 min
+            </span>
+          </CardFooter>
         </Card>
 
         <PayFooter />

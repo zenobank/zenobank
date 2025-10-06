@@ -1,24 +1,15 @@
 import { CardHeader, CardTitle } from '@/src/components/ui/card';
-import { CheckoutState } from '../types/state';
 import BadgerTimerCountdown from './badger-timer-countdown';
 import { CheckoutResponseDto } from '@repo/api-client/model';
 
-export default function CheckoutHeader({
-  expiresAt,
-  checkoutState,
-}: {
-  expiresAt?: string | null;
-  checkoutState: CheckoutState;
-}) {
+export default function CheckoutHeader({ expiresAt }: { expiresAt?: string | null }) {
   return (
     <CardHeader className="pb-4">
-      <div className="flex items-center justify-between">
+      <div className="flex items-baseline justify-between">
         <div className="flex items-center">
           <CardTitle className="text-lg">Send Payment</CardTitle>
         </div>
-        {expiresAt && checkoutState === CheckoutState.AWAITING_DEPOSIT && (
-          <BadgerTimerCountdown expiresAt={expiresAt} />
-        )}
+        {expiresAt && <BadgerTimerCountdown expiresAt={expiresAt} />}
       </div>
     </CardHeader>
   );
