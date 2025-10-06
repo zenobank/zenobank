@@ -4,25 +4,23 @@ import { OnChainTokenResponseDto } from './dto/onchain-token-response';
 import { toDto } from 'src/lib/utils/to-dto';
 import { BinancePayTokenResponseDto } from './dto/binance-pay-token-response';
 import { MethodType } from '@prisma/client';
+import { CanonicalTokensResponseDto } from './dto/canonical-tokens-response';
 
 @Injectable()
 export class TokensService {
   private readonly logger = new Logger(TokensService.name);
   constructor(private db: PrismaService) {}
 
-  async getCanonicalTokens(): Promise<{
-    [MethodType.ONCHAIN]: OnChainTokenResponseDto[];
-    [MethodType.BINANCE_PAY]: BinancePayTokenResponseDto[];
-  }> {
+  async getCanonicalTokens(): Promise<CanonicalTokensResponseDto> {
     const [onchainTokens, binancePayTokens] = await Promise.all([
       this.getOnChainTokens(),
       this.getBinancePayTokens(),
     ]);
 
-    return {
-      [MethodType.ONCHAIN]: onchainTokens,
-      [MethodType.BINANCE_PAY]: binancePayTokens,
-    };
+    return toDto(CanonicalTokensResponseDto, {
+      ONCHAIN: onchainTokens,
+      BINANCE_PAY: binancePayTokens,
+    });
   }
 
   async getOnChainTokens(): Promise<OnChainTokenResponseDto[]> {

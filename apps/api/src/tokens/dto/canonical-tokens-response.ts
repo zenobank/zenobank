@@ -1,19 +1,22 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { MethodType } from '@prisma/client';
 import { OnChainTokenResponseDto } from './onchain-token-response';
 import { BinancePayTokenResponseDto } from './binance-pay-token-response';
+import { Expose, Type } from 'class-transformer';
 
 export class CanonicalTokensResponseDto {
+  @Expose()
+  @Type(() => OnChainTokenResponseDto)
   @ApiProperty({
     type: [OnChainTokenResponseDto],
     description: 'On-chain tokens available for payments',
   })
-  [MethodType.ONCHAIN]: OnChainTokenResponseDto[];
+  ONCHAIN: OnChainTokenResponseDto[];
 
+  @Expose()
+  @Type(() => BinancePayTokenResponseDto)
   @ApiProperty({
     type: [BinancePayTokenResponseDto],
     description: 'Binance Pay tokens available for payments',
   })
-  [MethodType.BINANCE_PAY]: BinancePayTokenResponseDto[];
+  BINANCE_PAY: BinancePayTokenResponseDto[];
 }
-

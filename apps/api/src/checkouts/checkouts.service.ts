@@ -31,22 +31,14 @@ export class CheckoutsService {
     if (!checkout) {
       throw new NotFoundException('Checkout not found');
     }
-    if (checkout.store.binancePayCredential) {
-      const binancePayTokens = await this.tokensService.getBinancePayTokens();
-      return {
-        binancePayTokens,
-      };
+    const canonicalTokens = await this.tokensService.getCanonicalTokens();
+    if (!checkout.store.binancePayCredential) {
+      canonicalTokens.BINANCE_PAY = [];
     }
-    if (checkout.store.wallets.length > 0) {
-      const onchainTokens = await this.tokensService.getOnChainTokens();
-      return {
-        onchainTokens,
-      };
+    if (checkout.store.wallets.length === 0) {
+      canonicalTokens.ONCHAIN = [];
     }
-    return {
-      onchainTokens: [],
-      binancePayTokens: [],
-    };
+    return canonicalTokens;
   }
 
   async createCheckout(
