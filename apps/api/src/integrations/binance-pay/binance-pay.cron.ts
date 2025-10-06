@@ -4,6 +4,8 @@ import { Injectable } from '@nestjs/common';
 import {
   AttemptStatus,
   BinancePayPaymentAttempt,
+  CheckoutStatus,
+  PaymentStatus,
   PrismaPromise,
 } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -36,7 +38,10 @@ export class BinanceCron {
   async handleCron() {
     // 1) Traer attempts PENDING con monto y moneda
     const attempts = (await this.db.binancePayPaymentAttempt.findMany({
-      where: { status: AttemptStatus.PENDING },
+      where: {
+        status: AttemptStatus.PENDING,
+        AND: { checkout: { status: CheckoutStatus.OPEN } },
+      },
       select: {
         id: true,
         checkout: {
@@ -112,13 +117,26 @@ export class BinanceCron {
         if (!candidates.length) attemptsIndex.delete(key); // limpiar si ya no quedan
 
         // 3e) Actualizar attempt en DB
+        const paidAt = new Date(trade.transactionTime ?? new Date().getTime());
         updates.push(
           this.db.binancePayPaymentAttempt.update({
             where: { id: attemptToConfirm.id },
             data: {
               status: AttemptStatus.SUCCEEDED,
               transactionId: trade.transactionId,
-              paidAt: new Date(trade.transactionTime ?? new Date().getTime()),
+              paidAt: paidAt,
+              checkout: {
+                update: {
+                  status: CheckoutStatus.COMPLETED,
+                  payment: {
+                    update: {
+                      status: PaymentStatus.COMPLETED,
+                      binanceAttemptId: attemptToConfirm.id,
+                      paidAt: paidAt,
+                    },
+                  },
+                },
+              },
             },
           }),
         );
