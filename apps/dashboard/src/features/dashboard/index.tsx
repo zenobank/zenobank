@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useAuth, UserButton } from '@clerk/clerk-react'
+import copy from 'copy-to-clipboard'
 import { Copy, Edit3, Check, Loader2 } from 'lucide-react'
 // import { usePayments } from '@/lib/state/payments/hooks'
 import { useActiveStore } from '@/lib/state/store/hooks'
@@ -9,8 +10,8 @@ import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
 import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
-import { ChangeBinanceIdDialog } from '../wallets/components/change-binance-id-dialog'
-import { ChangeWalletDialog } from '../wallets/components/change-wallet-dialog'
+import { ChangeBinanceIdDialog } from '../funds-reception-methods/dialogs/change-binance-pay-dialog'
+import { ChangeWalletDialog } from '../funds-reception-methods/dialogs/change-wallet-dialog'
 
 export default function Dashboard() {
   // const { payments, isLoading: isPaymentsLoading } = usePayments()
@@ -29,8 +30,10 @@ export default function Dashboard() {
   const [copiedBinance, setCopiedBinance] = useState(false)
   const [isWalletDialogOpen, setIsWalletDialogOpen] = useState(false)
   const [isBinanceDialogOpen, setIsBinanceDialogOpen] = useState(false)
+
+  const { binancePayCredential } = activeStore || {}
   // TODO: Get this from backend/store
-  const [binanceId] = useState<string>('')
+
   const { getToken } = useAuth()
   getToken().then((_token) => {
     // console.log('token!!!', token)
@@ -51,10 +54,10 @@ export default function Dashboard() {
 
   const copyBinanceId = async () => {
     try {
-      if (!binanceId) {
+      if (!binancePayCredential?.accountId) {
         return
       }
-      await navigator.clipboard.writeText(binanceId)
+      await copy(binancePayCredential.accountId)
       setCopiedBinance(true)
       setTimeout(() => setCopiedBinance(false), 2000)
     } catch (_err) {
@@ -79,7 +82,7 @@ export default function Dashboard() {
           <h1 className='text-2xl font-bold tracking-tight'>Dashboard</h1>
         </div>
         <div className='max-w-4xl space-y-6'>
-          <p className='text-muted-foreground'>Receive funds</p>
+          <p className='text-muted-foreground'>Funds reception methods</p>
 
           {/* Cards Grid */}
           <div className='grid grid-cols-1 gap-4 lg:grid-cols-2'>
@@ -103,17 +106,6 @@ export default function Dashboard() {
                     </svg>
                     <span className='text-muted-foreground'>Wallet</span>
                   </div>
-                  {paymentWallet && (
-                    <Button
-                      variant='ghost'
-                      size='sm'
-                      className='h-7 px-2 text-xs'
-                      onClick={() => setIsWalletDialogOpen(true)}
-                    >
-                      <Edit3 className='mr-1 h-3 w-3' />
-                      Edit
-                    </Button>
-                  )}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -176,17 +168,6 @@ export default function Dashboard() {
                     </svg>
                     <span className='text-muted-foreground'>Binance Pay</span>
                   </div>
-                  {binanceId && (
-                    <Button
-                      variant='ghost'
-                      size='sm'
-                      className='h-7 px-2 text-xs'
-                      onClick={() => setIsBinanceDialogOpen(true)}
-                    >
-                      <Edit3 className='mr-1 h-3 w-3' />
-                      Edit
-                    </Button>
-                  )}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -194,10 +175,10 @@ export default function Dashboard() {
                   <div className='flex items-center justify-center py-6'>
                     <Loader2 className='text-muted-foreground h-4 w-4 animate-spin' />
                   </div>
-                ) : binanceId ? (
+                ) : binancePayCredential ? (
                   <div className='flex items-center gap-2'>
                     <code className='text-foreground font-mono text-sm'>
-                      {binanceId}
+                      {binancePayCredential.accountId}
                     </code>
                     <Button
                       variant='ghost'
@@ -240,7 +221,7 @@ export default function Dashboard() {
       <ChangeBinanceIdDialog
         open={isBinanceDialogOpen}
         onOpenChange={setIsBinanceDialogOpen}
-        currentBinanceId={binanceId}
+        currentBinanceId={binancePayCredential?.accountId || ''}
       />
     </>
   )

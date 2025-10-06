@@ -27,6 +27,10 @@ export class StoreResponseDto {
 
   @Expose()
   @Type(() => BinancePayCredentialResponseDto)
+  @ApiProperty({
+    description: 'Binance Pay credential',
+    type: BinancePayCredentialResponseDto,
+  })
   binancePayCredential: BinancePayCredentialResponseDto | null;
 
   @Expose()

@@ -580,6 +580,23 @@
           "confirmationRetryDelay"
         ]
       },
+      "BinancePayCredentialResponseDto": {
+        "type": "object",
+        "properties": {
+          "apiKey": {
+            "type": "string",
+            "example": "cuid_1234567890abcdef"
+          },
+          "accountId": {
+            "type": "string",
+            "example": "568321"
+          }
+        },
+        "required": [
+          "apiKey",
+          "accountId"
+        ]
+      },
       "WalletResponseDto": {
         "type": "object",
         "properties": {
@@ -619,23 +636,6 @@
           "label"
         ]
       },
-      "BinancePayCredentialResponseDto": {
-        "type": "object",
-        "properties": {
-          "apiKey": {
-            "type": "string",
-            "example": "cuid_1234567890abcdef"
-          },
-          "accountId": {
-            "type": "string",
-            "example": "568321"
-          }
-        },
-        "required": [
-          "apiKey",
-          "accountId"
-        ]
-      },
       "StoreResponseDto": {
         "type": "object",
         "properties": {
@@ -654,28 +654,29 @@
             "description": "API key for the store",
             "example": "cuid_1234567890abcdef"
           },
+          "binancePayCredential": {
+            "nullable": true,
+            "description": "Binance Pay credential",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BinancePayCredentialResponseDto"
+              }
+            ]
+          },
           "wallets": {
             "description": "Associated wallets",
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/WalletResponseDto"
             }
-          },
-          "binancePayCredential": {
-            "nullable": true,
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/BinancePayCredentialResponseDto"
-              }
-            ]
           }
         },
         "required": [
           "id",
           "name",
           "apiKey",
-          "wallets",
-          "binancePayCredential"
+          "binancePayCredential",
+          "wallets"
         ]
       },
       "UserResponseDto": {

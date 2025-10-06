@@ -6,7 +6,10 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
-import { useActiveStore } from '@/lib/state/store/hooks'
+import {
+  useActiveStore,
+  useCreateBinancePayCredential,
+} from '@/lib/state/store/hooks'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -27,21 +30,9 @@ import {
 import { Input } from '@/components/ui/input'
 
 const formSchema = z.object({
-  binanceId: z
-    .string()
-    .min(1, 'Binance ID is required')
-    .regex(
-      /^[0-9]{6,12}$/,
-      'Please enter a valid Binance Pay ID (6-12 digits)'
-    ),
-  apiKey: z
-    .string()
-    .min(1, 'API Key is required')
-    .min(32, 'API Key must be at least 32 characters'),
-  apiSecret: z
-    .string()
-    .min(1, 'API Secret is required')
-    .min(32, 'API Secret must be at least 32 characters'),
+  binanceId: z.string().min(1, 'Binance ID is required'),
+  apiKey: z.string().min(1, 'API Key is required'),
+  apiSecret: z.string().min(1, 'API Secret is required'),
 })
 
 type BinanceForm = z.infer<typeof formSchema>
@@ -55,16 +46,18 @@ interface Props {
 export function ChangeBinanceIdDialog({
   open,
   onOpenChange,
-  currentBinanceId,
+  currentBinanceId: _currentBinanceId,
 }: Props) {
   const { activeStore } = useActiveStore()
+  const { createBinancePayCredential } = useCreateBinancePayCredential()
   const [loading, setLoading] = useState(false)
+  const { binancePayCredential } = activeStore || {}
 
   const form = useForm<BinanceForm>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      binanceId: currentBinanceId || '',
-      apiKey: '',
+      binanceId: binancePayCredential?.accountId || '',
+      apiKey: binancePayCredential?.apiKey || '',
       apiSecret: '',
     },
   })
@@ -76,16 +69,11 @@ export function ChangeBinanceIdDialog({
     }
     setLoading(true)
     try {
-      // TODO: Connect to backend API
-      // await updateBinanceCredentials({
-      //   binanceId: values.binanceId,
-      //   apiKey: values.apiKey,
-      //   apiSecret: values.apiSecret,
-      //   storeId: activeStore.id,
-      // })
-
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 500))
+      await createBinancePayCredential({
+        apiKey: values.apiKey,
+        apiSecret: values.apiSecret,
+        accountId: values.binanceId,
+      })
 
       toast.success('Binance credentials updated successfully!')
       form.reset()

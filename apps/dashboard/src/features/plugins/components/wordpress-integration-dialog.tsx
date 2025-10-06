@@ -20,7 +20,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { ChangeWalletDialog } from '@/features/wallets/components/change-wallet-dialog'
+import { ChangeWalletDialog } from '@/features/funds-reception-methods/dialogs/change-wallet-dialog'
 
 interface Props {
   open: boolean
