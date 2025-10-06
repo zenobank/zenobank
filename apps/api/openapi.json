@@ -20,7 +20,9 @@
             }
           }
         },
-        "tags": ["Tokens"]
+        "tags": [
+          "Tokens"
+        ]
       }
     },
     "/api/v1/tokens/binance-pay": {
@@ -42,7 +44,9 @@
             }
           }
         },
-        "tags": ["Tokens"]
+        "tags": [
+          "Tokens"
+        ]
       }
     },
     "/api/v1/wallet/external": {
@@ -81,7 +85,9 @@
           }
         ],
         "summary": "Register an external wallet for a store.",
-        "tags": ["Wallet"]
+        "tags": [
+          "Wallet"
+        ]
       }
     },
     "/api/v1/networks": {
@@ -105,7 +111,9 @@
           }
         },
         "summary": "Get all networks",
-        "tags": ["Networks"]
+        "tags": [
+          "Networks"
+        ]
       }
     },
     "/api/v1/webhooks/alchemy": {
@@ -119,7 +127,9 @@
           }
         },
         "summary": "Receive Alchemy webhook",
-        "tags": ["Webhooks"]
+        "tags": [
+          "Webhooks"
+        ]
       }
     },
     "/api/v1/users/me": {
@@ -139,7 +149,9 @@
           }
         },
         "summary": "Get the current user data",
-        "tags": ["Users"]
+        "tags": [
+          "Users"
+        ]
       }
     },
     "/api/v1/users/me/bootstrap": {
@@ -159,7 +171,9 @@
           }
         },
         "summary": "Create initial backend resources for the newly signed-up user",
-        "tags": ["Users"]
+        "tags": [
+          "Users"
+        ]
       }
     },
     "/api/v1/stores/providers/binance-pay": {
@@ -204,7 +218,9 @@
           }
         ],
         "summary": "Create a new store credential",
-        "tags": ["Stores"]
+        "tags": [
+          "Stores"
+        ]
       }
     },
     "/api/v1/checkouts": {
@@ -249,7 +265,9 @@
           }
         ],
         "summary": "Create a new checkout",
-        "tags": ["Checkouts"]
+        "tags": [
+          "Checkouts"
+        ]
       }
     },
     "/api/v1/checkouts/{id}": {
@@ -278,12 +296,14 @@
           }
         },
         "summary": "Get checkout by ID",
-        "tags": ["Checkouts"]
+        "tags": [
+          "Checkouts"
+        ]
       }
     },
-    "/api/v1/checkouts/{id}/attempts": {
+    "/api/v1/checkouts/{id}/attempts/binance-pay": {
       "post": {
-        "operationId": "CheckoutsController_createCheckoutAttempt_v1",
+        "operationId": "CheckoutsController_createCheckoutAttemptBinancePay_v1",
         "parameters": [
           {
             "name": "id",
@@ -306,11 +326,61 @@
         },
         "responses": {
           "201": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BinancePayAttemptResponseDto"
+                }
+              }
+            }
           }
         },
-        "summary": "Create a new checkout attempt",
-        "tags": ["Checkouts"]
+        "summary": "Create a new binance pay checkout attempt",
+        "tags": [
+          "Checkouts"
+        ]
+      }
+    },
+    "/api/v1/checkouts/{id}/attempts/onchain": {
+      "post": {
+        "operationId": "CheckoutsController_createCheckoutAttemptOnchain_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePaymentAttemptDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OnchainAttemptResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Create a new onchain checkout attempt",
+        "tags": [
+          "Checkouts"
+        ]
       }
     }
   },
@@ -412,7 +482,9 @@
             "type": "string"
           }
         },
-        "required": ["address"]
+        "required": [
+          "address"
+        ]
       },
       "NetworkResponseDto": {
         "type": "object",
@@ -432,7 +504,10 @@
           "networkType": {
             "type": "string",
             "example": "EVM",
-            "enum": ["EVM", "SOLANA"]
+            "enum": [
+              "EVM",
+              "SOLANA"
+            ]
           },
           "isTestnet": {
             "type": "boolean",
@@ -494,7 +569,12 @@
             "example": "Main Wallet"
           }
         },
-        "required": ["id", "address", "network", "label"]
+        "required": [
+          "id",
+          "address",
+          "network",
+          "label"
+        ]
       },
       "BinancePayCredentialResponseDto": {
         "type": "object",
@@ -508,7 +588,10 @@
             "example": "568321"
           }
         },
-        "required": ["apiKey", "accountId"]
+        "required": [
+          "apiKey",
+          "accountId"
+        ]
       },
       "StoreResponseDto": {
         "type": "object",
@@ -544,7 +627,13 @@
             ]
           }
         },
-        "required": ["id", "name", "apiKey", "wallets", "binancePayCredential"]
+        "required": [
+          "id",
+          "name",
+          "apiKey",
+          "wallets",
+          "binancePayCredential"
+        ]
       },
       "UserResponseDto": {
         "type": "object",
@@ -562,7 +651,10 @@
             }
           }
         },
-        "required": ["id", "stores"]
+        "required": [
+          "id",
+          "stores"
+        ]
       },
       "CreateBinancePayCredentialDto": {
         "type": "object",
@@ -583,7 +675,11 @@
             "description": "Account ID"
           }
         },
-        "required": ["apiKey", "apiSecret", "accountId"]
+        "required": [
+          "apiKey",
+          "apiSecret",
+          "accountId"
+        ]
       },
       "CreateCheckoutDto": {
         "type": "object",
@@ -605,7 +701,11 @@
             "description": "ISO 4217 currency code"
           }
         },
-        "required": ["orderId", "priceAmount", "priceCurrency"]
+        "required": [
+          "orderId",
+          "priceAmount",
+          "priceCurrency"
+        ]
       },
       "CheckoutResponseDto": {
         "type": "object",
@@ -632,7 +732,12 @@
           },
           "status": {
             "type": "string",
-            "enum": ["OPEN", "COMPLETED", "EXPIRED", "CANCELLED"],
+            "enum": [
+              "OPEN",
+              "COMPLETED",
+              "EXPIRED",
+              "CANCELLED"
+            ],
             "example": "OPEN",
             "description": "Current status of the checkout"
           },
@@ -682,7 +787,64 @@
             "example": "ckl1234567890"
           }
         },
-        "required": ["tokenId", "checkoutId"]
+        "required": [
+          "tokenId",
+          "checkoutId"
+        ]
+      },
+      "BinancePayAttemptResponseDto": {
+        "type": "object",
+        "properties": {
+          "depositAccountId": {
+            "type": "string",
+            "description": "Deposit Binance ID for the payment attempt",
+            "example": "568321"
+          },
+          "tokenPayAmount": {
+            "type": "string",
+            "description": "Token pay amount for the payment attempt",
+            "example": "100"
+          },
+          "binanceTokenId": {
+            "type": "string",
+            "description": "Binance token ID for the payment attempt",
+            "example": "USDC"
+          }
+        },
+        "required": [
+          "depositAccountId",
+          "tokenPayAmount",
+          "binanceTokenId"
+        ]
+      },
+      "OnchainAttemptResponseDto": {
+        "type": "object",
+        "properties": {
+          "tokenId": {
+            "type": "string",
+            "description": "Token ID for the payment attempt",
+            "example": "USDC"
+          },
+          "tokenPayAmount": {
+            "type": "string",
+            "description": "Token pay amount for the payment attempt",
+            "example": "100"
+          },
+          "networkId": {
+            "type": "string",
+            "description": "Network ID for the payment attempt",
+            "example": "ETHEREUM_MAINNET"
+          },
+          "depositWallet": {
+            "$ref": "#/components/schemas/WalletResponseDto"
+          }
+        },
+        "required": [
+          "tokenId",
+          "tokenPayAmount",
+          "networkId",
+          "depositWallet"
+        ]
       }
     }
   }
