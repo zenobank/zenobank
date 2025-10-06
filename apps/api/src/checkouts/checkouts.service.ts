@@ -6,6 +6,7 @@ import { toDto } from 'src/lib/utils/to-dto';
 import { StoresService } from 'src/stores/stores.service';
 import { TokensService } from 'src/tokens/tokens.service';
 import { getCheckoutUrl } from 'src/checkouts/lib/utils';
+import { CanonicalTokensResponseDto } from 'src/tokens/dto/canonical-tokens-response';
 
 @Injectable()
 export class CheckoutsService {
@@ -16,7 +17,9 @@ export class CheckoutsService {
     private readonly storesService: StoresService,
     private readonly tokensService: TokensService,
   ) {}
-  async getEnabledTokens(checkoutId: string): Promise<any> {
+  async getEnabledTokens(
+    checkoutId: string,
+  ): Promise<CanonicalTokensResponseDto> {
     const checkout = await this.db.checkout.findUnique({
       where: { id: checkoutId },
       include: {

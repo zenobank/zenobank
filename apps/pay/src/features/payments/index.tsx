@@ -8,10 +8,9 @@ import {
   useCheckoutsControllerCreateCheckoutV1,
   useCheckoutsControllerGetCheckoutV1,
   useNetworksControllerGetNetworksV1,
-  useTokensControllerGetBinancePayTokensV1,
-  useTokensControllerGetOnChainTokensV1,
   useCheckoutsControllerCreateCheckoutAttemptBinancePayV1,
   useCheckoutsControllerCreateCheckoutAttemptOnchainV1,
+  useCheckoutsControllerGetEnabledTokensV1,
 } from '@repo/api-client';
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
@@ -56,13 +55,12 @@ export default function Payament({ id }: { id: string }) {
       refetchInterval: ms('3s'),
     },
   });
-  const { data: { data: binancePayTokens } = {} } = useTokensControllerGetBinancePayTokensV1();
-  const { data: { data: onchainTokens } = {} } = useTokensControllerGetOnChainTokensV1();
+  const { data: { data: canonicalTokens } = {} } = useCheckoutsControllerGetEnabledTokensV1(id);
+  const binancePayTokens = canonicalTokens?.BINANCE_PAY || [];
+  const onchainTokens = canonicalTokens?.ONCHAIN || [];
+  const enabledTokens = [...binancePayTokens, ...onchainTokens];
   const { data: { data: networks } = {} } = useNetworksControllerGetNetworksV1();
 
-  const enabledTokens: TokenResponseDto[] = useMemo(() => {
-    return [...(binancePayTokens || []), ...(onchainTokens || [])];
-  }, [binancePayTokens, onchainTokens]);
   const [isLoading, setIsLoading] = useState(false);
   const [activePopover, setActivePopover] = useState<PopoverId | null>(null);
   const [selectedTokenId, setSelectedTokenId] = useState<string | null>(null);

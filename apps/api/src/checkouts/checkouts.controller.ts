@@ -17,6 +17,7 @@ import { CreatePaymentAttemptDto } from './attempts/dtos/create-payment-attempt.
 import { AttemptsService } from './attempts/attempts.service';
 import { BinancePayAttemptResponseDto } from './attempts/dtos/binance-pay-attempt-response.dto';
 import { OnchainAttemptResponseDto } from './attempts/dtos/onchain-attempt-response.dto';
+import { CanonicalTokensResponseDto } from 'src/tokens/dto/canonical-tokens-response';
 
 @ApiTags('Checkouts')
 @Controller('checkouts')
@@ -91,7 +92,9 @@ export class CheckoutsController {
 
   @Get(':id/enabled-tokens')
   @ApiOperation({ summary: 'Get enabled tokens for a checkout' })
-  async getEnabledTokens(@Param('id') checkoutId: string): Promise<string[]> {
+  async getEnabledTokens(
+    @Param('id') checkoutId: string,
+  ): Promise<CanonicalTokensResponseDto> {
     return this.checkoutsService.getEnabledTokens(checkoutId);
   }
 }
