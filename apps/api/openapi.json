@@ -49,6 +49,20 @@
         ]
       }
     },
+    "/api/v1/wallet/test-binance-pay": {
+      "get": {
+        "operationId": "WalletController_testBinancePay_v1",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Wallet"
+        ]
+      }
+    },
     "/api/v1/wallet/external": {
       "post": {
         "description": "An Externall wallet is an non-custodial wallet. Address must be an EVM address.",

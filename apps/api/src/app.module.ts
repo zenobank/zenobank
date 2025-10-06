@@ -14,6 +14,8 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { StoresModule } from './stores/stores.module';
 import { CheckoutsModule } from './checkouts/checkouts.module';
+import { BinancePayModule } from './integrations/binance-pay/binance-pay.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -40,10 +42,12 @@ import { CheckoutsModule } from './checkouts/checkouts.module';
     NetworksModule,
     WebhooksModule,
     SvixModule,
+    ScheduleModule.forRoot(),
     UsersModule,
     AuthModule,
     StoresModule,
     CheckoutsModule,
+    BinancePayModule,
   ],
   controllers: [],
   providers: [],

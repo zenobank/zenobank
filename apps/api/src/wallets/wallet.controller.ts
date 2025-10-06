@@ -1,13 +1,48 @@
-import { Body, Controller, Headers, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Headers,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { WalletService } from './wallet.service';
 import { ApiHeader, ApiOperation, ApiSecurity } from '@nestjs/swagger';
 import { RegisterExternalWalletDto } from './dto/register-external-wallet-request.dto';
 import { ApiKeyGuard } from 'src/auth/api-key.guard';
 import { API_KEY_HEADER } from 'src/auth/auth.constants';
+import { Pay as BinancePay } from '@binance/pay';
+import { ConfigService } from '@nestjs/config';
+import { ms } from 'src/lib/utils/ms';
 
 @Controller('wallet')
 export class WalletController {
-  constructor(private readonly walletService: WalletService) {}
+  constructor(
+    private readonly walletService: WalletService,
+    private readonly configService: ConfigService,
+  ) {}
+
+  @Get('test-binance-pay')
+  async testBinancePay() {
+    const client = new BinancePay({
+      configurationRestAPI: {
+        apiKey: this.configService.get('BINANCE_PAY_API_KEY')!,
+        apiSecret: this.configService.get('BINANCE_PAY_API_SECRET'),
+      },
+    });
+    const tradeHistory = await client.restAPI.getPayTradeHistory({
+      recvWindow: ms('1m'),
+      // startTime: Date.now() - ms('10m'),
+      // endTime: Date.now(),
+      limit: 100,
+    });
+
+    // 👇 data es en realidad una función async, así que debes invocarla
+    const data = await tradeHistory.data();
+
+    console.log(data); // aquí sí vas a ver el array real de transacciones
+    return null;
+  }
 
   @UseGuards(ApiKeyGuard)
   @ApiSecurity(API_KEY_HEADER)

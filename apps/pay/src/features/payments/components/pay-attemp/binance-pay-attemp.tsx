@@ -32,7 +32,7 @@ export function BinancePayAttemp({ attempt, expiresAt, checkoutState, onBack }: 
               )}
             </div>
           </CardHeader>
-
+          <p>Estimated confirmation time: ~1m</p>
           <CardContent className="space-y-4">
             {/* Amount to pay */}
             <div className="bg-muted/50 mx-auto flex w-full flex-col items-center justify-center rounded-lg border p-4">
