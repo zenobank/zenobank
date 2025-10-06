@@ -143,6 +143,8 @@ model BinancePayPaymentAttempt {
   tokenPayAmount String
   tokenId        String
   checkoutId     String
+  transactionId  String?
+  paidAt         DateTime?
   checkout       Checkout        @relation(fields: [checkoutId], references: [id])
   payment        Payment?
   createdAt      DateTime        @default(now())
