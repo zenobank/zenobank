@@ -74,7 +74,7 @@ export default function Apps() {
             App Integrations
           </h1>
           <p className='text-muted-foreground'>
-            Here&apos;s a list of your apps for the integration!
+            Integrate Crypto Payments into your apps!
           </p>
         </div>
         <div className='my-4 flex items-end justify-between sm:my-0 sm:items-center'>

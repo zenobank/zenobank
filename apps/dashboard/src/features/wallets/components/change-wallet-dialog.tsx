@@ -62,7 +62,7 @@ export function ChangeWalletDialog({
 
   const onSubmit = async (values: WalletForm) => {
     if (!activeStore) {
-      toast.error('No store found!')
+      toast.error('No active store found!')
       return
     }
     setLoading(true)

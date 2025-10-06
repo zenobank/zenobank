@@ -1,0 +1,206 @@
+'use client'
+
+import { useState } from 'react'
+import { z } from 'zod'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Loader2 } from 'lucide-react'
+import { toast } from 'sonner'
+import { useActiveStore } from '@/lib/state/store/hooks'
+import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+
+const formSchema = z.object({
+  binanceId: z
+    .string()
+    .min(1, 'Binance ID is required')
+    .regex(
+      /^[0-9]{6,12}$/,
+      'Please enter a valid Binance Pay ID (6-12 digits)'
+    ),
+  apiKey: z
+    .string()
+    .min(1, 'API Key is required')
+    .min(32, 'API Key must be at least 32 characters'),
+  apiSecret: z
+    .string()
+    .min(1, 'API Secret is required')
+    .min(32, 'API Secret must be at least 32 characters'),
+})
+
+type BinanceForm = z.infer<typeof formSchema>
+
+interface Props {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  currentBinanceId?: string
+}
+
+export function ChangeBinanceIdDialog({
+  open,
+  onOpenChange,
+  currentBinanceId,
+}: Props) {
+  const { activeStore } = useActiveStore()
+  const [loading, setLoading] = useState(false)
+
+  const form = useForm<BinanceForm>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      binanceId: currentBinanceId || '',
+      apiKey: '',
+      apiSecret: '',
+    },
+  })
+
+  const onSubmit = async (values: BinanceForm) => {
+    if (!activeStore) {
+      toast.error('No active store found!')
+      return
+    }
+    setLoading(true)
+    try {
+      // TODO: Connect to backend API
+      // await updateBinanceCredentials({
+      //   binanceId: values.binanceId,
+      //   apiKey: values.apiKey,
+      //   apiSecret: values.apiSecret,
+      //   storeId: activeStore.id,
+      // })
+
+      // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 500))
+
+      toast.success('Binance credentials updated successfully!')
+      form.reset()
+      onOpenChange(false)
+    } catch (_error) {
+      toast.error('Failed to update Binance credentials!')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <Dialog
+      open={open}
+      onOpenChange={(state) => {
+        form.reset()
+        onOpenChange(state)
+      }}
+    >
+      <DialogContent className='sm:max-w-md'>
+        <DialogHeader>
+          <DialogTitle>Update Binance Credentials</DialogTitle>
+          <DialogDescription>
+            Enter your Binance Pay credentials to receive payments.
+          </DialogDescription>
+          <DialogDescription className='pt-2'>
+            Need help?{' '}
+            <a
+              href='https://www.binance.com/en/support/faq/how-to-create-api-360002502072'
+              target='_blank'
+              rel='noopener noreferrer'
+              className='text-primary hover:text-primary/80 underline'
+            >
+              Learn how to create API keys
+            </a>
+          </DialogDescription>
+        </DialogHeader>
+
+        <Form {...form}>
+          <form
+            id='binance-form'
+            onSubmit={form.handleSubmit(onSubmit)}
+            className='space-y-4'
+          >
+            <FormField
+              control={form.control}
+              name='binanceId'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Binance Pay ID</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder='123456789'
+                      className='font-mono'
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name='apiKey'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>API Key</FormLabel>
+                  <FormControl>
+                    <Input
+                      type='text'
+                      placeholder='Your Binance API Key'
+                      className='font-mono text-xs'
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name='apiSecret'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>API Secret</FormLabel>
+                  <FormControl>
+                    <Input
+                      type='password'
+                      placeholder='Your Binance API Secret'
+                      className='font-mono text-xs'
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </form>
+        </Form>
+
+        <DialogFooter>
+          <Button variant='outline' onClick={() => onOpenChange(false)}>
+            Cancel
+          </Button>
+          <Button type='submit' form='binance-form' disabled={loading}>
+            {loading ? (
+              <Loader2 className='h-6 w-6 animate-spin' />
+            ) : (
+              'Save Credentials'
+            )}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}

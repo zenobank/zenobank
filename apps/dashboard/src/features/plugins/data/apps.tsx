@@ -1,11 +1,18 @@
 import { IconBrandWordpress } from '@tabler/icons-react'
+import { Cloud } from 'lucide-react'
 
 export const apps = [
   {
-    name: 'Wordpress',
+    name: 'WooCommerce',
     logo: <IconBrandWordpress />,
     connected: false,
-    desc: 'Integrate Crypto Payments into your WooCommerce store',
+    desc: 'Accept Crypto in your WooCommerce store',
+  },
+  {
+    name: 'Tienda Nube',
+    logo: <Cloud />,
+    connected: true,
+    desc: 'Accept Crypto in your Tienda Nube store',
   },
   // {
   //   name: 'Notion',
