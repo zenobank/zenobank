@@ -103,9 +103,9 @@ model Checkout {
 
   createdAt         DateTime         @default(now())
   updatedAt         DateTime         @updatedAt
-  OnchainToken      OnchainToken?    @relation(fields: [onchainTokenId], references: [id])
+  onchainToken      OnchainToken?    @relation(fields: [onchainTokenId], references: [id])
   onchainTokenId    String?
-  BinancePayToken   BinancePayToken? @relation(fields: [binancePayTokenId], references: [id])
+  binancePayToken   BinancePayToken? @relation(fields: [binancePayTokenId], references: [id])
   binancePayTokenId String?
 }
 

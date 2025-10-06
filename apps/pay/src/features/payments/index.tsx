@@ -152,6 +152,7 @@ export default function Payament({ id }: { id: string }) {
         expiresAt={checkoutData.expiresAt}
         checkoutState={checkoutState}
         onBack={handleBack}
+        networks={networksAvailableForSelectedToken || []}
       />
     );
   }
