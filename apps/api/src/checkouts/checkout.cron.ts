@@ -24,6 +24,18 @@ export class CheckoutCron {
           status: CheckoutStatus.EXPIRED,
         },
       });
+      await this.db.onChainPaymentAttempt.updateMany({
+        where: { checkoutId: checkout.id },
+        data: {
+          status: AttemptStatus.CANCELLED,
+        },
+      });
+      await this.db.binancePayPaymentAttempt.updateMany({
+        where: { checkoutId: checkout.id },
+        data: {
+          status: AttemptStatus.CANCELLED,
+        },
+      });
     }
   }
 }

@@ -16,6 +16,7 @@ import { StoresModule } from './stores/stores.module';
 import { CheckoutsModule } from './checkouts/checkouts.module';
 import { BinancePayModule } from './integrations/binance-pay/binance-pay.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { ConversionsModule } from './conversions/conversions.module';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     StoresModule,
     CheckoutsModule,
     BinancePayModule,
+    ConversionsModule,
   ],
   controllers: [],
   providers: [],

@@ -9,7 +9,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CreatePaymentAttemptDto } from './dtos/create-payment-attempt.dto';
 import { TokensService } from 'src/tokens/tokens.service';
 
-import { MethodType } from '@prisma/client';
+import { CheckoutStatus, MethodType } from '@prisma/client';
 import { OnchainAttemptResponseDto } from './dtos/onchain-attempt-response.dto';
 import { toDto } from 'src/lib/utils/to-dto';
 import { BinancePayAttemptResponseDto } from './dtos/binance-pay-attempt-response.dto';
@@ -17,12 +17,14 @@ import { toEnumValue } from 'src/lib/utils/to-enum';
 import { SupportedNetworksId } from 'src/networks/network.interface';
 import { BinancePayTokenResponseDto } from 'src/tokens/dto/binance-pay-token-response';
 import { OnChainTokenResponseDto } from 'src/tokens/dto/onchain-token-response';
+import { ConversionsService } from 'src/conversions/conversions.service';
 
 @Injectable()
 export class AttemptsService {
   constructor(
     private readonly db: PrismaService,
     private readonly tokensService: TokensService,
+    private readonly conversionsService: ConversionsService,
   ) {}
   private async getCheckoutContextOrThrow(checkoutId: string) {
     const checkout = await this.db.checkout.findUnique({
@@ -68,10 +70,23 @@ export class AttemptsService {
   ): Promise<OnchainAttemptResponseDto> {
     const { checkout, wallet } =
       await this.getCheckoutContextOrThrow(checkoutId);
+
+    if (checkout.status !== CheckoutStatus.OPEN) {
+      throw new UnprocessableEntityException('Checkout is not open');
+    }
     const token = await this.getTokenOrThrow(
       MethodType.ONCHAIN,
       createCheckoutAttemptDto.tokenId,
     );
+
+    const paymentAmount = await this.conversionsService.convert({
+      from: checkout.priceCurrency,
+      amount: checkout.priceAmount,
+      to: token.symbol,
+    });
+
+    // ahora lo que tengo que hacer es buscar un decimal que este libre
+
     const onChainPaymentAttempt = await this.db.onChainPaymentAttempt.upsert({
       where: {
         checkoutId_tokenId: { checkoutId, tokenId: token.id },
@@ -80,7 +95,7 @@ export class AttemptsService {
       create: {
         checkoutId,
         tokenId: token.id,
-        tokenPayAmount: checkout.priceAmount,
+        tokenPayAmount: paymentAmount.amount,
         depositWalletId: wallet.id,
         networkId: token.networkId,
       },
@@ -105,6 +120,10 @@ export class AttemptsService {
   ): Promise<BinancePayAttemptResponseDto> {
     const { checkout, store } =
       await this.getCheckoutContextOrThrow(checkoutId);
+
+    if (checkout.status !== CheckoutStatus.OPEN) {
+      throw new UnprocessableEntityException('Checkout is not open');
+    }
     const token = await this.getTokenOrThrow(
       MethodType.BINANCE_PAY,
       createCheckoutAttemptDto.tokenId,
@@ -115,6 +134,11 @@ export class AttemptsService {
         'Binance Pay credentials not found',
       );
     }
+    const paymentAmount = await this.conversionsService.convert({
+      from: checkout.priceCurrency,
+      amount: checkout.priceAmount,
+      to: token.symbol,
+    });
 
     const binancePayPaymentAttempt =
       await this.db.binancePayPaymentAttempt.upsert({
@@ -125,7 +149,7 @@ export class AttemptsService {
         create: {
           checkoutId,
           tokenId: token.id,
-          tokenPayAmount: checkout.priceAmount,
+          tokenPayAmount: paymentAmount.amount,
         },
         include: {
           token: true,
