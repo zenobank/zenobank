@@ -4,7 +4,6 @@ import { Card, CardContent, CardFooter } from '@/src/components/ui/card';
 import { ms } from '@/src/lib/ms';
 import { match } from 'ts-pattern';
 import {
-  useCheckoutsControllerCreateCheckoutV1,
   useCheckoutsControllerGetCheckoutV1,
   useNetworksControllerGetNetworksV1,
   useCheckoutsControllerCreateCheckoutAttemptBinancePayV1,
@@ -13,7 +12,6 @@ import {
 } from '@repo/api-client';
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
-import { getPaymentCheckoutState } from './utils/payment-checkout-state';
 import CheckoutHeader from './components/checkout-header';
 import { TokenSelector } from './components/token-selector';
 import { CheckoutPrice } from './components/checkout-price';
@@ -39,11 +37,6 @@ export enum MethodType {
   ONCHAIN = 'ONCHAIN',
   BINANCE_PAY = 'BINANCE_PAY',
 }
-type AttemptPayload = {
-  id: string;
-  data: { tokenId: string; checkoutId: string };
-};
-type AttemptCreator = (p: AttemptPayload) => Promise<void>;
 
 export type TokenResponseDto = BinancePayTokenResponseDto | OnChainTokenResponseDto;
 export default function Payament({ id }: { id: string }) {
@@ -164,7 +157,6 @@ export default function Payament({ id }: { id: string }) {
           <CheckoutHeader expiresAt={checkoutData?.expiresAt} />
           <CardContent className="space-y-3">
             <CheckoutPrice amount={checkoutData.priceAmount} currency={checkoutData.priceCurrency} />
-
             {enabledTokens.length === 0 ? (
               <MissingPaymentMethodsNotice />
             ) : (
@@ -188,7 +180,6 @@ export default function Payament({ id }: { id: string }) {
                   networks={networksAvailableForSelectedToken || []}
                   isBinancePayAvailableForSelectedCanonicalToken={isBinancePayAvailableForSelectedCanonicalToken}
                 />
-
                 <Button
                   onClick={() => {
                     handleDepositSelectionSubmit();
@@ -201,10 +192,8 @@ export default function Payament({ id }: { id: string }) {
               </>
             )}
           </CardContent>
-
           <CardFooter className="w-full space-y-3 pt-4"></CardFooter>
         </Card>
-
         <PayFooter />
       </div>
     </div>
