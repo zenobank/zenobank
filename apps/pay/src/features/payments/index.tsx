@@ -27,6 +27,7 @@ import {
 } from '@repo/api-client/model';
 import { OnchainPayAttemp } from './components/pay-attemp/onchain-pay-attemp';
 import { BinancePayAttemp } from './components/pay-attemp/binance-pay-attemp';
+import MissingPaymentMethodsNotice from './components/missing-payment-methods-notice';
 
 export enum PopoverId {
   TOKEN = 'token',
@@ -163,35 +164,42 @@ export default function Payament({ id }: { id: string }) {
           <CheckoutHeader expiresAt={checkoutData?.expiresAt} />
           <CardContent className="space-y-3">
             <CheckoutPrice amount={checkoutData.priceAmount} currency={checkoutData.priceCurrency} />
-            <TokenSelector
-              activePopover={activePopover}
-              setActivePopover={setActivePopover}
-              selectedTokenData={selectedTokenData}
-              binancePayTokens={binancePayTokens || []}
-              onchainTokens={onchainTokens || []}
-              setSelectedTokenId={setSelectedTokenId}
-            />
-            <MethodSelector
-              activePopover={activePopover}
-              selectedMethod={selectedMethod}
-              onChainTokens={onchainTokens || []}
-              binancePayTokens={binancePayTokens || []}
-              setActivePopover={setActivePopover}
-              selectedTokenData={selectedTokenData}
-              setSelectedTokenId={setSelectedTokenId}
-              networks={networksAvailableForSelectedToken || []}
-              isBinancePayAvailableForSelectedCanonicalToken={isBinancePayAvailableForSelectedCanonicalToken}
-            />
 
-            <Button
-              onClick={() => {
-                handleDepositSelectionSubmit();
-              }}
-              disabled={!!disabled}
-              className={`mx-auto w-full ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}
-            >
-              {buttonText}
-            </Button>
+            {enabledTokens.length === 0 ? (
+              <MissingPaymentMethodsNotice />
+            ) : (
+              <>
+                <TokenSelector
+                  activePopover={activePopover}
+                  setActivePopover={setActivePopover}
+                  selectedTokenData={selectedTokenData}
+                  binancePayTokens={binancePayTokens || []}
+                  onchainTokens={onchainTokens || []}
+                  setSelectedTokenId={setSelectedTokenId}
+                />
+                <MethodSelector
+                  activePopover={activePopover}
+                  selectedMethod={selectedMethod}
+                  onChainTokens={onchainTokens || []}
+                  binancePayTokens={binancePayTokens || []}
+                  setActivePopover={setActivePopover}
+                  selectedTokenData={selectedTokenData}
+                  setSelectedTokenId={setSelectedTokenId}
+                  networks={networksAvailableForSelectedToken || []}
+                  isBinancePayAvailableForSelectedCanonicalToken={isBinancePayAvailableForSelectedCanonicalToken}
+                />
+
+                <Button
+                  onClick={() => {
+                    handleDepositSelectionSubmit();
+                  }}
+                  disabled={!!disabled}
+                  className={`mx-auto w-full ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+                >
+                  {buttonText}
+                </Button>
+              </>
+            )}
           </CardContent>
 
           <CardFooter className="w-full space-y-3 pt-4"></CardFooter>
