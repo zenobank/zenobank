@@ -9,7 +9,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CreatePaymentAttemptDto } from './dtos/create-payment-attempt.dto';
 import { TokensService } from 'src/tokens/tokens.service';
 
-import { CheckoutStatus, MethodType } from '@prisma/client';
+import { AttemptStatus, CheckoutStatus, MethodType } from '@prisma/client';
 import { OnchainAttemptResponseDto } from './dtos/onchain-attempt-response.dto';
 import { toDto } from 'src/lib/utils/to-dto';
 import { BinancePayAttemptResponseDto } from './dtos/binance-pay-attempt-response.dto';
@@ -18,6 +18,7 @@ import { SupportedNetworksId } from 'src/networks/network.interface';
 import { BinancePayTokenResponseDto } from 'src/tokens/dto/binance-pay-token-response';
 import { OnChainTokenResponseDto } from 'src/tokens/dto/onchain-token-response';
 import { ConversionsService } from 'src/conversions/conversions.service';
+import { toBN } from 'src/lib/utils/numbers';
 
 @Injectable()
 export class AttemptsService {
@@ -64,6 +65,72 @@ export class AttemptsService {
     }
     throw new UnprocessableEntityException('Unsupported payment method');
   }
+  private generateRandomizedPayAmount(baseAmount: string): string {
+    const MIN_SUFFIX = 0.000001;
+    const MAX_SUFFIX = 0.000999;
+
+    const MAX_DECIMALS = 6;
+    const randomSuffix = MIN_SUFFIX + Math.random() * (MAX_SUFFIX - MIN_SUFFIX);
+
+    // sumamos base + sufijo
+    const candidate = toBN(baseAmount).plus(
+      toBN(randomSuffix.toFixed(MAX_DECIMALS)), // sufijo con 6 decimales
+    );
+
+    // 🔑 forzamos a 6 decimales como string
+    const candidateAmountStr = candidate.decimalPlaces(MAX_DECIMALS).toString();
+    return candidateAmountStr;
+  }
+
+  private async generateUniqueBinancePayPaymentAttemptAmount(
+    baseAmount: string,
+    tokenId: string,
+    maxRetries = 20,
+  ): Promise<string> {
+    for (let i = 0; i < maxRetries; i++) {
+      const candidateAmountStr = this.generateRandomizedPayAmount(baseAmount);
+      const exists = await this.db.binancePayPaymentAttempt.findFirst({
+        where: {
+          status: { in: [AttemptStatus.PENDING] },
+          tokenId: tokenId,
+          tokenPayAmount: candidateAmountStr,
+        },
+        select: { id: true },
+      });
+
+      if (!exists) {
+        return candidateAmountStr;
+      }
+    }
+    throw new Error(
+      'Could not generate a unique binance pay payment attempt amount (max retries reached)',
+    );
+  }
+  private async generateUniqueOnChainPaymentAttemptAmount(
+    baseAmount: string,
+    tokenId: string,
+    maxRetries = 20,
+  ): Promise<string> {
+    for (let i = 0; i < maxRetries; i++) {
+      const candidateAmountStr = this.generateRandomizedPayAmount(baseAmount);
+      const exists = await this.db.onChainPaymentAttempt.findFirst({
+        where: {
+          status: { in: [AttemptStatus.PENDING] },
+          tokenId: tokenId,
+          tokenPayAmount: candidateAmountStr,
+        },
+        select: { id: true },
+      });
+
+      if (!exists) {
+        return candidateAmountStr;
+      }
+    }
+    throw new Error(
+      'Could not generate a unique on chain payment attempt amount (max retries reached)',
+    );
+  }
+
   async createOnChainCheckoutAttempt(
     checkoutId: string,
     createCheckoutAttemptDto: CreatePaymentAttemptDto,
@@ -79,13 +146,16 @@ export class AttemptsService {
       createCheckoutAttemptDto.tokenId,
     );
 
-    const paymentAmount = await this.conversionsService.convert({
+    const convertedAmount = await this.conversionsService.convert({
       from: checkout.priceCurrency,
       amount: checkout.priceAmount,
       to: token.symbol,
     });
 
-    // ahora lo que tengo que hacer es buscar un decimal que este libre
+    const tokenPayAmount = await this.generateUniqueOnChainPaymentAttemptAmount(
+      convertedAmount.amount,
+      token.id,
+    );
 
     const onChainPaymentAttempt = await this.db.onChainPaymentAttempt.upsert({
       where: {
@@ -95,7 +165,7 @@ export class AttemptsService {
       create: {
         checkoutId,
         tokenId: token.id,
-        tokenPayAmount: paymentAmount.amount,
+        tokenPayAmount: tokenPayAmount,
         depositWalletId: wallet.id,
         networkId: token.networkId,
       },
@@ -134,11 +204,17 @@ export class AttemptsService {
         'Binance Pay credentials not found',
       );
     }
-    const paymentAmount = await this.conversionsService.convert({
+    const convertedAmount = await this.conversionsService.convert({
       from: checkout.priceCurrency,
       amount: checkout.priceAmount,
       to: token.symbol,
     });
+
+    const tokenPayAmount =
+      await this.generateUniqueBinancePayPaymentAttemptAmount(
+        convertedAmount.amount,
+        token.id,
+      );
 
     const binancePayPaymentAttempt =
       await this.db.binancePayPaymentAttempt.upsert({
@@ -149,7 +225,7 @@ export class AttemptsService {
         create: {
           checkoutId,
           tokenId: token.id,
-          tokenPayAmount: paymentAmount.amount,
+          tokenPayAmount: tokenPayAmount,
         },
         include: {
           token: true,

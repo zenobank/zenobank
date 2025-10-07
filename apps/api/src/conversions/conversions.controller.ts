@@ -4,12 +4,14 @@ import { ConversionsService } from './conversions.service';
 @Controller('conversions')
 export class ConversionsController {
   constructor(private readonly conversionsService: ConversionsService) {}
-  //   @Get('convert')
-  //   async convert(
-  //     @Query('from') from: string,
-  //     @Query('to') to: string,
-  //     @Query('amount') amount: string,
-  //   ) {
-  //     return this.conversionsService.convert({ from, to, amount });
-  //   }
+  @Get('convert')
+  async convert(
+    @Query('from') from: string,
+    @Query('to') to: string,
+    @Query('amount') amount: string,
+  ) {
+    const result = await this.conversionsService.convert({ from, to, amount });
+    console.log('result', result.amount);
+    return result;
+  }
 }

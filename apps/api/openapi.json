@@ -402,6 +402,45 @@
           "Checkouts"
         ]
       }
+    },
+    "/api/v1/conversions/convert": {
+      "get": {
+        "operationId": "ConversionsController_convert_v1",
+        "parameters": [
+          {
+            "name": "from",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "amount",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Conversions"
+        ]
+      }
     }
   },
   "info": {
