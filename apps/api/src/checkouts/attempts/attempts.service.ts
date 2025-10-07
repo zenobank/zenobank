@@ -78,7 +78,11 @@ export class AttemptsService {
     );
 
     // 🔑 forzamos a 6 decimales como string
-    const candidateAmountStr = candidate.decimalPlaces(MAX_DECIMALS).toString();
+    let candidateAmountStr = candidate.decimalPlaces(MAX_DECIMALS).toString();
+
+    // 🚀 quitar ceros finales innecesarios y posible punto final
+    candidateAmountStr = candidateAmountStr.replace(/\.?0+$/, '');
+
     return candidateAmountStr;
   }
 
