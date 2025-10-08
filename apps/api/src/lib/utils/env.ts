@@ -34,6 +34,10 @@ export class Env {
   static readonly CLERK_SECRET_KEY = 'CLERK_SECRET_KEY';
   @IsString()
   CLERK_SECRET_KEY: string;
+
+  static readonly SENTRY_DSN = 'SENTRY_DSN';
+  @IsString()
+  SENTRY_DSN: string;
 }
 
 export function validateEnvConfig(config: Record<string, unknown>) {

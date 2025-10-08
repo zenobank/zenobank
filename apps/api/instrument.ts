@@ -1,12 +1,12 @@
-const Sentry = require('@sentry/nestjs');
-const { nodeProfilingIntegration } = require('@sentry/profiling-node');
+import { Env, getEnv } from 'src/lib/utils/env';
+
+import * as Sentry from '@sentry/nestjs';
 
 // Ensure to call this before requiring any other modules!
 Sentry.init({
-  dsn: SENTRY_DSN,
+  dsn: getEnv(Env.SENTRY_DSN),
   integrations: [
     // Add our Profiling integration
-    nodeProfilingIntegration(),
   ],
 
   // Add Tracing by setting tracesSampleRate

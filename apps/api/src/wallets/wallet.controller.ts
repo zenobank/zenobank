@@ -21,6 +21,10 @@ export class WalletController {
     private readonly walletService: WalletService,
     private readonly configService: ConfigService,
   ) {}
+  @Get('error-sentry')
+  async errorSentry() {
+    throw new Error('Error from sentry');
+  }
 
   @Get('test-binance-pay')
   async testBinancePay() {
