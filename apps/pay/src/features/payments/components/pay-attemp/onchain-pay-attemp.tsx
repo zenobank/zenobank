@@ -1,5 +1,5 @@
 import { NetworkResponseDto, OnchainAttemptResponseDto } from '@repo/api-client/model';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/src/components/ui/card';
+import { Card, CardContent, CardFooter, CardHeader } from '@/src/components/ui/card';
 import { Button } from '@/src/components/ui/button';
 import { Badge } from '@/src/components/ui/badge';
 import BadgerTimerCountdown from '../badger-timer-countdown';
@@ -53,7 +53,6 @@ export function OnchainPayAttemp({ attempt, expiresAt, onBack, networks }: Oncha
                   Send Exact Amount to this address
                 </span>
               </div>
-
               {/* Wallet Address */}
               <div
                 className="bg-background hover:bg-accent cursor-pointer rounded-lg border px-3 py-3 shadow-sm transition-colors"
@@ -76,7 +75,16 @@ export function OnchainPayAttemp({ attempt, expiresAt, onBack, networks }: Oncha
             </div>
           </CardContent>
 
-          <CardFooter className="pt-4"></CardFooter>
+          <CardFooter className="pt-4">
+            <Button
+              variant="outline"
+              onClick={() => {
+                toast.error('Not implemented');
+              }}
+            >
+              Connect Wallet
+            </Button>
+          </CardFooter>
         </Card>
 
         <PayFooter />

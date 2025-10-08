@@ -30,10 +30,11 @@
     "@radix-ui/react-switch": "^1.2.5",
     "@radix-ui/react-tabs": "^1.1.12",
     "@radix-ui/react-tooltip": "^1.2.7",
+    "@rainbow-me/rainbowkit": "^2.2.8",
     "@repo/api-client": "workspace:*",
     "@sentry/nextjs": "^10",
     "@tabler/icons-react": "^3.34.1",
-    "@tanstack/react-query": "^5.83.0",
+    "@tanstack/react-query": "^5.85.0",
     "@tanstack/react-query-devtools": "^5.83.0",
     "axios": "^1.12.2",
     "class-variance-authority": "^0.7.1",
@@ -50,9 +51,12 @@
     "react-day-picker": "^9.10.0",
     "react-dom": "19.1.0",
     "react-hook-form": "^7.62.0",
+    "require-in-the-middle": "^8.0.0",
     "sonner": "^2.0.6",
     "tailwind-merge": "^3.3.1",
-    "ts-pattern": "5.8.0"
+    "ts-pattern": "5.8.0",
+    "viem": "2.x",
+    "wagmi": "^2.17.5"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",

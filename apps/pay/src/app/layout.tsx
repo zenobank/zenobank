@@ -5,7 +5,11 @@ import './globals.css';
 import { TanstackQuery } from '@/src/lib/providers/tanstack-query';
 import { Toaster } from 'sonner';
 import { ThemeProvider } from '@/src/lib/providers/theme-context';
+import { wagmiConfig } from '../lib/wagmi-config';
+import { RainbowKitProvider } from '@rainbow-me/rainbowkit';
+import '@rainbow-me/rainbowkit/styles.css';
 
+import { WagmiProvider } from 'wagmi';
 const geistSans = Geist({
   variable: '--font-geist-sans',
   subsets: ['latin'],
@@ -41,12 +45,16 @@ export default function RootLayout({
         </Script>
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <TanstackQuery>
-          <ThemeProvider>
-            {children}
-            <Toaster />
-          </ThemeProvider>
-        </TanstackQuery>
+        <WagmiProvider config={wagmiConfig}>
+          <TanstackQuery>
+            <RainbowKitProvider>
+              <ThemeProvider>
+                {children}
+                <Toaster />
+              </ThemeProvider>
+            </RainbowKitProvider>
+          </TanstackQuery>
+        </WagmiProvider>
       </body>
     </html>
   );
