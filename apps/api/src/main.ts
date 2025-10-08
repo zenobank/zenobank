@@ -1,4 +1,4 @@
-import './instrument.ts'; // sentry always at the top
+import './instrument'; // sentry always at the top
 import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
@@ -10,8 +10,7 @@ import {
 import { Request, Response, NextFunction } from 'express';
 import * as fs from 'fs';
 import cookieParser from 'cookie-parser';
-import { WEBHOOKS_PATHS } from './webhooks/webhooks.constants';
-import * as express from 'express';
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 

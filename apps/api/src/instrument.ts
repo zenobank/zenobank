@@ -7,6 +7,7 @@ Sentry.init({
   dsn: getEnv(Env.SENTRY_DSN),
   integrations: [
     // Add our Profiling integration
+    Sentry.consoleLoggingIntegration({ levels: ['log', 'warn', 'error'] }),
   ],
 
   // Add Tracing by setting tracesSampleRate
