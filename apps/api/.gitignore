@@ -251,3 +251,6 @@ dist
 
 
 /generated/prisma
+
+# Sentry Config File
+.sentryclirc

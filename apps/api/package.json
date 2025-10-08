@@ -4,7 +4,7 @@
   "description": "",
   "private": true,
   "scripts": {
-    "build": "pnpm run db:generate && nest build",
+    "build": "pnpm run db:generate && nest build && pnpm sentry:sourcemaps",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "tunnel": "lt -s dkfjadskfjaercl --port 3001",
@@ -22,7 +22,8 @@
     "db:push": "pnpm prisma db push",
     "db:studio": "pnpm prisma studio",
     "db:fix": "rm -rf node_modules/.prisma/client && pnpm db:generate",
-    "db:seed": "pnpm ts-node -r tsconfig-paths/register prisma/seed.ts"
+    "db:seed": "pnpm ts-node -r tsconfig-paths/register prisma/seed.ts",
+    "sentry:sourcemaps": "sentry-cli sourcemaps inject --org zeno-yb --project prod-api ./dist && sentry-cli sourcemaps upload --org zeno-yb --project prod-api ./dist"
   },
   "dependencies": {
     "@binance/pay": "^4.0.0",
@@ -37,6 +38,7 @@
     "@nestjs/serve-static": "^5.0.3",
     "@nestjs/swagger": "^11.2.0",
     "@prisma/client": "^6.16.1",
+    "@sentry/cli": "^2.56.0",
     "@sentry/nestjs": "^10.18.0",
     "@sentry/profiling-node": "^10.18.0",
     "@types/uuid": "^10.0.0",
