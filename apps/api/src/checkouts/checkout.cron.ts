@@ -13,7 +13,7 @@ export class CheckoutCron {
     private readonly db: PrismaService,
   ) {}
 
-  @Cron(CronExpression.EVERY_5_SECONDS)
+  @Cron(CronExpression.EVERY_30_SECONDS)
   async handleCron() {
     const checkouts = await this.db.checkout.findMany({
       where: {
