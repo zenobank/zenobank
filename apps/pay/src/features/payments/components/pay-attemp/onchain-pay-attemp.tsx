@@ -12,7 +12,7 @@ import { useConnectModal } from '@rainbow-me/rainbowkit';
 import { useAccount, useWriteContract, useSwitchChain, useChainId, useChains } from 'wagmi';
 import { Chain, erc20Abi, parseUnits } from 'viem';
 import { wagmiConfig } from '@/src/lib/wagmi-config';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import * as Sentry from '@sentry/nextjs';
 
 interface OnchainPayAttempProps {
@@ -35,6 +35,7 @@ export function OnchainPayAttemp({ attempt, expiresAt, onBack, networks, selecte
   const { isConnected, chain } = useAccount();
   const { switchChainAsync } = useSwitchChain();
   const [isPayWithBrowserWalletLoading, setIsPayWithBrowserWalletLoading] = useState(false);
+  const [shouldTriggerTransaction, setShouldTriggerTransaction] = useState(false);
 
   const sendTx = async (chain: Chain) => {
     await writeContractAsync({
@@ -65,20 +66,29 @@ export function OnchainPayAttemp({ attempt, expiresAt, onBack, networks, selecte
         }
         if (chain?.id !== network?.chainId) {
           await switchChainAsync({ chainId: network?.chainId });
-          await sendTx(wagmiChain);
-          toast.success('Transaction sent');
-          return;
         }
+        await sendTx(wagmiChain);
+        toast.success('Transaction sent');
+        setShouldTriggerTransaction(false);
       } else {
+        setShouldTriggerTransaction(true);
         openConnectModal?.();
       }
     } catch (error) {
       toast.error('Failed to pay with browser wallet');
       console.error(error);
+      setShouldTriggerTransaction(false);
     } finally {
       setIsPayWithBrowserWalletLoading(false);
     }
   };
+
+  // Effect to trigger transaction after wallet connection
+  useEffect(() => {
+    if (isConnected && shouldTriggerTransaction) {
+      triggerPayWithBrowserWalletTransaction();
+    }
+  }, [isConnected, shouldTriggerTransaction]);
   return (
     <div className="flex min-h-screen items-center justify-center px-4 py-8">
       <div className="mx-auto max-w-md flex-1">
@@ -99,7 +109,7 @@ export function OnchainPayAttemp({ attempt, expiresAt, onBack, networks, selecte
                 className="hover:text-muted-foreground cursor-pointer text-3xl font-semibold tracking-tight transition-colors"
                 onClick={() => handleCopy(`${attempt.tokenPayAmount}`)}
               >
-                {attempt.tokenPayAmount} USDC
+                {attempt.tokenPayAmount} {selectedTokenData.symbol}
               </span>
               <Badge variant="secondary" className="text-xs">
                 {networks.find((network) => network.id === attempt.networkId)?.displayName} Network
@@ -135,16 +145,10 @@ export function OnchainPayAttemp({ attempt, expiresAt, onBack, networks, selecte
             <Button
               disabled={isPayWithBrowserWalletLoading}
               variant={'outline'}
-              onClick={() => {
-                if (isConnected) {
-                  triggerPayWithBrowserWalletTransaction();
-                } else {
-                  openConnectModal?.();
-                }
-              }}
+              onClick={triggerPayWithBrowserWalletTransaction}
             >
               {isPayWithBrowserWalletLoading ? <Loader className="h-5 w-5 animate-spin" /> : null}
-              Pay With Browser Wallet
+              Or Pay With Browser Wallet
             </Button>
           </CardFooter>
         </Card>
