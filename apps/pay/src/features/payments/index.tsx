@@ -1,5 +1,5 @@
 'use client';
-import { Card } from '@/src/components/ui/card';
+import { Card, CardTitle, CardHeader, CardContent } from '@/src/components/ui/card';
 import { ms } from '@/src/lib/ms';
 import { match } from 'ts-pattern';
 import {
@@ -25,6 +25,7 @@ import OpenCheckout from './components/checkouts/open-checkout';
 import ExpiredCheckout from './components/checkouts/expired-checkout';
 import CompletedCheckout from './components/checkouts/completed-checkout';
 import CancelledCheckout from './components/checkouts/cancelled-checkout';
+import { Loader, LoaderIcon } from 'lucide-react';
 
 export enum PopoverId {
   TOKEN = 'token',
@@ -47,7 +48,8 @@ export default function Payament({ id }: { id: string }) {
       refetchInterval: ms('3s'),
     },
   });
-  const { data: { data: canonicalTokens } = {} } = useCheckoutsControllerGetEnabledTokensV1(id);
+  const { data: { data: canonicalTokens } = {}, isLoading: isLoadingCanonicalTokens } =
+    useCheckoutsControllerGetEnabledTokensV1(id);
   const binancePayTokens = canonicalTokens?.BINANCE_PAY || [];
   const onchainTokens = canonicalTokens?.ONCHAIN || [];
   const enabledTokens = [...binancePayTokens, ...onchainTokens];
@@ -130,6 +132,14 @@ export default function Payament({ id }: { id: string }) {
     setOnchainAttempt(null);
     setBinancePayAttempt(null);
   };
+
+  if (isLoadingCanonicalTokens) {
+    return (
+      <div className="flex min-h-screen items-center justify-center px-4 py-8">
+        <Loader className="h-6 w-6 animate-spin" />
+      </div>
+    );
+  }
 
   if (checkoutData.status === CheckoutResponseDtoStatus.EXPIRED) {
     return <ExpiredCheckout />;
