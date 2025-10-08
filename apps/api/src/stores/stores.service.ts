@@ -9,6 +9,7 @@ import { toDto } from 'src/lib/utils/to-dto';
 import { WalletService } from 'src/wallets/wallet.service';
 import { Store } from '@prisma/client';
 import { BinancePayCredentialResponseDto } from './dtos/binance-pay-credential-response.dto';
+import { generateApiKey } from 'src/lib/utils/generate-api-key';
 
 @Injectable()
 export class StoresService {
@@ -25,6 +26,7 @@ export class StoresService {
       data: {
         name: createStoreDto.name,
         userId: userId,
+        apiKey: generateApiKey(),
       },
       include: {
         wallets: {

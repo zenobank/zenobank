@@ -60,10 +60,9 @@ model Store {
   name      String   @default("Default Store")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  apiKey    String   @unique @default(cuid())
-
-  userId String
-  user   User   @relation(fields: [userId], references: [id])
+  apiKey    String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
 
   // Credenciales por proveedor
 

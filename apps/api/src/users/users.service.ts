@@ -8,6 +8,7 @@ import { WalletService } from 'src/wallets/wallet.service';
 import { CreateStoreDto } from '../stores/dtos/create-store.dto';
 import { StoreResponseDto } from '../stores/dtos/store-response.dto';
 import { UserResponseDto } from './dtos/user-response.dto';
+import { generateApiKey } from 'src/lib/utils/generate-api-key';
 
 @Injectable()
 export class UsersService {
@@ -30,6 +31,7 @@ export class UsersService {
           id: userId,
           stores: {
             create: {
+              apiKey: generateApiKey(),
               name: 'Default Store',
             },
           },
@@ -42,6 +44,7 @@ export class UsersService {
         data: {
           name: 'Default Store',
           userId: user.id,
+          apiKey: generateApiKey(),
         },
         include: {
           binancePayCredential: true,
