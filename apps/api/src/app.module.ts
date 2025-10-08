@@ -17,9 +17,11 @@ import { CheckoutsModule } from './checkouts/checkouts.module';
 import { BinancePayModule } from './integrations/binance-pay/binance-pay.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ConversionsModule } from './conversions/conversions.module';
-
+import { SentryGlobalFilter, SentryModule } from '@sentry/nestjs/setup';
+import { APP_FILTER } from '@nestjs/core';
 @Module({
   imports: [
+    SentryModule.forRoot(),
     AlchemyModule,
     WalletModule,
     ConfigModule.forRoot({
@@ -52,6 +54,11 @@ import { ConversionsModule } from './conversions/conversions.module';
     ConversionsModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: APP_FILTER, // sentry provider needs to be the first provider
+      useClass: SentryGlobalFilter,
+    },
+  ],
 })
 export class AppModule {}

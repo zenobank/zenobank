@@ -1,3 +1,4 @@
+import './instrument'; // sentry always at the top
 import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
