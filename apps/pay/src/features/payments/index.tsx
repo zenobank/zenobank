@@ -1,6 +1,5 @@
 'use client';
-import { Button } from '@/src/components/ui/button';
-import { Card, CardContent, CardFooter } from '@/src/components/ui/card';
+import { Card } from '@/src/components/ui/card';
 import { ms } from '@/src/lib/ms';
 import { match } from 'ts-pattern';
 import {
@@ -10,13 +9,10 @@ import {
   useCheckoutsControllerCreateCheckoutAttemptOnchainV1,
   useCheckoutsControllerGetEnabledTokensV1,
 } from '@repo/api-client';
+import { CheckoutResponseDtoStatus } from '@repo/api-client/model';
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
-import CheckoutHeader from './components/checkout-header';
-import { TokenSelector } from './components/token-selector';
-import { CheckoutPrice } from './components/checkout-price';
 import PayFooter from './components/pay-footer';
-import MethodSelector from './components/method-selector';
 import {
   BinancePayTokenResponseDto,
   OnChainTokenResponseDto,
@@ -25,7 +21,10 @@ import {
 } from '@repo/api-client/model';
 import { OnchainPayAttemp } from './components/pay-attemp/onchain-pay-attemp';
 import { BinancePayAttemp } from './components/pay-attemp/binance-pay-attemp';
-import MissingPaymentMethodsNotice from './components/missing-payment-methods-notice';
+import OpenCheckout from './components/checkouts/open-checkout';
+import ExpiredCheckout from './components/checkouts/expired-checkout';
+import CompletedCheckout from './components/checkouts/completed-checkout';
+import CancelledCheckout from './components/checkouts/cancelled-checkout';
 
 export enum PopoverId {
   TOKEN = 'token',
@@ -132,6 +131,15 @@ export default function Payament({ id }: { id: string }) {
     setBinancePayAttempt(null);
   };
 
+  if (checkoutData.status === CheckoutResponseDtoStatus.EXPIRED) {
+    return <ExpiredCheckout />;
+  }
+  if (checkoutData.status === CheckoutResponseDtoStatus.COMPLETED) {
+    return <CompletedCheckout />;
+  }
+  if (checkoutData.status === CheckoutResponseDtoStatus.CANCELLED) {
+    return <CancelledCheckout />;
+  }
   // Show Onchain attempt component with its own complete card
   if (onchainAttempt) {
     return (
@@ -154,45 +162,22 @@ export default function Payament({ id }: { id: string }) {
     <div className="flex min-h-screen items-center justify-center px-4 py-8">
       <div className="mx-auto max-w-md flex-1">
         <Card className="">
-          <CheckoutHeader expiresAt={checkoutData?.expiresAt} />
-          <CardContent className="space-y-3">
-            <CheckoutPrice amount={checkoutData.priceAmount} currency={checkoutData.priceCurrency} />
-            {enabledTokens.length === 0 ? (
-              <MissingPaymentMethodsNotice />
-            ) : (
-              <>
-                <TokenSelector
-                  activePopover={activePopover}
-                  setActivePopover={setActivePopover}
-                  selectedTokenData={selectedTokenData}
-                  binancePayTokens={binancePayTokens || []}
-                  onchainTokens={onchainTokens || []}
-                  setSelectedTokenId={setSelectedTokenId}
-                />
-                <MethodSelector
-                  activePopover={activePopover}
-                  selectedMethod={selectedMethod}
-                  onChainTokens={onchainTokens || []}
-                  binancePayTokens={binancePayTokens || []}
-                  setActivePopover={setActivePopover}
-                  selectedTokenData={selectedTokenData}
-                  setSelectedTokenId={setSelectedTokenId}
-                  networks={networksAvailableForSelectedToken || []}
-                  isBinancePayAvailableForSelectedCanonicalToken={isBinancePayAvailableForSelectedCanonicalToken}
-                />
-                <Button
-                  onClick={() => {
-                    handleDepositSelectionSubmit();
-                  }}
-                  disabled={!!disabled}
-                  className={`mx-auto w-full ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}
-                >
-                  {buttonText}
-                </Button>
-              </>
-            )}
-          </CardContent>
-          <CardFooter className="w-full space-y-3 pt-4"></CardFooter>
+          <OpenCheckout
+            checkoutData={checkoutData}
+            enabledTokens={enabledTokens}
+            activePopover={activePopover}
+            setActivePopover={setActivePopover}
+            selectedTokenData={selectedTokenData}
+            binancePayTokens={binancePayTokens}
+            onchainTokens={onchainTokens}
+            setSelectedTokenId={setSelectedTokenId}
+            selectedMethod={selectedMethod}
+            networksAvailableForSelectedToken={networksAvailableForSelectedToken || []}
+            isBinancePayAvailableForSelectedCanonicalToken={isBinancePayAvailableForSelectedCanonicalToken}
+            buttonText={buttonText?.toString()}
+            disabled={!!disabled}
+            handleDepositSelectionSubmit={handleDepositSelectionSubmit}
+          />
         </Card>
         <PayFooter />
       </div>
