@@ -1,25 +1,83 @@
-import { NetworkResponseDto, OnchainAttemptResponseDto } from '@repo/api-client/model';
+import { NetworkResponseDto, OnchainAttemptResponseDto, OnChainTokenResponseDto } from '@repo/api-client/model';
 import { Card, CardContent, CardFooter, CardHeader } from '@/src/components/ui/card';
 import { Button } from '@/src/components/ui/button';
 import { Badge } from '@/src/components/ui/badge';
 import BadgerTimerCountdown from '../badger-timer-countdown';
 import PayFooter from '../pay-footer';
 import { QRCodeCanvas } from 'qrcode.react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Loader } from 'lucide-react';
 import { toast } from 'sonner';
 import copy from 'copy-to-clipboard';
+import { useConnectModal } from '@rainbow-me/rainbowkit';
+import { useAccount, useWriteContract, useSwitchChain, useChainId, useChains } from 'wagmi';
+import { Chain, erc20Abi, parseUnits } from 'viem';
+import { wagmiConfig } from '@/src/lib/wagmi-config';
+import { useState } from 'react';
+import * as Sentry from '@sentry/nextjs';
 
 interface OnchainPayAttempProps {
   attempt: OnchainAttemptResponseDto;
   expiresAt?: string | null;
   onBack: () => void;
   networks: NetworkResponseDto[];
+  selectedTokenData: OnChainTokenResponseDto;
 }
 
-export function OnchainPayAttemp({ attempt, expiresAt, onBack, networks }: OnchainPayAttempProps) {
+export function OnchainPayAttemp({ attempt, expiresAt, onBack, networks, selectedTokenData }: OnchainPayAttempProps) {
   const handleCopy = (text: string) => {
     copy(text);
     toast.success('Copied to clipboard!');
+  };
+  const chains = useChains();
+  const { openConnectModal } = useConnectModal();
+  const { writeContractAsync } = useWriteContract();
+  const network = networks.find((network) => network.id === attempt.networkId);
+  const { isConnected, chain } = useAccount();
+  const { switchChainAsync } = useSwitchChain();
+  const [isPayWithBrowserWalletLoading, setIsPayWithBrowserWalletLoading] = useState(false);
+
+  const sendTx = async (chain: Chain) => {
+    await writeContractAsync({
+      address: selectedTokenData.address as `0x${string}`,
+      abi: erc20Abi,
+      functionName: 'transfer',
+      args: [
+        attempt.depositWallet.address as `0x${string}`,
+        parseUnits(attempt.tokenPayAmount, selectedTokenData.decimals),
+      ],
+      chain: chain,
+    });
+  };
+  const triggerPayWithBrowserWalletTransaction = async () => {
+    setIsPayWithBrowserWalletLoading(true);
+    try {
+      if (isConnected) {
+        if (!network?.chainId) {
+          Sentry.captureException(new Error(`Network chain ID is not set for ${network?.id}`));
+          toast.error('Pay with browser wallet is not supported for this network');
+          return;
+        }
+        const wagmiChain = chains.find((chain) => chain.id === network?.chainId);
+        if (!wagmiChain) {
+          Sentry.captureException(new Error(`Unsupported network for ${network?.id}`));
+          toast.error('Unsupported network');
+          return;
+        }
+        if (chain?.id !== network?.chainId) {
+          await switchChainAsync({ chainId: network?.chainId });
+          await sendTx(wagmiChain);
+          toast.success('Transaction sent');
+          return;
+        }
+      } else {
+        openConnectModal?.();
+      }
+    } catch (error) {
+      toast.error('Failed to pay with browser wallet');
+      console.error(error);
+    } finally {
+      setIsPayWithBrowserWalletLoading(false);
+    }
   };
   return (
     <div className="flex min-h-screen items-center justify-center px-4 py-8">
@@ -49,9 +107,7 @@ export function OnchainPayAttemp({ attempt, expiresAt, onBack, networks }: Oncha
             </div>
             <div className="space-y-2">
               <div className="flex w-full justify-center">
-                <span className="text-muted-foreground text-center text-xs font-light">
-                  Send Exact Amount to this address
-                </span>
+                <span className="text-muted-foreground text-center text-sm">Send exact amount to this address</span>
               </div>
               {/* Wallet Address */}
               <div
@@ -75,14 +131,20 @@ export function OnchainPayAttemp({ attempt, expiresAt, onBack, networks }: Oncha
             </div>
           </CardContent>
 
-          <CardFooter className="pt-4">
+          <CardFooter className="flex flex-col items-center">
             <Button
-              variant="outline"
+              disabled={isPayWithBrowserWalletLoading}
+              variant={'outline'}
               onClick={() => {
-                toast.error('Not implemented');
+                if (isConnected) {
+                  triggerPayWithBrowserWalletTransaction();
+                } else {
+                  openConnectModal?.();
+                }
               }}
             >
-              Connect Wallet
+              {isPayWithBrowserWalletLoading ? <Loader className="h-5 w-5 animate-spin" /> : null}
+              Pay With Browser Wallet
             </Button>
           </CardFooter>
         </Card>

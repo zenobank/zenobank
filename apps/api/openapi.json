@@ -589,6 +589,12 @@
             "type": "string",
             "example": "ETHEREUM_MAINNET"
           },
+          "chainId": {
+            "type": "number",
+            "nullable": true,
+            "example": 1,
+            "description": "Chain ID of evm networks"
+          },
           "name": {
             "type": "string",
             "example": "Ethereum Mainnet"
@@ -624,6 +630,7 @@
         },
         "required": [
           "id",
+          "chainId",
           "name",
           "displayName",
           "networkType",

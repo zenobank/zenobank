@@ -13,6 +13,15 @@ export class NetworkResponseDto {
   id: string;
 
   @Expose()
+  @IsNumber()
+  @ApiProperty({
+    example: 1,
+    nullable: true,
+    description: 'Chain ID of evm networks',
+  })
+  chainId: number | null;
+
+  @Expose()
   @IsString()
   @ApiProperty({ example: 'Ethereum Mainnet' })
   name: string;

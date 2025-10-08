@@ -141,19 +141,20 @@ export default function Payament({ id }: { id: string }) {
     return <CancelledCheckout />;
   }
   // Show Onchain attempt component with its own complete card
-  if (onchainAttempt) {
+  if (onchainAttempt && selectedTokenData) {
     return (
       <OnchainPayAttemp
         attempt={onchainAttempt}
         expiresAt={checkoutData.expiresAt}
         onBack={handleBack}
         networks={networksAvailableForSelectedToken || []}
+        selectedTokenData={selectedTokenData as OnChainTokenResponseDto}
       />
     );
   }
 
   // Show Binance Pay attempt component with its own complete card
-  if (binancePayAttempt) {
+  if (binancePayAttempt && selectedTokenData) {
     return <BinancePayAttemp attempt={binancePayAttempt} expiresAt={checkoutData.expiresAt} onBack={handleBack} />;
   }
 

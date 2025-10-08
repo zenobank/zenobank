@@ -193,6 +193,7 @@ model Network {
   confirmationRetryDelay  Int         @default(1000)
   maxConfirmationAttempts Int         @default(100)
   minBlockConfirmations   Int         @default(3)
+  chainId                 Int?
 
   onChainTokens          OnchainToken[]
   wallets                Wallet[]
