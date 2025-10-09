@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 export interface HealthCheckResult {
@@ -18,7 +18,6 @@ export class HealthService {
   constructor(private readonly prisma: PrismaService) {}
 
   async check(): Promise<HealthCheckResult> {
-    const startTime = Date.now();
     const checks: HealthCheckResult['checks'] = {};
 
     try {
@@ -42,29 +41,7 @@ export class HealthService {
       checks.database = {
         status: 'error',
       };
-
-      return {
-        status: 'error',
-        timestamp: new Date().toISOString(),
-        uptime: process.uptime(),
-        checks,
-      };
+      throw new InternalServerErrorException('Database connection failed');
     }
-  }
-
-  async ready(): Promise<HealthCheckResult> {
-    // Readiness check - verify that the service can accept traffic
-    // This could include checking database connections, external services, etc.
-    return this.check();
-  }
-
-  async live(): Promise<HealthCheckResult> {
-    // Liveness check - verify that the service is running
-    // This is a basic check that doesn't depend on external services
-    return {
-      status: 'ok',
-      timestamp: new Date().toISOString(),
-      uptime: process.uptime(),
-    };
   }
 }
