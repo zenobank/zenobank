@@ -21,32 +21,6 @@ export class WalletController {
     private readonly walletService: WalletService,
     private readonly configService: ConfigService,
   ) {}
-  @Get('error-sentry')
-  async errorSentry() {
-    throw new Error('Error from sentry');
-  }
-
-  @Get('test-binance-pay')
-  async testBinancePay() {
-    const client = new BinancePay({
-      configurationRestAPI: {
-        apiKey: this.configService.get('BINANCE_PAY_API_KEY')!,
-        apiSecret: this.configService.get('BINANCE_PAY_API_SECRET'),
-      },
-    });
-    const tradeHistory = await client.restAPI.getPayTradeHistory({
-      recvWindow: ms('1m'),
-      // startTime: Date.now() - ms('10m'),
-      // endTime: Date.now(),
-      limit: 100,
-    });
-
-    // 👇 data es en realidad una función async, así que debes invocarla
-    const data = await tradeHistory.data();
-
-    console.log(data); // aquí sí vas a ver el array real de transacciones
-    return null;
-  }
 
   @UseGuards(ApiKeyGuard)
   @ApiSecurity(API_KEY_HEADER)
