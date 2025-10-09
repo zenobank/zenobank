@@ -434,49 +434,16 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "Service is healthy"
-          },
-          "503": {
-            "description": "Service is unhealthy"
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
           }
         },
-        "summary": "Health check endpoint",
-        "tags": [
-          "Health"
-        ]
-      }
-    },
-    "/api/v1/health/ready": {
-      "get": {
-        "operationId": "HealthController_ready_v1",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "Service is ready"
-          },
-          "503": {
-            "description": "Service is not ready"
-          }
-        },
-        "summary": "Readiness check endpoint",
-        "tags": [
-          "Health"
-        ]
-      }
-    },
-    "/api/v1/health/live": {
-      "get": {
-        "operationId": "HealthController_live_v1",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "Service is alive"
-          },
-          "503": {
-            "description": "Service is not alive"
-          }
-        },
-        "summary": "Liveness check endpoint",
         "tags": [
           "Health"
         ]
