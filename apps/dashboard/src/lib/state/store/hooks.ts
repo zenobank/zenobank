@@ -39,7 +39,7 @@ export function useRegisterExternalWallet() {
     })
 
   const registerExternalWallet = useCallback(
-    async ({ address, _storeId }: { address: string; _storeId: string }) => {
+    async ({ address }: { address: string }) => {
       await mutateRegisterExternalWallet({
         data: {
           address,

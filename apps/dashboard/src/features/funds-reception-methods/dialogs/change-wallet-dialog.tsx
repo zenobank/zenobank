@@ -69,7 +69,6 @@ export function ChangeWalletDialog({
     try {
       await registerExternalWallet({
         address: values.walletAddress,
-        storeId: activeStore.id,
       })
       toast.success('Wallet changed successfully!')
       form.reset()
