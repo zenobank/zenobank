@@ -34,6 +34,10 @@ export class Env {
   static readonly SENTRY_DSN = 'SENTRY_DSN';
   @IsString()
   SENTRY_DSN: string;
+
+  static readonly SENTRY_AUTH_TOKEN = 'SENTRY_AUTH_TOKEN';
+  @IsString()
+  SENTRY_AUTH_TOKEN: string;
 }
 
 export function validateEnvConfig(config: Record<string, unknown>) {
