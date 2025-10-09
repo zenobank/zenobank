@@ -31,15 +31,15 @@ import { APP_FILTER } from '@nestjs/core';
       validate: validateEnvConfig,
     }),
     PrismaModule,
-    BullModule.forRootAsync({
-      imports: [],
-      inject: [],
-      useFactory: () => {
-        return {
-          connection: { url: getEnv(Env.REDIS_QUEUE_URL) },
-        };
-      },
-    }),
+    // BullModule.forRootAsync({
+    //   imports: [],
+    //   inject: [],
+    //   useFactory: () => {
+    //     return {
+    //       connection: { url: getEnv(Env.REDIS_QUEUE_URL) },
+    //     };
+    //   },
+    // }),
     TransactionsModule,
     BlockchainModule,
     AlchemyModule,

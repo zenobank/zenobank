@@ -15,17 +15,13 @@ export class Env {
   @IsString()
   DATABASE_URL: string;
 
-  static readonly REDIS_QUEUE_URL = 'REDIS_QUEUE_URL';
-  @IsString()
-  REDIS_QUEUE_URL: string;
+  // static readonly REDIS_QUEUE_URL = 'REDIS_QUEUE_URL';
+  // @IsString()
+  // REDIS_QUEUE_URL: string;
 
   static readonly ALCHEMY_AUTH_TOKEN = 'ALCHEMY_AUTH_TOKEN';
   @IsString()
   ALCHEMY_AUTH_TOKEN: string;
-
-  static readonly SVIX_API_KEY = 'SVIX_API_KEY';
-  @IsString()
-  SVIX_API_KEY: string;
 
   static readonly CLERK_PUBLISHABLE_KEY = 'CLERK_PUBLISHABLE_KEY';
   @IsString()
