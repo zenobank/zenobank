@@ -17,6 +17,7 @@ import { CheckoutsModule } from './checkouts/checkouts.module';
 import { BinancePayModule } from './integrations/binance-pay/binance-pay.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ConversionsModule } from './conversions/conversions.module';
+import { HealthModule } from './health/health.module';
 import { SentryGlobalFilter, SentryModule } from '@sentry/nestjs/setup';
 import { APP_FILTER } from '@nestjs/core';
 @Module({
@@ -52,6 +53,7 @@ import { APP_FILTER } from '@nestjs/core';
     CheckoutsModule,
     BinancePayModule,
     ConversionsModule,
+    HealthModule,
   ],
   controllers: [],
   providers: [
