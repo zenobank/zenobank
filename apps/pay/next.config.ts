@@ -1,4 +1,3 @@
-import { withSentryConfig } from '@sentry/nextjs';
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
@@ -9,5 +8,9 @@ const nextConfig: NextConfig = {
         destination: `${process.env.API_BASE_URL}/:path*`,
       },
     ];
+  },
+  transpilePackages: ['wagmi', 'viem', '@rainbow-me/rainbowkit'],
+  experimental: {
+    esmExternals: 'loose',
   },
 };

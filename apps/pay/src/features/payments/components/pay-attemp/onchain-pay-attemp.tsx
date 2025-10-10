@@ -13,7 +13,6 @@ import { useAccount, useWriteContract, useSwitchChain, useChainId, useChains } f
 import { Chain, erc20Abi, parseUnits } from 'viem';
 import { wagmiConfig } from '@/src/lib/wagmi-config';
 import { useState, useEffect } from 'react';
-import * as Sentry from '@sentry/nextjs';
 
 interface OnchainPayAttempProps {
   attempt: OnchainAttemptResponseDto;
@@ -54,13 +53,13 @@ export function OnchainPayAttemp({ attempt, expiresAt, onBack, networks, selecte
     try {
       if (isConnected) {
         if (!network?.chainId) {
-          Sentry.captureException(new Error(`Network chain ID is not set for ${network?.id}`));
+          // Sentry.captureException(new Error(`Network chain ID is not set for ${network?.id}`));
           toast.error('Pay with browser wallet is not supported for this network');
           return;
         }
         const wagmiChain = chains.find((chain) => chain.id === network?.chainId);
         if (!wagmiChain) {
-          Sentry.captureException(new Error(`Unsupported network for ${network?.id}`));
+          // Sentry.captureException(new Error(`Unsupported network for ${network?.id}`));
           toast.error('Unsupported network');
           return;
         }
