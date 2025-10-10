@@ -7,7 +7,8 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@api-client/*": ["./src/lib/generated/api-client/*"]
     }
   }
 }

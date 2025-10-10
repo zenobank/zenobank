@@ -9,8 +9,8 @@ export default defineConfig({
     input: '../api/openapi.json',
     output: {
       baseUrl: process.env.API_BASE_URL,
-      target: 'src/lib/generated/index.ts',
-      schemas: 'src/lib/generated/model',
+      target: 'src/lib/generated/api-client/index.ts',
+      schemas: 'src/lib/generated/api-client/model',
       client: 'react-query',
       clean: true,
     },
