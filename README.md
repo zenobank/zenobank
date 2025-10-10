@@ -1,4 +1,5 @@
-<img width="422" height="86.3" alt="logo black" src="https://github.com/user-attachments/assets/113a8851-4272-40e2-8ac0-56e0343327e2" />
+<img width="422" height="86.3" alt="logo black" src="https://github.com/user-attachments/assets/113a8851-4272-40e2-8ac0-56e0343327e2#gh-light-mode-only" />
+<img width="422" height="86.3" alt="logo white" src="https://github.com/user-attachments/assets/2b54a340-5fe0-41e5-a18b-add15ca6f8d5#gh-dark-mode-only" />
 
 # Zeno Bank: Open-source Crypto Payment Gateway
 
