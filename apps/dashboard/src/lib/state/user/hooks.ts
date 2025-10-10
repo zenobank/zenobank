@@ -12,14 +12,14 @@ export function useUser() {
       withCredentials: true,
     },
   })
-  useEffect(() => {
-    if (!user || user.stores.length === 0) {
-      mutateBootstrap().then((data) => {
-        if (!data.data.alreadyExists) {
-          window.location.reload()
-        }
-      })
-    }
-  }, [user, mutateBootstrap])
+  // useEffect(() => {
+  //   if (!user || user.stores.length === 0) {
+  //     mutateBootstrap().then((data) => {
+  //       if (!data.data.alreadyExists) {
+  //         window.location.reload()
+  //       }
+  //     })
+  //   }
+  // }, [user, mutateBootstrap])
   return { user, isLoading }
 }
