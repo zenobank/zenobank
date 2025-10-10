@@ -18,7 +18,6 @@ import { ChangeWalletDialog } from '../funds-reception-methods/dialogs/change-wa
 export default function Dashboard() {
   // const { payments, isLoading: isPaymentsLoading } = usePayments()
   const { activeStore, isLoading } = useActiveStore()
-  const { mutateAsync: mutateBootstrap } = useUsersControllerBootstrapV1()
   // const paymentList = useMemo(() => {
   //   if (!payments) return []
   //   return paymentListSchema.parse(payments)
@@ -66,11 +65,6 @@ export default function Dashboard() {
       // Silently handle clipboard error
     }
   }
-  useEffect(() => {
-    mutateBootstrap().then((data) => {
-      console.log('data', data.data)
-    })
-  }, [mutateBootstrap])
 
   return (
     <>
