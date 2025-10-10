@@ -4,7 +4,6 @@ import { defineConfig } from 'orval';
 
 dotenv.config();
 
-console.log('!!!!!!!!!!!!!!!!!process.env.VITE_API_URL', process.env.VITE_API_URL);
 export default defineConfig({
   api: {
     input: '../api/openapi.json',
