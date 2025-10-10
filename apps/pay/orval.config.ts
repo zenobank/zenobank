@@ -4,12 +4,12 @@ import { defineConfig } from 'orval';
 
 dotenv.config();
 
-console.log('!!!!!!!!!!!!!!!!!process.env.API_URL', process.env.API_URL);
+console.log('!!!!!!!!!!!!!!!!!process.env.VITE_API_URL', process.env.VITE_API_URL);
 export default defineConfig({
   api: {
     input: '../api/openapi.json',
     output: {
-      baseUrl: process.env.API_URL,
+      baseUrl: process.env.VITE_API_URL,
       target: 'src/lib/generated/api-client/index.ts',
       schemas: 'src/lib/generated/api-client/model',
       client: 'react-query',
