@@ -67,8 +67,10 @@ export default function Dashboard() {
     }
   }
   useEffect(() => {
-    mutateBootstrap()
-  }, [])
+    mutateBootstrap().then((data) => {
+      console.log('data', data.data)
+    })
+  }, [mutateBootstrap])
 
   return (
     <>

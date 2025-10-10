@@ -139,7 +139,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object"
+                  "$ref": "#/components/schemas/BootstrapResponseDto"
                 }
               }
             }
@@ -751,6 +751,18 @@
         "required": [
           "id",
           "stores"
+        ]
+      },
+      "BootstrapResponseDto": {
+        "type": "object",
+        "properties": {
+          "alreadyExists": {
+            "type": "boolean",
+            "example": false
+          }
+        },
+        "required": [
+          "alreadyExists"
         ]
       },
       "CreateBinancePayCredentialDto": {

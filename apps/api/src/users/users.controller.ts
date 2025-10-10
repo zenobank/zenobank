@@ -12,6 +12,7 @@ import { UsersService } from './users.service';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { type AuthenticatedRequest } from 'src/auth/auth.interface';
 import { UserResponseDto } from './dtos/user-response.dto';
+import { BootstrapResponseDto } from './dtos/bootstrap-response.dto';
 
 @Controller('users')
 export class UsersController {
@@ -36,7 +37,9 @@ export class UsersController {
   })
   @UseGuards(AuthGuard)
   @Post('me/bootstrap')
-  async bootstrap(@Req() req: AuthenticatedRequest): Promise<any> {
+  async bootstrap(
+    @Req() req: AuthenticatedRequest,
+  ): Promise<BootstrapResponseDto> {
     return this.usersService.bootstrap(req.userId);
   }
 }
