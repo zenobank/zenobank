@@ -1,7 +1,9 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { useRouter } from '@tanstack/react-router'
 import { useAuth, UserButton } from '@clerk/clerk-react'
 import copy from 'copy-to-clipboard'
 import { Copy, Edit3, Check, Loader2 } from 'lucide-react'
+import { useUsersControllerBootstrapV1 } from '@/lib/generated/api-client'
 // import { usePayments } from '@/lib/state/payments/hooks'
 import { useActiveStore } from '@/lib/state/store/hooks'
 import { Button } from '@/components/ui/button'
@@ -16,7 +18,7 @@ import { ChangeWalletDialog } from '../funds-reception-methods/dialogs/change-wa
 export default function Dashboard() {
   // const { payments, isLoading: isPaymentsLoading } = usePayments()
   const { activeStore, isLoading } = useActiveStore()
-
+  const { mutateAsync: mutateBootstrap } = useUsersControllerBootstrapV1()
   // const paymentList = useMemo(() => {
   //   if (!payments) return []
   //   return paymentListSchema.parse(payments)
@@ -64,6 +66,9 @@ export default function Dashboard() {
       // Silently handle clipboard error
     }
   }
+  useEffect(() => {
+    mutateBootstrap()
+  }, [])
 
   return (
     <>
