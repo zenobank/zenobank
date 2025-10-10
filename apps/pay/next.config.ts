@@ -14,3 +14,4 @@ const nextConfig: NextConfig = {
     esmExternals: 'loose',
   },
 };
+export default nextConfig;
