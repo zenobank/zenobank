@@ -47,12 +47,12 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <WagmiProvider config={wagmiConfig}>
           <TanstackQuery>
-            <RainbowKitProvider modalSize="compact">
-              <ThemeProvider>
+            <ThemeProvider>
+              <RainbowKitProvider modalSize="compact">
                 {children}
                 <Toaster />
-              </ThemeProvider>
-            </RainbowKitProvider>
+              </RainbowKitProvider>
+            </ThemeProvider>
           </TanstackQuery>
         </WagmiProvider>
       </body>
