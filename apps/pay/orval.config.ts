@@ -3,7 +3,6 @@ import * as dotenv from 'dotenv';
 import { defineConfig } from 'orval';
 
 dotenv.config();
-
 export default defineConfig({
   api: {
     input: '../api/openapi.json',
