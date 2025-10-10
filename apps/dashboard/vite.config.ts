@@ -6,14 +6,7 @@ import { tanstackRouter } from '@tanstack/router-plugin/vite'
 
 // https://vite.dev/config/
 export default defineConfig({
-  server: {
-    proxy: {
-      '/api': {
-        target: 'https://sadfsdfsdfds.free.beeceptor.com' + '/api',
-        changeOrigin: true,
-      },
-    },
-  },
+  server: {},
   plugins: [
     tanstackRouter({
       target: 'react',
