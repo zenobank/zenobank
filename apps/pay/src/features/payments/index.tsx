@@ -9,7 +9,7 @@ import {
   useCheckoutsControllerCreateCheckoutAttemptOnchainV1,
   useCheckoutsControllerGetEnabledTokensV1,
 } from '@/lib/generated/api-client';
-import { CheckoutResponseDtoStatus } from '@repo/api-client/model';
+import { CheckoutResponseDtoStatus } from '@/lib/generated/api-client/model';
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import PayFooter from './components/pay-footer';
@@ -18,7 +18,7 @@ import {
   OnChainTokenResponseDto,
   BinancePayAttemptResponseDto,
   OnchainAttemptResponseDto,
-} from '@repo/api-client/model';
+} from '@/lib/generated/api-client/model';
 import { OnchainPayAttemp } from './components/pay-attemp/onchain-pay-attemp';
 import { BinancePayAttemp } from './components/pay-attemp/binance-pay-attemp';
 import OpenCheckout from './components/checkouts/open-checkout';

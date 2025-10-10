@@ -12,7 +12,11 @@ import { ChevronsUpDown } from 'lucide-react';
 import { Check } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
 import { MethodType, PopoverId, TokenResponseDto } from '../..';
-import { NetworkResponseDto, BinancePayTokenResponseDto, OnChainTokenResponseDto } from '@repo/api-client/model';
+import {
+  NetworkResponseDto,
+  BinancePayTokenResponseDto,
+  OnChainTokenResponseDto,
+} from '@/lib/generated/api-client/model';
 import { useMemo } from 'react';
 
 export default function MethodSelector({

@@ -1,5 +1,9 @@
 import { CommandGroup, CommandItem } from '@/src/components/ui/command';
-import { BinancePayTokenResponseDto, CheckoutResponseDto, OnChainTokenResponseDto } from '@repo/api-client/model';
+import {
+  BinancePayTokenResponseDto,
+  CheckoutResponseDto,
+  OnChainTokenResponseDto,
+} from '@/lib/generated/api-client/model';
 import Image from 'next/image';
 import { PopoverId, TokenResponseDto } from '../..';
 import { Check } from 'lucide-react';

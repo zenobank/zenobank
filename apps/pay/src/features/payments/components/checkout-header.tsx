@@ -1,6 +1,6 @@
 import { CardHeader, CardTitle } from '@/src/components/ui/card';
 import BadgerTimerCountdown from './badger-timer-countdown';
-import { CheckoutResponseDto } from '@repo/api-client/model';
+import { CheckoutResponseDto } from '@/lib/generated/api-client/model';
 
 export default function CheckoutHeader({ expiresAt }: { expiresAt?: string | null }) {
   return (

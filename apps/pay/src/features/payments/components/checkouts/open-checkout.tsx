@@ -9,7 +9,7 @@ import {
   CheckoutResponseDto,
   NetworkResponseDto,
   OnChainTokenResponseDto,
-} from '@repo/api-client/model';
+} from '@/lib/generated/api-client/model';
 import { Button } from '@/src/components/ui/button';
 import { MethodType, PopoverId, TokenResponseDto } from '../..';
 export default function OpenCheckout({

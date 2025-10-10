@@ -1,4 +1,8 @@
-import { BinancePayTokenResponseDto, CheckoutResponseDto, OnChainTokenResponseDto } from '@repo/api-client/model';
+import {
+  BinancePayTokenResponseDto,
+  CheckoutResponseDto,
+  OnChainTokenResponseDto,
+} from '@/lib/generated/api-client/model';
 import { PopoverId } from '../..';
 import { TokenResponseDto } from '../..';
 import { Button } from '@/src/components/ui/button';
