@@ -27,4 +27,5 @@ dist-ssr
 
 .tanstack/tmp
 
-src/lib/requests/api-client
+
+src/lib/generated/api-client

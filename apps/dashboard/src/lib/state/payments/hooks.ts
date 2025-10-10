@@ -1,4 +1,4 @@
-// import { usePaymentControllerGetPaymentsV1 } from '@repo/api-client'
+// import { usePaymentControllerGetPaymentsV1 } from '@/lib/generated/api-client'
 // import { useActiveStore } from '../store/hooks'
 
 // export function usePayments() {

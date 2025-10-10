@@ -8,7 +8,7 @@ import {
   useCheckoutsControllerCreateCheckoutAttemptBinancePayV1,
   useCheckoutsControllerCreateCheckoutAttemptOnchainV1,
   useCheckoutsControllerGetEnabledTokensV1,
-} from '@repo/api-client';
+} from '@/lib/generated/api-client';
 import { CheckoutResponseDtoStatus } from '@repo/api-client/model';
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';

@@ -72,3 +72,6 @@ src/routeTree.gen.ts
 
 # Sentry Config File
 .env.sentry-build-plugin
+
+# Generated API Client
+src/lib/generated/api-client

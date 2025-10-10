@@ -5,7 +5,7 @@ import {
   useWalletControllerRegisterExternalWalletV1,
   useStoresControllerCreateBinancePayCredentialV1,
   getUsersControllerGetMeV1QueryKey,
-} from '@repo/api-client'
+} from '@/lib/generated/api-client'
 import { useUser } from '../user/hooks'
 
 export function useActiveStore() {
