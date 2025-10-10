@@ -18,6 +18,16 @@
     "dev": {
       "cache": false,
       "persistent": true
+    },
+    "api-client:generate": {
+      "dependsOn": ["api#build"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        ".env*",
+        "API_URL",
+        "apps/api/openapi.json"
+      ],
+      "outputs": ["src/**", "dist/**"]
     }
   }
 }
