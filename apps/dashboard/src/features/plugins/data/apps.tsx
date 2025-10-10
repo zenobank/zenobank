@@ -1,18 +1,27 @@
 import { IconBrandWordpress } from '@tabler/icons-react'
 import { Cloud } from 'lucide-react'
+import { ModalType } from '../components/modal-registry'
 
-export const apps = [
+export const apps: {
+  name: string
+  logo: React.ReactNode
+  connected: boolean
+  desc: string
+  modalType: ModalType
+}[] = [
   {
     name: 'WooCommerce',
     logo: <IconBrandWordpress />,
     connected: false,
     desc: 'Accept Crypto in your WooCommerce store',
+    modalType: ModalType.Wordpress,
   },
   {
     name: 'Tienda Nube',
     logo: <Cloud />,
-    connected: true,
+    connected: false,
     desc: 'Accept Crypto in your Tienda Nube store',
+    modalType: ModalType.TiendaNube,
   },
   // {
   //   name: 'Notion',

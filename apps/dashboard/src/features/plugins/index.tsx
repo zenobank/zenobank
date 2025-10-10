@@ -19,25 +19,17 @@ import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
 import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
-import { WordPressIntegrationDialog } from './components/wordpress-integration-dialog'
+import { modalComponents, type ModalType } from './components/modal-registry'
 import { apps } from './data/apps'
-
-const appText = new Map<string, string>([
-  ['all', 'All Apps'],
-  ['connected', 'Connected'],
-  ['notConnected', 'Not Connected'],
-])
 
 export default function Apps() {
   const [sort, setSort] = useState('ascending')
-  const [appType, setAppType] = useState('all')
   const [searchTerm, setSearchTerm] = useState('')
-  const [isWordPressDialogOpen, setIsWordPressDialogOpen] = useState(false)
-  const [hasWallet] = useState(false) // Variable para controlar si el usuario tiene wallet
+  const [openModal, setOpenModal] = useState<ModalType | null>(null)
 
   const handleAppClick = (app: (typeof apps)[0]) => {
-    if (app.name === 'Wordpress' && !app.connected) {
-      setIsWordPressDialogOpen(true)
+    if (!app.connected && app.modalType) {
+      setOpenModal(app.modalType as ModalType)
     }
   }
 
@@ -46,13 +38,6 @@ export default function Apps() {
       sort === 'ascending'
         ? a.name.localeCompare(b.name)
         : b.name.localeCompare(a.name)
-    )
-    .filter((app) =>
-      appType === 'connected'
-        ? app.connected
-        : appType === 'notConnected'
-          ? !app.connected
-          : true
     )
     .filter((app) => app.name.toLowerCase().includes(searchTerm.toLowerCase()))
 
@@ -150,11 +135,20 @@ export default function Apps() {
         </ul>
       </Main>
 
-      {/* WordPress Integration Dialog */}
-      <WordPressIntegrationDialog
-        open={isWordPressDialogOpen}
-        onOpenChange={setIsWordPressDialogOpen}
-      />
+      {/* Dynamic Modals */}
+      {openModal && modalComponents[openModal] && (
+        <>
+          {Object.entries(modalComponents).map(
+            ([modalType, ModalComponent]) => (
+              <ModalComponent
+                key={modalType}
+                open={openModal === modalType}
+                onOpenChange={(open) => !open && setOpenModal(null)}
+              />
+            )
+          )}
+        </>
+      )}
     </>
   )
 }
