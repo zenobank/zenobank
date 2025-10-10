@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "pnpm api-client:generate && tsc -b && vite build",
+    "api-client:generate": "orval",
     "lint": "eslint .",
     "preview": "vite preview",
     "format:check": "prettier --check .",
@@ -68,6 +69,7 @@
     "zustand": "^5.0.6"
   },
   "devDependencies": {
+    "orval": "^7.11.2",
     "@eslint/js": "^9.31.0",
     "@faker-js/faker": "^9.9.0",
     "@tanstack/eslint-plugin-query": "^5.81.2",
