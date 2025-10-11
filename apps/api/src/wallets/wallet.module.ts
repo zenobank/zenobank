@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { WalletService } from './wallet.service';
+import { WalletsService } from './wallet.service';
 import { WalletFactory } from './wallet.factory';
 
 import { WalletController } from './wallet.controller';
@@ -10,7 +10,7 @@ import { AuthModule } from 'src/auth/auth.module';
 @Module({
   imports: [PrismaModule, AlchemyModule, AuthModule],
   controllers: [WalletController],
-  providers: [WalletService, WalletFactory],
-  exports: [WalletService, WalletFactory],
+  providers: [WalletsService, WalletFactory],
+  exports: [WalletsService, WalletFactory],
 })
 export class WalletModule {}

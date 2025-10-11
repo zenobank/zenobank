@@ -6,7 +6,7 @@ import { StoreResponseDto } from './dtos/store-response.dto';
 import { toEnumValue } from 'src/lib/utils/to-enum';
 import { SupportedNetworksId } from 'src/networks/network.interface';
 import { toDto } from 'src/lib/utils/to-dto';
-import { WalletService } from 'src/wallets/wallet.service';
+import { WalletsService } from 'src/wallets/wallet.service';
 import { Store } from '@prisma/client';
 import { BinancePayCredentialResponseDto } from './dtos/binance-pay-credential-response.dto';
 import { generateApiKey } from 'src/lib/utils/generate-api-key';
@@ -15,7 +15,7 @@ import { generateApiKey } from 'src/lib/utils/generate-api-key';
 export class StoresService {
   constructor(
     private readonly db: PrismaService,
-    private readonly walletService: WalletService,
+    private readonly walletService: WalletsService,
   ) {}
 
   async createStore(

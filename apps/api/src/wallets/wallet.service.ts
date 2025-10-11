@@ -15,8 +15,8 @@ import { toDto } from 'src/lib/utils/to-dto';
 import { WalletResponseDto } from './dto/wallet.response.dto';
 
 @Injectable()
-export class WalletService {
-  private readonly logger = new Logger(WalletService.name);
+export class WalletsService {
+  private readonly logger = new Logger(WalletsService.name);
 
   constructor(
     private readonly db: PrismaService,

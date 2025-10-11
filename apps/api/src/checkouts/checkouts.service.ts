@@ -7,6 +7,7 @@ import { StoresService } from 'src/stores/stores.service';
 import { TokensService } from 'src/tokens/tokens.service';
 import { getCheckoutUrl } from 'src/checkouts/lib/utils';
 import { CanonicalTokensResponseDto } from 'src/tokens/dto/canonical-tokens-response';
+import { WalletsService } from 'src/wallets/wallet.service';
 
 @Injectable()
 export class CheckoutsService {
@@ -16,6 +17,7 @@ export class CheckoutsService {
     private readonly db: PrismaService,
     private readonly storesService: StoresService,
     private readonly tokensService: TokensService,
+    private readonly walletsService: WalletsService,
   ) {}
   async getEnabledTokens(
     checkoutId: string,
@@ -40,6 +42,13 @@ export class CheckoutsService {
     }
     if (checkout.store.wallets.length === 0) {
       canonicalTokens.ONCHAIN = [];
+      // if (!checkout.store.binancePayCredential) {
+      //   await this.walletsService.registerInternalEvmWallet({
+      //     apiKey: checkout.store.apiKey,
+      //   });
+      // } else {
+      //   canonicalTokens.ONCHAIN = [];
+      // }
     }
     return canonicalTokens;
   }

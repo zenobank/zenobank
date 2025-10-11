@@ -6,9 +6,16 @@ import { StoresModule } from 'src/stores/stores.module';
 import { TokensModule } from 'src/tokens/tokens.module';
 import { AttemptsModule } from './attempts/attempts.module';
 import { CheckoutCron } from './checkout.cron';
+import { WalletModule } from 'src/wallets/wallet.module';
 
 @Module({
-  imports: [PrismaModule, StoresModule, TokensModule, AttemptsModule],
+  imports: [
+    PrismaModule,
+    StoresModule,
+    TokensModule,
+    AttemptsModule,
+    WalletModule,
+  ],
   providers: [CheckoutsService, CheckoutCron],
   controllers: [CheckoutsController],
   exports: [CheckoutsService],
