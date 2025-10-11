@@ -7,11 +7,7 @@ import {
 export function useUser() {
   const { mutateAsync: mutateBootstrap } = useUsersControllerBootstrapV1()
 
-  const { data: { data: user } = {}, isLoading } = useUsersControllerGetMeV1({
-    axios: {
-      withCredentials: true,
-    },
-  })
+  const { data: { data: user } = {}, isLoading } = useUsersControllerGetMeV1({})
   // useEffect(() => {
   //   if (!user || user.stores.length === 0) {
   //     mutateBootstrap().then((data) => {
