@@ -14,7 +14,7 @@ export class PrismaService
     await this.$disconnect();
   }
   async cleanDb() {
-    if (env.NODE_ENV === 'prod' || env.NODE_ENV === 'production') {
+    if (env.NODE_ENV === 'production') {
       return;
     }
 

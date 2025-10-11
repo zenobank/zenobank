@@ -11,7 +11,7 @@ const envSchema = z.object({
   CLERK_SECRET_KEY: z.string(),
   SENTRY_DSN: z.string(),
   SENTRY_AUTH_TOKEN: z.string(),
-  NODE_ENV: z.enum(['development', 'production']),
+  NODE_ENV: z.enum(['development', 'production', 'test']),
 });
 
 export const env = envSchema.parse(process.env);
