@@ -1,4 +1,4 @@
-import { env } from '@/src/lib/env';
+import { envClient } from '@/src/lib/env-client';
 
 export default function PayFooter() {
   return (
@@ -6,7 +6,7 @@ export default function PayFooter() {
       <p className="text-xs font-normal">Open Source Crypto Gateway</p>
       <p className="text-xs font-light italic">
         Powered by{' '}
-        <a href={`${env.NEXT_PUBLIC_MAIN_DOMAIN_URL}`} target="_blank" rel="noreferrer">
+        <a href={`${envClient.NEXT_PUBLIC_MAIN_DOMAIN_URL}`} target="_blank" rel="noreferrer">
           <span className="font-semibold underline">Zenobank</span>
         </a>
       </p>
