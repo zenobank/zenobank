@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { Request } from 'express';
 import * as crypto from 'crypto';
-import { getEnv, Env } from 'src/lib/utils/env';
+import { getEnv, Env, env } from 'src/lib/utils/env';
 
 @Injectable()
 export class AlchemySignatureGuard implements CanActivate {
@@ -32,7 +32,7 @@ export class AlchemySignatureGuard implements CanActivate {
       throw new UnauthorizedException('IP not allowed');
     }
     const sig = req.headers['x-alchemy-signature'] as string;
-    const signingKey = getEnv(Env.ALCHEMY_AUTH_TOKEN);
+    const signingKey = env.ALCHEMY_AUTH_TOKEN;
     return true;
   }
 }

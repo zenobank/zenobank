@@ -9,7 +9,7 @@ import { SupportedNetworksId } from 'src/networks/network.interface';
 import { Alchemy, WebhookType as AlchemyWebhookType } from 'alchemy-sdk';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ALCHEMY_SDK } from './lib/alchemy.constants';
-import { Env, getEnv } from 'src/lib/utils/env';
+import { env } from 'src/lib/utils/env';
 import {
   AddressActivity,
   AddressActivityWebhookResponse,
@@ -273,7 +273,7 @@ export class AlchemyService {
     address: string,
   ): Promise<AddressActivityWebhookDto> {
     const alchemyWebhook = await this.alchemy.notify.createWebhook(
-      getEnv(Env.API_URL) + WEBHOOKS_PATHS.ALCHEMY,
+      env.API_URL + WEBHOOKS_PATHS.ALCHEMY,
       AlchemyWebhookType.ADDRESS_ACTIVITY,
       {
         network: NETWORK_TO_ALCHEMY_SDK[network],
