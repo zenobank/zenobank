@@ -68,8 +68,6 @@
     "zustand": "^5.0.6"
   },
   "devDependencies": {
-    "dotenv-cli": "^10.0.0",
-    "orval": "^7.11.2",
     "@eslint/js": "^9.31.0",
     "@faker-js/faker": "^9.9.0",
     "@tanstack/eslint-plugin-query": "^5.81.2",
@@ -82,12 +80,14 @@
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "@vitejs/plugin-react-swc": "^3.11.0",
+    "dotenv-cli": "^10.0.0",
     "eslint": "^9.31.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^16.3.0",
     "knip": "^5.62.0",
     "openapi-typescript": "^7.9.1",
+    "orval": "^7.11.2",
     "prettier": "^3.6.2",
     "prettier-plugin-tailwindcss": "^0.6.14",
     "typescript": "~5.8.3",
