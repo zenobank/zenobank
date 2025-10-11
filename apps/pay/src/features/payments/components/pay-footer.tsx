@@ -6,7 +6,7 @@ export default function PayFooter() {
       <p className="text-xs font-normal">Open Source Crypto Gateway</p>
       <p className="text-xs font-light italic">
         Powered by{' '}
-        <a href={`${envClient.NEXT_PUBLIC_MAIN_DOMAIN_URL}`} target="_blank" rel="noreferrer">
+        <a href={`https://zenobank.io`} target="_blank" rel="noreferrer">
           <span className="font-semibold underline">Zenobank</span>
         </a>
       </p>
