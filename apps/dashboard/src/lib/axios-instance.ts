@@ -13,7 +13,6 @@ instance.interceptors.request.use((config) => {
   return config
 })
 
-// 🔥 ESTA es la función que Orval espera (el nombre debe coincidir con `name`)
 export const customAxios = <T = unknown>(
   config: AxiosRequestConfig,
   options?: AxiosRequestConfig
