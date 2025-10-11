@@ -62,88 +62,51 @@ export function WordPressIntegrationDialog({ open, onOpenChange }: Props) {
           <div className='space-y-4'>
             {/* Step 1: Wallet */}
 
+            {/* Step 2: Download Plugin */}
+
             <Card>
               <CardHeader className='pb-2'>
                 <CardTitle className='flex items-center gap-2 text-base'>
-                  <IconWallet className='h-5 w-5' />
-                  1. Add Wallet{' '}
-                  {paymentWallet && <CheckCircleIcon className='h-5 w-5' />}
+                  <IconDownload className='h-5 w-5' />
+                  1. Download Plugin
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {paymentWallet ? (
-                  <div className='space-y-2'>
-                    <p className='text-muted-foreground text-sm'>
-                      Payments will be received directly in this wallet:
-                    </p>
-                    <div className='flex items-center gap-2'>
-                      <code className='text-md font-mono break-all'>
-                        {paymentWallet.address}
-                      </code>
-                    </div>
-                  </div>
-                ) : (
-                  <>
-                    <p className='text-muted-foreground mb-3 text-sm'>
-                      Connect your wallet to receive crypto payments directly
-                    </p>
-                    <Button onClick={addWallet} size='sm'>
-                      Add Wallet
-                    </Button>
-                  </>
-                )}
+                <p className='text-muted-foreground mb-3 text-sm'>
+                  Download and install the WordPress plugin
+                </p>
+                <Button onClick={downloadPlugin} size='sm'>
+                  Download Plugin
+                </Button>
               </CardContent>
             </Card>
 
-            {/* Step 2: Download Plugin */}
-            {paymentWallet && (
-              <Card>
-                <CardHeader className='pb-2'>
-                  <CardTitle className='flex items-center gap-2 text-base'>
-                    <IconDownload className='h-5 w-5' />
-                    2. Download Plugin
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className='text-muted-foreground mb-3 text-sm'>
-                    Download and install the WordPress plugin
-                  </p>
-                  <Button onClick={downloadPlugin} size='sm'>
-                    Download Plugin
-                  </Button>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Step 3: API Key */}
-            {paymentWallet && (
-              <Card>
-                <CardHeader className='pb-2'>
-                  <CardTitle className='flex items-center gap-2 text-base'>
-                    <IconKey className='h-5 w-5' />
-                    3. Configure API Key
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className='text-muted-foreground mb-3 text-sm'>
-                    Copy this API key to your WordPress plugin settings
-                  </p>
-                  <div className='flex items-center gap-2'>
-                    <div className='bg-muted flex-1 rounded-md border px-3 py-2 font-mono text-sm'>
-                      {apiKey}
-                    </div>
-                    <Button variant='outline' size='sm' onClick={copyApiKey}>
-                      <IconCopy className='h-4 w-4' />
-                    </Button>
+            <Card>
+              <CardHeader className='pb-2'>
+                <CardTitle className='flex items-center gap-2 text-base'>
+                  <IconKey className='h-5 w-5' />
+                  2. Configure API Key
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className='text-muted-foreground mb-3 text-sm'>
+                  Copy this API key to your WordPress plugin settings
+                </p>
+                <div className='flex items-center gap-2'>
+                  <div className='bg-muted flex-1 rounded-md border px-3 py-2 font-mono text-sm'>
+                    {apiKey}
                   </div>
-                </CardContent>
-              </Card>
-            )}
+                  <Button variant='outline' size='sm' onClick={copyApiKey}>
+                    <IconCopy className='h-4 w-4' />
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
-          <DialogFooter>
+          {/* <DialogFooter>
             <Button onClick={() => onOpenChange(false)}>Done</Button>
-          </DialogFooter>
+          </DialogFooter> */}
         </DialogContent>
       </Dialog>
 

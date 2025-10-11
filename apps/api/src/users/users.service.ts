@@ -14,7 +14,10 @@ export class UsersService {
   constructor(private readonly db: PrismaService) {}
 
   async bootstrap(userId: string): Promise<BootstrapResponseDto> {
-    this.logger.log('Bootstrapping user');
+    this.logger.log('Bootstrapping user with id: ' + userId);
+    if (!userId) {
+      throw new Error('User id is required for bootstrap');
+    }
 
     // First, try to find the user
     let user = await this.db.user.findUnique({
