@@ -22,6 +22,8 @@ async function bootstrap() {
     'https://api.zenobank.io',
     'https://dashboard.zenobank.io',
     'https://dashboard-staging.zenobank.io',
+    'https://pay.zenobank.io',
+    'https://pay-staging.zenobank.io',
     'http://localhost:3000',
   ];
   app.enableCors({
