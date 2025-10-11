@@ -260,14 +260,13 @@ model BinancePayToken {
 }
 
 model Wallet {
-  id                  String   @id @default(uuid())
-  address             String
-  encryptedPrivateKey String?
-  networkId           String
-  label               String?
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
-  storeId             String?
+  id        String   @id @default(uuid())
+  address   String
+  networkId String
+  label     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  storeId   String?
 
   network                Network                 @relation(fields: [networkId], references: [id])
   store                  Store?                  @relation(fields: [storeId], references: [id])
