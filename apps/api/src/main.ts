@@ -15,8 +15,28 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   // Enable CORS
+  const allowedOrigins = [
+    'https://zenobank.io',
+    'https://www.zenobank.io',
+    'https://api-staging.zenobank.io',
+    'https://api.zenobank.io',
+    'https://dashboard.zenobank.io',
+    'https://dashboard-staging.zenobank.io',
+    'http://localhost:3000',
+  ];
   app.enableCors({
-    origin: true,
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(
+          new Error('CORS not allowed for this origin: ' + origin),
+          false,
+        );
+      }
+    },
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: [
       'Content-Type',
