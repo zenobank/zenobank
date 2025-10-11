@@ -1,9 +1,6 @@
 // orval.config.ts
-import * as dotenv from 'dotenv';
 import { defineConfig } from 'orval';
 import { env } from './src/lib/env';
-
-dotenv.config();
 export default defineConfig({
   api: {
     input: '../api/openapi.json',
