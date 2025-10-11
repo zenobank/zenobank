@@ -23,7 +23,7 @@ export function useRegisterExternalWallet() {
 
   const { mutateAsync: mutateRegisterExternalWallet } =
     useWalletControllerRegisterExternalWalletV1({
-      axios: {
+      request: {
         headers: {
           'x-api-key': activeStore?.apiKey || '',
         },
@@ -58,7 +58,7 @@ export function useCreateBinancePayCredential() {
 
   const { mutateAsync: mutateCreateBinancePayCredential } =
     useStoresControllerCreateBinancePayCredentialV1({
-      axios: {
+      request: {
         headers: {
           'x-api-key': activeStore?.apiKey || '',
         },
