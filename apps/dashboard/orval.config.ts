@@ -14,6 +14,12 @@ export default defineConfig({
       schemas: 'src/lib/generated/api-client/model',
       client: 'react-query',
       clean: true,
+      override: {
+        mutator: {
+          path: 'src/lib/axios-instance.ts',
+          name: 'customAxios',
+        },
+      },
     },
   },
 })
