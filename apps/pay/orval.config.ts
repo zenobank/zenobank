@@ -1,11 +1,11 @@
 // orval.config.ts
 import { defineConfig } from 'orval';
-import { envServer } from './src/lib/env-server';
+import { envClient } from './src/lib/env-client';
 export default defineConfig({
   api: {
     input: '../api/openapi.json',
     output: {
-      baseUrl: envServer.API_URL,
+      baseUrl: envClient.NEXT_PUBLIC_API_URL,
       target: 'src/lib/generated/api-client/index.ts',
       schemas: 'src/lib/generated/api-client/model',
       client: 'react-query',
