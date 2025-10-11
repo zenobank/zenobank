@@ -101,6 +101,9 @@ importers:
       crypto-convert:
         specifier: ^2.1.7
         version: 2.1.7(encoding@0.1.13)
+      cryptr:
+        specifier: ^6.4.0
+        version: 6.4.0
       dotenv:
         specifier: ^17.2.2
         version: 17.2.2
@@ -5356,6 +5359,9 @@ packages:
 
   crypto-js@4.2.0:
     resolution: {integrity: sha512-KALDyEYgpY+Rlob/iriUtjV6d5Eq+Y191A5g4UqLAi8CyGP9N1+FdVbkc1SxKc2r4YAYqG8JzO2KGL+AizD70Q==}
+
+  cryptr@6.4.0:
+    resolution: {integrity: sha512-9jpMU9HMt1vhMUqNO+MPuGEpbh/f7HHZdxrd6L2DMwTuYGyt9pgUJfQyTS1Ei4/sn7qPM4FkjxUoiW79k0x8sA==}
 
   css-what@6.2.2:
     resolution: {integrity: sha512-u/O3vwbptzhMs3L1fQE82ZSLHQQfto5gyZzwteVIEyeaY5Fc7R4dapF/BvRoSYFeqfBk4m0V1Vafq5Pjv25wvA==}
@@ -16553,6 +16559,8 @@ snapshots:
       - encoding
 
   crypto-js@4.2.0: {}
+
+  cryptr@6.4.0: {}
 
   css-what@6.2.2: {}
 

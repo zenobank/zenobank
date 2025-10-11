@@ -10,6 +10,9 @@ import { AlchemyService } from 'src/integrations/alchemy/alchemy.service';
 import { Wallet, NetworkType } from '@prisma/client';
 import { toEnumValue } from 'src/lib/utils/to-enum';
 import { AddressActivityWebhookDto } from './dto/address-activity-webhook.dto';
+import { generatePrivateKey, privateKeyToAddress } from 'viem/accounts';
+import { toDto } from 'src/lib/utils/to-dto';
+import { WalletResponseDto } from './dto/wallet.response.dto';
 
 @Injectable()
 export class WalletService {
@@ -27,6 +30,62 @@ export class WalletService {
    * @param address - The EVM wallet address to register
    * @returns Promise<Wallet[]> - Array of created wallet records for each EVM network
    */
+  async registerInternalEvmWallet({
+    apiKey,
+  }: {
+    apiKey: string;
+  }): Promise<WalletResponseDto[]> {
+    const store = await this.db.store.findUnique({
+      where: { apiKey },
+      include: {
+        wallets: true,
+      },
+    });
+    if (!store) {
+      throw new NotFoundException('Store not found');
+    }
+    if (store.wallets.length > 0) {
+      throw new ConflictException('Wallets already registered for this store');
+    }
+    const networks = await this.db.network.findMany({
+      where: {
+        networkType: NetworkType.EVM,
+      },
+    });
+    const privateKey = generatePrivateKey();
+    const address = privateKeyToAddress(privateKey);
+    await Promise.all(
+      networks.map(async (network) => {
+        this.logger.log(
+          `Subscribing to address activity for ${address} on network ${network.id}`,
+        );
+        await this.subscribeToAddressActivity({
+          address,
+          network: toEnumValue(SupportedNetworksId, network.id),
+        });
+      }),
+    );
+    const wallets = await this.db.$transaction(async (tx) => {
+      return await Promise.all(
+        networks.map((network) =>
+          tx.wallet.create({
+            data: {
+              storeId: store.id,
+              address,
+              networkId: network.id,
+              encryptedPrivateKey: privateKey,
+            },
+          }),
+        ),
+      );
+    });
+    return wallets.map((wallet) =>
+      toDto(WalletResponseDto, {
+        ...wallet,
+        network: toEnumValue(SupportedNetworksId, wallet.networkId),
+      }),
+    );
+  }
 
   async registerExternalEvmWallet({
     _address,
@@ -73,7 +132,7 @@ export class WalletService {
     if (walletsWithThatAddress.length > 0) {
       throw new ConflictException(`Wallet ${address} already exists`);
     }
-    for (const network of networks.slice(0, 1)) {
+    for (const network of networks) {
       this.logger.log(
         `Subscribing to address activity for ${address} on network ${network.id}`,
       );
