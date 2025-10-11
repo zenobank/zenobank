@@ -1,11 +1,11 @@
-import { Env, getEnv } from 'src/lib/utils/env';
+import { env } from 'src/lib/utils/env';
 
 import * as Sentry from '@sentry/nestjs';
 
 // Ensure to call this before requiring any other modules!
 Sentry.init({
-  dsn: getEnv(Env.SENTRY_DSN),
-  environment: process.env.NODE_ENV || 'undefined',
+  dsn: env.SENTRY_DSN,
+  environment: env.NODE_ENV || 'undefined',
   integrations: [
     // Add our Profiling integration
     Sentry.consoleLoggingIntegration({ levels: ['log', 'warn', 'error'] }),

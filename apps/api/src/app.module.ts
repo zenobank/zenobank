@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { WalletModule } from './wallets/wallet.module';
 import { ConfigModule } from '@nestjs/config';
-import { Env, getEnv, validateEnvConfig } from './lib/utils/env';
+import { env } from './lib/utils/env';
 import { PrismaModule } from './prisma/prisma.module';
 import { BullModule } from '@nestjs/bullmq';
 import { TransactionsModule } from './transactions/transactions.module';
@@ -28,7 +28,6 @@ import { APP_FILTER } from '@nestjs/core';
     ConfigModule.forRoot({
       cache: true,
       isGlobal: true,
-      validate: validateEnvConfig,
     }),
     PrismaModule,
     // BullModule.forRootAsync({
@@ -36,7 +35,7 @@ import { APP_FILTER } from '@nestjs/core';
     //   inject: [],
     //   useFactory: () => {
     //     return {
-    //       connection: { url: getEnv(Env.REDIS_QUEUE_URL) },
+    //       connection: { url: env.REDIS_QUEUE_URL },
     //     };
     //   },
     // }),

@@ -1,5 +1,5 @@
-import { getEnv, Env } from 'src/lib/utils/env';
+import { env } from 'src/lib/utils/env';
 
 export function getCheckoutUrl(paymentId: string): string {
-  return `${getEnv(Env.PAYMENT_FRONTEND_BASE_URL)}/${paymentId}`;
+  return `${env.PAYMENT_FRONTEND_BASE_URL}/${paymentId}`;
 }

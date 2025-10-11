@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { AlchemyService } from './alchemy.service';
 import { ALCHEMY_SDK } from './lib/alchemy.constants';
 import { Alchemy } from 'alchemy-sdk';
-import { Env, getEnv } from 'src/lib/utils/env';
+import { env } from 'src/lib/utils/env';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { SvixModule } from 'src/webhooks/svix.module';
 import { TokensModule } from 'src/tokens/tokens.module';
@@ -13,7 +13,7 @@ import { TokensModule } from 'src/tokens/tokens.module';
       provide: ALCHEMY_SDK,
       useFactory: () =>
         new Alchemy({
-          authToken: getEnv(Env.ALCHEMY_AUTH_TOKEN),
+          authToken: env.ALCHEMY_AUTH_TOKEN,
         }),
     },
   ],

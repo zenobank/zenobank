@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { Request } from 'express';
 import { verifyToken } from '@clerk/backend';
-import { Env, getEnv } from 'src/lib/utils/env';
+import { env } from 'src/lib/utils/env';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -35,7 +35,7 @@ export class AuthGuard implements CanActivate {
       // Try to verify the token (either session or bearer)
       const tokenToVerify = bearerToken || sessionToken;
       const tokenPayload = await verifyToken(tokenToVerify, {
-        secretKey: getEnv(Env.CLERK_SECRET_KEY),
+        secretKey: env.CLERK_SECRET_KEY,
       });
       if (!tokenPayload) {
         throw new UnauthorizedException('Invalid session');

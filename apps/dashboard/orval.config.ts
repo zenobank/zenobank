@@ -1,6 +1,7 @@
 // orval.config.ts
 import * as dotenv from 'dotenv'
 import { defineConfig } from 'orval'
+import { env } from './src/lib/env'
 
 dotenv.config()
 
@@ -8,7 +9,7 @@ export default defineConfig({
   api: {
     input: '../api/openapi.json',
     output: {
-      baseUrl: process.env.VITE_API_URL,
+      baseUrl: env.VITE_API_URL,
       target: 'src/lib/generated/api-client/index.ts',
       schemas: 'src/lib/generated/api-client/model',
       client: 'react-query',

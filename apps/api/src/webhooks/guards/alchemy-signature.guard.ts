@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { Request } from 'express';
 import * as crypto from 'crypto';
-import { getEnv, Env, env } from 'src/lib/utils/env';
+import { env } from 'src/lib/utils/env';
 
 @Injectable()
 export class AlchemySignatureGuard implements CanActivate {

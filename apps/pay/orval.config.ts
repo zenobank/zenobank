@@ -7,7 +7,7 @@ export default defineConfig({
   api: {
     input: '../api/openapi.json',
     output: {
-      baseUrl: process.env.VITE_API_URL,
+      baseUrl: env.VITE_API_URL,
       target: 'src/lib/generated/api-client/index.ts',
       schemas: 'src/lib/generated/api-client/model',
       client: 'react-query',
