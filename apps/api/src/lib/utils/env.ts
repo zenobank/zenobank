@@ -3,8 +3,8 @@ import 'dotenv/config';
 import { z } from 'zod';
 
 const envSchema = z.object({
-  API_URL: z.url(),
-  PAYMENT_FRONTEND_BASE_URL: z.url(),
+  API_BASE_URL: z.url(),
+  FRONTEND_CHECKOUT_BASE_URL: z.url(),
   DATABASE_URL: z.url(),
   ALCHEMY_AUTH_TOKEN: z.string(),
   CLERK_PUBLISHABLE_KEY: z.string(),

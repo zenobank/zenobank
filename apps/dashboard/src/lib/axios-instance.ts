@@ -4,7 +4,7 @@ import axios, { AxiosRequestConfig, AxiosResponse } from 'axios'
 // puedes conservar una instancia interna si quieres interceptores, baseURL, etc.
 const instance = axios.create({
   withCredentials: true,
-  // baseURL: process.env.NEXT_PUBLIC_API_URL, // si te sirve
+  // baseURL: process.env.NEXT_PUBLIC_API_BASE_URL, // si te sirve
 })
 
 // interceptores opcionales

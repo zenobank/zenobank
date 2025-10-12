@@ -273,7 +273,7 @@ export class AlchemyService {
     address: string,
   ): Promise<AddressActivityWebhookDto> {
     const alchemyWebhook = await this.alchemy.notify.createWebhook(
-      env.API_URL + WEBHOOKS_PATHS.ALCHEMY,
+      env.API_BASE_URL + WEBHOOKS_PATHS.ALCHEMY,
       AlchemyWebhookType.ADDRESS_ACTIVITY,
       {
         network: NETWORK_TO_ALCHEMY_SDK[network],
