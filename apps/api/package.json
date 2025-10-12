@@ -6,7 +6,7 @@
   "scripts": {
     "build": "pnpm run db:generate && nest build && pnpm sentry:sourcemaps",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "start": "nest start",
+    "start": "db:migrate:prod && nest start",
     "tunnel": "lt -s dkfjadskfjaercl --port 3001",
     "dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
@@ -20,6 +20,8 @@
     "db:generate": "pnpm prisma generate",
     "db:pull": "pnpm prisma db pull",
     "db:push": "pnpm prisma db push",
+    "db:migrate": "pnpm prisma migrate dev",
+    "db:migrate:prod": "pnpm prisma migrate deploy",
     "db:studio": "pnpm prisma studio",
     "db:fix": "rm -rf node_modules/.prisma/client && pnpm db:generate",
     "db:seed": "pnpm ts-node -r tsconfig-paths/register prisma/seed.ts",
