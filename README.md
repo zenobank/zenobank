@@ -1,7 +1,7 @@
 <img width="422" height="86.3" alt="logo black" src="https://github.com/user-attachments/assets/113a8851-4272-40e2-8ac0-56e0343327e2#gh-light-mode-only" />
 <img width="422" height="86.3" alt="logo white" src="https://github.com/user-attachments/assets/2b54a340-5fe0-41e5-a18b-add15ca6f8d5#gh-dark-mode-only" />
 
-# 🏦 Zeno Bank — Open-source Crypto Payment Gateway
+# Zeno Bank — Open-source Crypto Payment Gateway
 
 **Zeno Bank** is an **open-source crypto payment gateway** that can be **self-hosted** or used via our **managed cloud platform** with **0% fees**.  
 You can try our hosted version at [dashboard.zenobank.io](https://dashboard.zenobank.io).
@@ -10,7 +10,7 @@ Learn how we sustain the project [here](https://zenobank.io/how-does-zeno-bank-m
 
 ---
 
-## ✨ Key Features
+## Key Features
 
 - **Self-hosted or Cloud** — Run on your own servers or use our managed platform at [dashboard.zenobank.io](https://dashboard.zenobank.io).
 - **0% fees** — No transaction or gateway fees.
@@ -20,7 +20,7 @@ Learn how we sustain the project [here](https://zenobank.io/how-does-zeno-bank-m
 
 ---
 
-## 🧩 System Overview
+## System Overview
 
 Zeno Bank is structured as a **monorepo** containing three applications:
 
@@ -60,7 +60,7 @@ The backend generates a **unique checkout URL** and returns it to the store, whi
 
 ---
 
-### 🧠 3. Checkout behavior
+### 3. Checkout behavior
 
 On the checkout page:
 
@@ -74,7 +74,7 @@ If the user goes back and selects the same combination again, **no new attempt**
 
 ---
 
-### 🔐 4. Wallet monitoring
+### 4. Wallet monitoring
 
 When a merchant adds a wallet, it immediately starts being **monitored via Alchemy webhooks**.
 
@@ -90,7 +90,7 @@ A background **cron job** runs every few minutes to mark old pending payments as
 
 ---
 
-## ⚙️ Requirements
+## Requirements
 
 To run Zeno Bank locally or self-hosted, you’ll need:
 
@@ -100,7 +100,7 @@ To run Zeno Bank locally or self-hosted, you’ll need:
 
 ---
 
-## 🧾 Environment Setup
+## Environment Setup
 
 Each app includes a `.env.example` file.
 
