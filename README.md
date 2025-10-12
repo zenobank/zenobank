@@ -78,8 +78,7 @@ If the user goes back and selects the same combination again, **no new attempt**
 
 When a merchant adds a wallet, it immediately starts being **monitored via Alchemy webhooks**.
 
-Each checkout is assigned a **unique amount** — we add **six random decimal digits** to differentiate transactions,  
-since all payments are received in the same wallet.
+Each checkout is assigned a **unique amount** — we add **six random decimal digits** to differentiate transactions, since all payments are received in the same wallet.
 
 When a new blockchain transaction arrives:
 
