@@ -38,9 +38,9 @@ Zeno Bank is structured as a **monorepo** containing three applications:
 
 ---
 
-## 🔁 Payment Flow
+## Payment Flow
 
-### 🛒 1. Merchant setup
+### 1. Merchant setup
 
 A merchant **creates an account** on the [Dashboard](https://dashboard.zenobank.io).  
 Inside **Integrations**, they can connect their store — for example, **WooCommerce**.
@@ -49,7 +49,7 @@ Once connected, the store is ready to accept crypto payments.
 
 ---
 
-### 💳 2. Customer checkout
+### 2. Customer checkout
 
 When a customer selects **“Pay with crypto”**, the store sends a `POST` request to the backend to **create a checkout**.
 
