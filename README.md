@@ -36,6 +36,9 @@ Zeno Bank is structured as a **monorepo** containing three applications:
 3. **Backend (NestJS)**  
    Manages all business logic, API endpoints, payment creation, webhook handling, and blockchain monitoring.
 
+4. **External Integrations**  
+   All third‑party and store/platform integrations live under `external-integrations` folder.
+
 ---
 
 ## Payment Flow
