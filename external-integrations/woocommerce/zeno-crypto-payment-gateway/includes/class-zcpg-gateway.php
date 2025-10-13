@@ -18,7 +18,7 @@ class ZCPG_Gateway extends WC_Payment_Gateway
         $this->method_description = esc_html__('Fast and Secure Crypto Payments for your store.', 'zeno-crypto-payment-gateway');
         $this->has_fields         = true;
         $this->supports           = array('products');
-
+        $this->icon = ZCPG_PLUGIN_URL . 'assets/icon-128x128.png';
         $this->init_form_fields();
         $this->init_settings();
 
