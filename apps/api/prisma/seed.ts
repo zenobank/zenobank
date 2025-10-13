@@ -122,7 +122,7 @@ async function seedTokensOnNetworks() {
     data: [
       {
         id: 'USDT_BINANCE_PAY',
-        logoUrl: 'https://example.com/logo.png',
+        logoUrl: 'https://pay.zenobank.io/images/tokens/usdt.png',
         name: 'USDT',
         canonicalTokenId: 'USDT',
         binanceTokenId: 'USDT',
@@ -130,7 +130,7 @@ async function seedTokensOnNetworks() {
       },
       {
         id: 'USDC_BINANCE_PAY',
-        logoUrl: 'https://example.com/logo.png',
+        logoUrl: 'https://pay.zenobank.io/images/tokens/usdc.png',
         name: 'USDC',
         canonicalTokenId: 'USDC',
         binanceTokenId: 'USDC',

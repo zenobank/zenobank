@@ -14,7 +14,9 @@ export class ConversionsService implements OnModuleInit {
   private iso4217Converter: Iso4217Converter;
   async onModuleInit() {
     this.cryptoConverter = new CryptoConvert({
-      binance: true,
+      binance: false,
+      bitfinex: true,
+      coinbase: true,
       calculateAverage: false,
       kraken: false,
     });
