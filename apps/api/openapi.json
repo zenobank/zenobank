@@ -667,7 +667,9 @@
             "enum": [
               "ETHEREUM_MAINNET",
               "BASE_MAINNET",
-              "ARBITRUM_MAINNET",
+              "ARBITRUM_ONE_MAINNET",
+              "BNB_MAINNET",
+              "POLYGON_POS_MAINNET",
               "ETHEREUM_HOLESKY",
               "ETHEREUM_SEPOLIA"
             ],

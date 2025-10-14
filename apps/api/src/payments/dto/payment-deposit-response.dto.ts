@@ -28,7 +28,7 @@ export class DepositDetailsDto {
   @Expose()
   @IsEnum(SupportedNetworksId)
   @ApiProperty({
-    example: SupportedNetworksId.ARBITRUM_MAINNET,
+    example: SupportedNetworksId.ARBITRUM_ONE_MAINNET,
     enum: SupportedNetworksId,
     enumName: 'NetworkId',
   })

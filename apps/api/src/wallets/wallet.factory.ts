@@ -9,8 +9,10 @@ export class WalletFactory {
     privateKey: string;
   } {
     switch (networkId) {
-      case SupportedNetworksId.ARBITRUM_MAINNET:
+      case SupportedNetworksId.ARBITRUM_ONE_MAINNET:
       case SupportedNetworksId.BASE_MAINNET:
+      case SupportedNetworksId.BNB_MAINNET:
+      case SupportedNetworksId.POLYGON_POS_MAINNET:
       case SupportedNetworksId.ETHEREUM_HOLESKY:
       case SupportedNetworksId.ETHEREUM_MAINNET:
       case SupportedNetworksId.ETHEREUM_SEPOLIA:
