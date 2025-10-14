@@ -20,7 +20,7 @@
     "db:generate": "pnpm prisma generate",
     "db:pull": "pnpm prisma db pull",
     "db:push": "pnpm prisma db push",
-    "db:migrate": "pnpm prisma migrate dev",
+    "db:migrate:dev": "pnpm prisma migrate dev",
     "db:migrate:prod": "pnpm prisma migrate deploy",
     "db:studio": "pnpm prisma studio",
     "db:fix": "rm -rf node_modules/.prisma/client && pnpm db:generate",
