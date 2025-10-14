@@ -68,15 +68,18 @@ export class WalletsService {
     if (walletsWithThatAddress.length > 0) {
       throw new ConflictException(`Wallet ${address} already exists`);
     }
-    for (const network of networks) {
-      this.logger.log(
-        `Subscribing to address activity for ${address} on network ${network.id}`,
-      );
-      await this.subscribeToAddressActivity({
-        address,
-        network: toEnumValue(SupportedNetworksId, network.id),
-      });
-    }
+    await Promise.all(
+      networks.map(async (network) => {
+        this.logger.log(
+          `Subscribing to address activity for ${address} on network ${network.id}`,
+        );
+
+        await this.subscribeToAddressActivity({
+          address,
+          network: toEnumValue(SupportedNetworksId, network.id),
+        });
+      }),
+    );
     // await Promise.all(
     //   networks.map((network) =>
     //     this.subscribeToAddressActivity({
@@ -107,7 +110,7 @@ export class WalletsService {
     address: string;
     network: SupportedNetworksId;
   }): Promise<AddressActivityWebhookDto> {
-    const webhook = await this.alchemyService.getWebhook(network);
+    const webhook = await this.alchemyService.getOrCreateWebhook(network);
     if (!webhook) {
       this.logger.error(
         `!!Webhook not found for network ${network}. Address: ${address}`,

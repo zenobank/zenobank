@@ -204,7 +204,7 @@ export class AlchemyService {
     });
   }
 
-  async getWebhook(
+  async getOrCreateWebhook(
     network: SupportedNetworksId,
   ): Promise<AddressActivityWebhookDto> {
     const webhooksData = await this.alchemy.notify.getAllWebhooks();
