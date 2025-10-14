@@ -97,12 +97,12 @@ export function ChangeWalletDialog({
           <DialogDescription className='pt-2'>
             Don't have a wallet?{' '}
             <a
-              href='https://metamask.io/download/'
+              href='https://rabby.io/'
               target='_blank'
               rel='noopener noreferrer'
               className='text-primary hover:text-primary/80 underline'
             >
-              Download MetaMask extension
+              Download Rabby extension
             </a>
           </DialogDescription>
         </DialogHeader>

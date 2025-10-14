@@ -16,13 +16,13 @@ export const apps: {
     desc: 'Accept Crypto in your WooCommerce store',
     modalType: ModalType.Wordpress,
   },
-  {
-    name: 'Tienda Nube',
-    logo: <Cloud />,
-    connected: false,
-    desc: 'Accept Crypto in your Tienda Nube store',
-    modalType: ModalType.TiendaNube,
-  },
+  // {
+  //   name: 'Tienda Nube',
+  //   logo: <Cloud />,
+  //   connected: false,
+  //   desc: 'Accept Crypto in your Tienda Nube store',
+  //   modalType: ModalType.TiendaNube,
+  // },
   // {
   //   name: 'Notion',
   //   logo: <IconBrandNotion />,

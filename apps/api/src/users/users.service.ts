@@ -15,49 +15,51 @@ export class UsersService {
 
   async bootstrap(userId: string): Promise<BootstrapResponseDto> {
     this.logger.log('Bootstrapping user with id: ' + userId);
+
     if (!userId) {
       throw new Error('User id is required for bootstrap');
     }
 
-    // First, try to find the user
-    let user = await this.db.user.findUnique({
-      where: { id: userId },
-      include: { stores: { include: { binancePayCredential: true } } },
-    });
-    let alreadyExists = true;
-    // If user doesn't exist, create them
-    if (!user) {
-      alreadyExists = false;
-      user = await this.db.user.create({
-        data: {
+    const result = await this.db.$transaction(async (tx) => {
+      const userAfterUpsert = await tx.user.upsert({
+        where: { id: userId },
+        update: {},
+        create: {
           id: userId,
-          stores: {
-            create: {
-              apiKey: generateApiKey(),
-              name: 'Default Store',
-            },
-          },
-        },
-        include: { stores: { include: { binancePayCredential: true } } },
-      });
-    } else if (user.stores.length === 0) {
-      // If user exists but has no stores, create a default store
-      alreadyExists = false;
-      const store = await this.db.store.create({
-        data: {
-          name: 'Default Store',
-          userId: user.id,
-          apiKey: generateApiKey(),
         },
         include: {
-          binancePayCredential: true,
+          stores: { include: { binancePayCredential: true } },
         },
       });
-      user.stores.push(store);
-    }
+
+      let createdUser = false;
+      let createdStore = false;
+      let user = userAfterUpsert;
+
+      if (user.stores.length === 0) {
+        const store = await tx.store.create({
+          data: {
+            name: 'Default Store',
+            userId: user.id,
+            apiKey: generateApiKey(),
+          },
+          include: { binancePayCredential: true },
+        });
+
+        user = {
+          ...user,
+          stores: [store],
+        };
+        createdStore = true;
+      }
+
+      return { user, createdUser, createdStore };
+    });
+
+    const alreadyExists = !(result.createdUser || result.createdStore);
 
     return toDto(BootstrapResponseDto, {
-      alreadyExists: alreadyExists,
+      alreadyExists,
     });
   }
 
