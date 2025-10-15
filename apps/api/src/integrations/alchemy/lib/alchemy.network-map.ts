@@ -1,6 +1,6 @@
 import { Network as AlchemyNetwork } from 'alchemy-sdk';
-import { SupportedNetworksId } from '@repo/networks/types';
-import { type SupportedNetworksId as SupportedNetworksIdTypes } from '@repo/networks/types';
+import { SupportedNetworksId } from '@repo/networks';
+import { type SupportedNetworksId as SupportedNetworksIdTypes } from '@repo/networks';
 export const NETWORK_TO_ALCHEMY_SDK: Record<
   SupportedNetworksId,
   AlchemyNetwork

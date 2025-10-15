@@ -1,5 +1,5 @@
 import { BlockchainFactory } from './blockchain-adapter.factory';
-import { SupportedNetworksId } from '@repo/networks/types';
+import { SupportedNetworksId } from '@repo/networks';
 
 describe('BlockchainAdapterFactory', () => {
   let factory: BlockchainFactory;

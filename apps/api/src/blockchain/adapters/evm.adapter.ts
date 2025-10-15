@@ -1,6 +1,6 @@
 import { BlockchainAdapter } from './blockchain-adapter.interface';
 import { client } from 'src/lib/utils/client';
-import { SupportedNetworksId } from '@repo/networks/types';
+import { SupportedNetworksId } from '@repo/networks';
 import { OnChainTxStatus } from '../lib/types';
 
 export class EvmAdapter implements BlockchainAdapter {

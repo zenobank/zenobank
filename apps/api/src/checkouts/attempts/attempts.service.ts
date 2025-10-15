@@ -19,7 +19,7 @@ import { OnchainAttemptResponseDto } from './dtos/onchain-attempt-response.dto';
 import { toDto } from 'src/lib/utils/to-dto';
 import { BinancePayAttemptResponseDto } from './dtos/binance-pay-attempt-response.dto';
 import { toEnumValue } from 'src/lib/utils/to-enum';
-import { SupportedNetworksId } from '@repo/networks/types';
+import { SupportedNetworksId } from '@repo/networks';
 import { BinancePayTokenResponseDto } from 'src/tokens/dto/binance-pay-token-response';
 import { OnChainTokenResponseDto } from 'src/tokens/dto/onchain-token-response';
 import { ConversionsService } from 'src/conversions/conversions.service';

@@ -1,4 +1,4 @@
-import { SupportedNetworksId } from '@repo/networks/types';
+import { SupportedNetworksId } from '@repo/networks';
 
 export interface TxIdentifier {
   hash: string;
