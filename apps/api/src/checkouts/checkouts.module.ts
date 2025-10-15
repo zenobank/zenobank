@@ -7,6 +7,7 @@ import { TokensModule } from 'src/tokens/tokens.module';
 import { AttemptsModule } from './attempts/attempts.module';
 import { CheckoutCron } from './checkout.cron';
 import { WalletModule } from 'src/wallets/wallet.module';
+import { CheckoutOnchainService } from './checkout-onchain.service';
 
 @Module({
   imports: [
@@ -16,8 +17,8 @@ import { WalletModule } from 'src/wallets/wallet.module';
     AttemptsModule,
     WalletModule,
   ],
-  providers: [CheckoutsService, CheckoutCron],
+  providers: [CheckoutsService, CheckoutCron, CheckoutOnchainService],
   controllers: [CheckoutsController],
-  exports: [CheckoutsService],
+  exports: [CheckoutsService, CheckoutOnchainService],
 })
 export class CheckoutsModule {}

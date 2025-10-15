@@ -9,7 +9,8 @@ import { getCheckoutUrl } from 'src/checkouts/lib/utils';
 import { CanonicalTokensResponseDto } from 'src/tokens/dto/canonical-tokens-response';
 import { WalletsService } from 'src/wallets/wallet.service';
 import { Checkout, CheckoutStatus } from '@prisma/client';
-
+import axios from 'axios';
+import { CheckoutEvents } from './lib/constants';
 @Injectable()
 export class CheckoutsService {
   private readonly logger = new Logger(CheckoutsService.name);
@@ -93,18 +94,31 @@ export class CheckoutsService {
     });
   }
 
-  async markCheckoutAsCompleted(checkoutId: string) {
-    await this.db.checkout.update({
+  /*
+   * Mark checkout as completed
+   */
+  async completeCheckout(checkoutId: string) {
+    const checkout = await this.db.checkout.update({
       where: { id: checkoutId },
       data: { status: CheckoutStatus.COMPLETED },
     });
-
     if (checkout.webhookUrl) {
-      await this.webhooksService.sendWebhook(checkout.webhookUrl, {
-        event: 'checkout_completed',
-        data: { checkoutId },
-      });
-  
+      await axios.post(
+        checkout.webhookUrl,
+        {
+          event: CheckoutEvents.COMPLETED,
+          data: toDto(CheckoutResponseDto, {
+            ...checkout,
+            checkoutUrl: getCheckoutUrl(checkout.id),
+          }),
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+    }
   }
 
   async getCheckoutIntegrity(

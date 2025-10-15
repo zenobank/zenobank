@@ -27,6 +27,7 @@ import { toDto } from 'src/lib/utils/to-dto';
 import { TokensService } from 'src/tokens/tokens.service';
 import { OnChainTokenResponseDto } from 'src/tokens/dto/onchain-token-response';
 import { CheckoutsService } from 'src/checkouts/checkouts.service';
+import { CheckoutOnchainService } from 'src/checkouts/checkout-onchain.service';
 
 @Injectable()
 export class AlchemyService {
@@ -36,6 +37,7 @@ export class AlchemyService {
     @Inject(ALCHEMY_SDK) private readonly alchemy: Alchemy,
     private readonly tokenService: TokensService,
     private readonly checkoutsService: CheckoutsService,
+    private readonly checkoutOnchainService: CheckoutOnchainService,
   ) {}
 
   async processAddressActivityWebhook(body: AddressActivityWebhookResponse) {
@@ -92,13 +94,14 @@ export class AlchemyService {
       return;
     }
 
-    const paymentAttempt = await this.findPaymentAttempt({
-      tokenId,
-      networkId: network,
-      depositWalletAddress: depositWalletAddress,
-      tokenPayAmount: tokenAmount.toString(),
-    });
-    if (!paymentAttempt) {
+    const onChainPaymentAttempt =
+      await this.checkoutOnchainService.findOnChainPaymentAttempt({
+        tokenId,
+        networkId: network,
+        depositWalletAddress: depositWalletAddress,
+        tokenPayAmount: tokenAmount.toString(),
+      });
+    if (!onChainPaymentAttempt) {
       this.logger.error('Payment attempt not found', {
         tokenId,
         networkId: network,
@@ -109,15 +112,19 @@ export class AlchemyService {
     }
 
     const checkoutIntegrity = await this.checkoutsService.getCheckoutIntegrity(
-      paymentAttempt.checkoutId,
+      onChainPaymentAttempt.checkoutId,
     );
     if (!checkoutIntegrity.isValid) {
       this.logger.error('Checkout integrity not valid', {
-        checkoutId: paymentAttempt.checkoutId,
+        checkoutId: onChainPaymentAttempt.checkoutId,
         reason: checkoutIntegrity.reason,
       });
       return;
     }
+
+    await this.checkoutOnchainService.confirmOnchainPaymentSuccess({
+      onChainPaymentAttemptId: onChainPaymentAttempt.id,
+    });
   }
 
   private extractTokenAmountFromActivity(activity: AddressActivity) {
@@ -149,33 +156,6 @@ export class AlchemyService {
       return false;
     }
     return true;
-  }
-
-  private async findPaymentAttempt({
-    tokenId,
-    networkId,
-    depositWalletAddress,
-    tokenPayAmount,
-  }: {
-    tokenId: string;
-    networkId: string;
-    depositWalletAddress: string;
-    tokenPayAmount: string;
-  }) {
-    const paymentAttempt = await this.db.onChainPaymentAttempt.findFirst({
-      where: {
-        status: AttemptStatus.PENDING,
-        networkId: networkId,
-        tokenPayAmount: tokenPayAmount,
-        tokenId: tokenId,
-        depositWallet: {
-          address: depositWalletAddress.toLowerCase(),
-          networkId: networkId,
-        },
-      },
-    });
-
-    return paymentAttempt || null;
   }
 
   private isValidWebhookType(body: AddressActivityWebhookResponse): boolean {
