@@ -6,6 +6,7 @@ import { env } from 'src/lib/utils/env';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { SvixModule } from 'src/webhooks/svix.module';
 import { TokensModule } from 'src/tokens/tokens.module';
+import { CheckoutsModule } from 'src/checkouts/checkouts.module';
 @Module({
   providers: [
     AlchemyService,
@@ -19,6 +20,6 @@ import { TokensModule } from 'src/tokens/tokens.module';
   ],
   controllers: [],
   exports: [AlchemyService],
-  imports: [PrismaModule, SvixModule, TokensModule],
+  imports: [PrismaModule, SvixModule, TokensModule, CheckoutsModule],
 })
 export class AlchemyModule {}

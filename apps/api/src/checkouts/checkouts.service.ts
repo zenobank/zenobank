@@ -19,7 +19,6 @@ export class CheckoutsService {
     private readonly db: PrismaService,
     private readonly storesService: StoresService,
     private readonly tokensService: TokensService,
-    private readonly walletsService: WalletsService,
   ) {}
   async getEnabledTokens(
     checkoutId: string,

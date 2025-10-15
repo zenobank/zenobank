@@ -13,10 +13,7 @@ import { generateApiKey } from 'src/lib/utils/generate-api-key';
 
 @Injectable()
 export class StoresService {
-  constructor(
-    private readonly db: PrismaService,
-    private readonly walletService: WalletsService,
-  ) {}
+  constructor(private readonly db: PrismaService) {}
 
   async createStore(
     createStoreDto: CreateStoreDto,
