@@ -109,6 +109,15 @@ async function seedTokensOnNetworks() {
         logoUrl: 'https://pay.zenobank.io/images/tokens/usdt.png',
       },
       {
+        id: 'USDT_BNB_MAINNET',
+        networkId: SupportedNetworksId.BNB_MAINNET,
+        symbol: 'USDT',
+        canonicalTokenId: 'USDT',
+        address: '0x55d398326f99059ff775485246999027b3197955',
+        decimals: 18,
+        logoUrl: 'https://pay.zenobank.io/images/tokens/usdt.png',
+      },
+      {
         id: 'USDT_ARBITRUM_ONE_MAINNET',
         networkId: SupportedNetworksId.ARBITRUM_ONE_MAINNET,
         symbol: 'USDT',
@@ -126,7 +135,24 @@ async function seedTokensOnNetworks() {
         decimals: 6,
         logoUrl: 'https://pay.zenobank.io/images/tokens/usdt.png',
       },
-
+      {
+        id: 'USDC_BASE_MAINNET',
+        networkId: SupportedNetworksId.BASE_MAINNET,
+        symbol: 'USDC',
+        canonicalTokenId: 'USDC',
+        address: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
+        decimals: 6,
+        logoUrl: 'https://pay.zenobank.io/images/tokens/usdc.png',
+      },
+      {
+        id: 'USDC_ARBITRUM_ONE_MAINNET',
+        networkId: SupportedNetworksId.ARBITRUM_ONE_MAINNET,
+        symbol: 'USDC',
+        canonicalTokenId: 'USDC',
+        address: '0xaf88d065e77c8cC2239327C5EDb3A432268e5831',
+        decimals: 6,
+        logoUrl: 'https://pay.zenobank.io/images/tokens/usdc.png',
+      },
       {
         id: 'USDC_POLYGON_POS_MAINNET',
         networkId: SupportedNetworksId.POLYGON_POS_MAINNET,
