@@ -1,10 +1,4 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import {
-  AttemptStatus,
-  Checkout,
-  OnChainPaymentAttempt,
-  PaymentStatus,
-} from '@prisma/client';
 import { SupportedNetworksId } from '@repo/networks/types';
 import { Alchemy, WebhookType as AlchemyWebhookType } from 'alchemy-sdk';
 import { PrismaService } from 'src/prisma/prisma.service';

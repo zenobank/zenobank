@@ -10,10 +10,7 @@
     "check-types": "tsc --noEmit"
   },
   "exports": {
-    "./types": {
-      "types": "./src/types.ts",
-      "default": "./dist/types.js"
-    }
+    "./*": "./src/*.ts"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",

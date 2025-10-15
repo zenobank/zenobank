@@ -788,6 +788,9 @@
             "example": "0xc429e068b65b3462f0e422b3ea388a7a37b23bff"
           },
           "network": {
+            "type": "string",
+            "description": "Wallet network",
+            "example": "ETHEREUM_MAINNET",
             "enum": [
               "ETHEREUM_MAINNET",
               "BASE_MAINNET",
@@ -796,10 +799,7 @@
               "POLYGON_POS_MAINNET",
               "ETHEREUM_HOLESKY",
               "ETHEREUM_SEPOLIA"
-            ],
-            "type": "string",
-            "description": "Wallet network",
-            "example": "ETHEREUM_MAINNET"
+            ]
           },
           "label": {
             "type": "string",

@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Network, NetworkType } from '@prisma/client';
-import { SupportedNetworksId } from '@repo/networks/types';
 import { Expose } from 'class-transformer';
 import { IsBoolean, IsEnum, IsNumber, IsString } from 'class-validator';
 
