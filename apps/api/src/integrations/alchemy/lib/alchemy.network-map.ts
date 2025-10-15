@@ -1,6 +1,6 @@
 import { Network as AlchemyNetwork } from 'alchemy-sdk';
 import { SupportedNetworksId } from '@repo/networks/types';
-
+import { type SupportedNetworksId as SupportedNetworksIdTypes } from '@repo/networks/types';
 export const NETWORK_TO_ALCHEMY_SDK: Record<
   SupportedNetworksId,
   AlchemyNetwork
@@ -20,7 +20,7 @@ export const ALCHEMY_SDK_TO_NETWORK_MAP: Record<
 > = Object.fromEntries(
   Object.entries(NETWORK_TO_ALCHEMY_SDK).map(([k, v]) => [
     v,
-    k as SupportedNetworksId,
+    k as SupportedNetworksIdTypes,
   ]),
 ) as Record<AlchemyNetwork, SupportedNetworksId>;
 
@@ -41,6 +41,6 @@ export const ALCHEMY_WEBHOOK_TO_NETWORK_MAP: Record<
   SupportedNetworksId
 > = Object.fromEntries(
   Object.entries(NETWORK_TO_ALCHEMY_ONLY_WEBHOOK_RECEIVED_EVENTS).map(
-    ([k, v]) => [v, k as SupportedNetworksId],
+    ([k, v]) => [v, k as SupportedNetworksIdTypes],
   ),
 ) as Record<keyof typeof AlchemyNetwork, SupportedNetworksId>;
