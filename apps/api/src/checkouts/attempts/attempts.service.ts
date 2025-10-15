@@ -46,10 +46,11 @@ export class AttemptsService {
     const store = checkout.store;
     if (!store) throw new NotFoundException('Store not found');
 
-    const wallet = store.wallets[0];
-    if (!wallet) throw new UnprocessableEntityException('Wallet not found');
+    const wallets = store.wallets;
+    if (!wallets || wallets.length === 0)
+      throw new UnprocessableEntityException('Wallets not found');
 
-    return { checkout, store, wallet };
+    return { checkout, store, wallets };
   }
   private async getTokenOrThrow(
     method: typeof MethodType.ONCHAIN,
@@ -146,7 +147,7 @@ export class AttemptsService {
     checkoutId: string,
     createCheckoutAttemptDto: CreatePaymentAttemptDto,
   ): Promise<OnchainAttemptResponseDto> {
-    const { checkout, wallet } =
+    const { checkout, wallets } =
       await this.getCheckoutContextOrThrow(checkoutId);
 
     if (checkout.status !== CheckoutStatus.OPEN) {
@@ -167,6 +168,14 @@ export class AttemptsService {
       convertedAmount.amount,
       token.id,
     );
+    const walletId = wallets.find(
+      (wallet) => wallet.networkId === token.networkId,
+    )?.id;
+    if (!walletId) {
+      throw new UnprocessableEntityException(
+        'No wallet found for token network!!!',
+      );
+    }
 
     const onChainPaymentAttempt = await this.db.onChainPaymentAttempt.upsert({
       where: {
@@ -177,7 +186,7 @@ export class AttemptsService {
         checkoutId,
         tokenId: token.id,
         tokenPayAmount: tokenPayAmount,
-        depositWalletId: wallet.id,
+        depositWalletId: walletId,
         networkId: token.networkId,
       },
       include: {
