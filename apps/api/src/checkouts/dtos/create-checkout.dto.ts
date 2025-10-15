@@ -42,7 +42,9 @@ export class CreateCheckoutDto {
   priceCurrency: string;
 
   @IsOptional()
-  @IsUrl()
+  @IsUrl({
+    require_tld: false,
+  })
   @MaxLength(2048)
   @ApiProperty({
     example: 'https://example.com/webhook',
