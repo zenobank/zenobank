@@ -102,21 +102,28 @@ export class CheckoutsService {
       data: { status: CheckoutStatus.COMPLETED },
     });
     if (checkout.webhookUrl) {
-      await axios.post(
-        checkout.webhookUrl,
-        {
-          event: CheckoutEvents.COMPLETED,
-          data: toDto(CheckoutResponseDto, {
-            ...checkout,
-            checkoutUrl: getCheckoutUrl(checkout.id),
-          }),
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
+      try {
+        await axios.post(
+          checkout.webhookUrl,
+          {
+            event: CheckoutEvents.COMPLETED,
+            data: toDto(CheckoutResponseDto, {
+              ...checkout,
+              checkoutUrl: getCheckoutUrl(checkout.id),
+            }),
           },
-        },
-      );
+          {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          },
+        );
+      } catch (error) {
+        this.logger.error(
+          `Error sending checkout ${checkoutId} completed webhook to ${checkout.webhookUrl}`,
+          error,
+        );
+      }
     }
   }
 
