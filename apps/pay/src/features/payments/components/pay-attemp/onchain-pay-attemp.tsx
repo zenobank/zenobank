@@ -61,10 +61,13 @@ export function OnchainPayAttemp({ attempt, expiresAt, onBack, networks, selecte
           toast.error('Pay with browser wallet is not supported for this network');
           return;
         }
-        const wagmiChain = chains.find((chain) => chain.id === network?.chainId);
+        const wagmiChain = chains.find((chain) => chain.id == network?.chainId);
+        console.log('wagmiChain', wagmiChain);
+        console.log('network', network);
+        console.log('chains', chains);
         if (!wagmiChain) {
           // Sentry.captureException(new Error(`Unsupported network for ${network?.id}`));
-          toast.error('Unsupported network');
+          toast.error(`Unsupported network. Networkd Id: ${network?.chainId}. Chain Id: ${network?.chainId}.`);
           return;
         }
         if (chain?.id !== network?.chainId) {

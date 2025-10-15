@@ -1,4 +1,4 @@
-import { SupportedNetworksId } from 'src/networks/networks.interface';
+import { SupportedNetworksId } from '@repo/networks/types';
 
 export function isNativeToken(
   tokenAddress: string,

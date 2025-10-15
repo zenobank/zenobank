@@ -1,6 +1,6 @@
 'use client';
 import { getDefaultConfig } from '@rainbow-me/rainbowkit';
-import { mainnet, polygon, optimism, arbitrum, base } from 'viem/chains';
+import { mainnet, polygon, optimism, arbitrum, base, Chain, bsc, sepolia, holesky } from 'viem/chains';
 import {
   metaMaskWallet,
   coinbaseWallet,
@@ -9,11 +9,24 @@ import {
   rabbyWallet,
   braveWallet,
 } from '@rainbow-me/rainbowkit/wallets';
-// filtrar todas las chains, cogerlo del enum
+import { SupportedNetworksId } from '@repo/networks/types';
+
+const chainsById: Record<SupportedNetworksId, Chain> = {
+  [SupportedNetworksId.ETHEREUM_MAINNET]: mainnet,
+  [SupportedNetworksId.POLYGON_POS_MAINNET]: polygon,
+  [SupportedNetworksId.ARBITRUM_ONE_MAINNET]: arbitrum,
+  [SupportedNetworksId.BASE_MAINNET]: base,
+  [SupportedNetworksId.BNB_MAINNET]: bsc,
+  [SupportedNetworksId.ETHEREUM_HOLESKY]: holesky,
+  [SupportedNetworksId.ETHEREUM_SEPOLIA]: sepolia,
+}
+
+const enabledChains = Object.values(chainsById) as [Chain, ...Chain[]];
+
 export const wagmiConfig: ReturnType<typeof getDefaultConfig> = getDefaultConfig({
   appName: 'Zeno Bank Pay',
   projectId: 'YOUR_PROJECT_ID',
-  chains: [mainnet, polygon, optimism, arbitrum, base],
+  chains: enabledChains,
   wallets: [
     {
       groupName: 'Popular',

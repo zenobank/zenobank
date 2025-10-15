@@ -6,7 +6,7 @@ import {
   WalletClient,
 } from 'viem';
 import { publicClients } from 'src/lib/contants/client';
-import { SupportedNetworksId } from 'src/networks/networks.interface';
+import { SupportedNetworksId } from '@repo/networks/types';
 
 export function client(networkId: SupportedNetworksId): PublicClient {
   return publicClients[networkId];

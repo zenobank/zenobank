@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { WalletFactory } from './wallets.factory';
-import { SupportedNetworksId } from 'src/networks/networks.interface';
+import { SupportedNetworksId } from '@repo/networks/types';
 
 describe('WalletFactory', () => {
   let walletFactory: WalletFactory;

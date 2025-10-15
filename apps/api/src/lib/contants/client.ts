@@ -9,7 +9,7 @@ import {
   polygon,
 } from 'viem/chains';
 import { http } from 'viem';
-import { SupportedNetworksId } from 'src/networks/networks.interface';
+import { SupportedNetworksId } from '@repo/networks/types';
 
 export const publicClients: Record<SupportedNetworksId, PublicClient> = {
   [SupportedNetworksId.ETHEREUM_MAINNET]: createPublicClient({

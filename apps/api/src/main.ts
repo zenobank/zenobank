@@ -77,7 +77,7 @@ async function bootstrap() {
     .addApiKey({ type: 'apiKey', name: 'x-api-key', in: 'header' }, 'api-key')
     .build();
 
-  const document = SwaggerModule.createDocument(app, config);
+  const document = SwaggerModule.createDocument(app, config, {});
   fs.writeFileSync('./openapi.json', JSON.stringify(document, null, 2));
 
   SwaggerModule.setup('docs', app, document);

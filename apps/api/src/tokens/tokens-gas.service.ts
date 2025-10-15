@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { publicClients } from 'src/lib/contants/client';
 import { parsePercent } from 'src/lib/utils/percent';
 import { PublicClient, encodeFunctionData, erc20Abi } from 'viem';
-import { SupportedNetworksId } from 'src/networks/networks.interface';
+import { SupportedNetworksId } from '@repo/networks/types';
 import { isNativeToken } from './lib/utils';
 
 @Injectable()

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { BlockchainAdapter } from './blockchain-adapter.interface';
 import { EvmAdapter } from './evm.adapter';
-import { SupportedNetworksId } from 'src/networks/networks.interface';
+import { SupportedNetworksId } from '@repo/networks/types';
 
 @Injectable()
 export class BlockchainFactory {

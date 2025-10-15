@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { SupportedNetworksId } from 'src/networks/networks.interface';
+import { SupportedNetworksId } from '@repo/networks/types';
 import { generatePrivateKey, privateKeyToAddress } from 'viem/accounts';
 
 @Injectable()

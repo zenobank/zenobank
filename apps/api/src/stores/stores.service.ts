@@ -4,7 +4,7 @@ import { CreateStoreDto } from './dtos/create-store.dto';
 import { CreateBinancePayCredentialDto } from './dtos/create-binance-pay-credential.dto';
 import { StoreResponseDto } from './dtos/store-response.dto';
 import { toEnumValue } from 'src/lib/utils/to-enum';
-import { SupportedNetworksId } from 'src/networks/networks.interface';
+import { SupportedNetworksId } from '@repo/networks/types';
 import { toDto } from 'src/lib/utils/to-dto';
 import { WalletsService } from 'src/wallets/wallets.service';
 import { Store } from '@prisma/client';

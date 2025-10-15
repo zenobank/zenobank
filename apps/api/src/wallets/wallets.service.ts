@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { SupportedNetworksId } from 'src/networks/networks.interface';
+import { SupportedNetworksId } from '@repo/networks/types';
 import { AlchemyService } from 'src/integrations/alchemy/alchemy.service';
 import { Wallet, NetworkType } from '@prisma/client';
 import { toEnumValue } from 'src/lib/utils/to-enum';

@@ -2,9 +2,9 @@ import { useMemo } from 'react'
 import { useCallback } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import {
-  useWalletControllerRegisterExternalWalletV1,
   useStoresControllerCreateBinancePayCredentialV1,
   getUsersControllerGetMeV1QueryKey,
+  useWalletsControllerRegisterExternalWalletV1,
 } from '@/lib/generated/api-client'
 import { useUser } from '../user/hooks'
 
@@ -22,7 +22,7 @@ export function useRegisterExternalWallet() {
   const queryClient = useQueryClient()
 
   const { mutateAsync: mutateRegisterExternalWallet } =
-    useWalletControllerRegisterExternalWalletV1({
+    useWalletsControllerRegisterExternalWalletV1({
       request: {
         headers: {
           'x-api-key': activeStore?.apiKey || '',

@@ -5,7 +5,7 @@ import {
   OnChainPaymentAttempt,
   PaymentStatus,
 } from '@prisma/client';
-import { SupportedNetworksId } from 'src/networks/networks.interface';
+import { SupportedNetworksId } from '@repo/networks/types';
 import { Alchemy, WebhookType as AlchemyWebhookType } from 'alchemy-sdk';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ALCHEMY_SDK } from './lib/alchemy.constants';
@@ -102,7 +102,7 @@ export class AlchemyService {
         tokenPayAmount: tokenAmount.toString(),
       });
     if (!onChainPaymentAttempt) {
-      this.logger.error('Payment attempt not found', {
+      this.logger.warn('Payment attempt not found', {
         tokenId,
         networkId: network,
         depositWalletAddress,
