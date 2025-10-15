@@ -24,10 +24,287 @@
         ]
       }
     },
-    "/api/v1/wallet/external": {
+    "/api/v1/checkouts": {
+      "post": {
+        "operationId": "CheckoutsController_createCheckout_v1",
+        "parameters": [
+          {
+            "name": "x-api-key",
+            "required": true,
+            "in": "header",
+            "description": "External API Key",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCheckoutDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckoutResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "x-api-key": []
+          }
+        ],
+        "summary": "Create a new checkout",
+        "tags": [
+          "Checkouts"
+        ]
+      }
+    },
+    "/api/v1/checkouts/{id}": {
+      "get": {
+        "operationId": "CheckoutsController_getCheckout_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckoutResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get checkout by ID",
+        "tags": [
+          "Checkouts"
+        ]
+      }
+    },
+    "/api/v1/checkouts/{id}/enabled-tokens": {
+      "get": {
+        "operationId": "CheckoutsController_getEnabledTokens_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CanonicalTokensResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get enabled tokens for a checkout",
+        "tags": [
+          "Checkouts"
+        ]
+      }
+    },
+    "/api/v1/stores/providers/binance-pay": {
+      "post": {
+        "operationId": "StoresController_createBinancePayCredential_v1",
+        "parameters": [
+          {
+            "name": "x-api-key",
+            "required": true,
+            "in": "header",
+            "description": "External API Key",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBinancePayCredentialDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BinancePayCredentialResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "x-api-key": []
+          }
+        ],
+        "summary": "Create a new store credential",
+        "tags": [
+          "Stores"
+        ]
+      }
+    },
+    "/api/v1/checkouts/{id}/attempts/binance-pay": {
+      "post": {
+        "operationId": "AttemptsController_createCheckoutAttemptBinancePay_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePaymentAttemptDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BinancePayAttemptResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Create a new binance pay checkout attempt",
+        "tags": [
+          "Checkouts"
+        ]
+      }
+    },
+    "/api/v1/checkouts/{id}/attempts/onchain": {
+      "post": {
+        "operationId": "AttemptsController_createCheckoutAttemptOnchain_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePaymentAttemptDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OnchainAttemptResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Create a new onchain checkout attempt",
+        "tags": [
+          "Checkouts"
+        ]
+      }
+    },
+    "/api/v1/conversions/convert": {
+      "get": {
+        "operationId": "ConversionsController_convert_v1",
+        "parameters": [
+          {
+            "name": "from",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "amount",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Conversions"
+        ]
+      }
+    },
+    "/api/v1/wallets/external": {
       "post": {
         "description": "An Externall wallet is an non-custodial wallet. Address must be an EVM address.",
-        "operationId": "WalletController_registerExternalWallet_v1",
+        "operationId": "WalletsController_registerExternalWallet_v1",
         "parameters": [
           {
             "name": "x-api-key",
@@ -61,7 +338,7 @@
         ],
         "summary": "Register an external wallet for a store.",
         "tags": [
-          "Wallet"
+          "Wallets"
         ]
       }
     },
@@ -148,283 +425,6 @@
         "summary": "Create initial backend resources for the newly signed-up user",
         "tags": [
           "Users"
-        ]
-      }
-    },
-    "/api/v1/stores/providers/binance-pay": {
-      "post": {
-        "operationId": "StoresController_createBinancePayCredential_v1",
-        "parameters": [
-          {
-            "name": "x-api-key",
-            "required": true,
-            "in": "header",
-            "description": "External API Key",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateBinancePayCredentialDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BinancePayCredentialResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "x-api-key": []
-          }
-        ],
-        "summary": "Create a new store credential",
-        "tags": [
-          "Stores"
-        ]
-      }
-    },
-    "/api/v1/checkouts": {
-      "post": {
-        "operationId": "CheckoutsController_createCheckout_v1",
-        "parameters": [
-          {
-            "name": "x-api-key",
-            "required": true,
-            "in": "header",
-            "description": "External API Key",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateCheckoutDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CheckoutResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "x-api-key": []
-          }
-        ],
-        "summary": "Create a new checkout",
-        "tags": [
-          "Checkouts"
-        ]
-      }
-    },
-    "/api/v1/checkouts/{id}": {
-      "get": {
-        "operationId": "CheckoutsController_getCheckout_v1",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CheckoutResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "summary": "Get checkout by ID",
-        "tags": [
-          "Checkouts"
-        ]
-      }
-    },
-    "/api/v1/checkouts/{id}/attempts/binance-pay": {
-      "post": {
-        "operationId": "CheckoutsController_createCheckoutAttemptBinancePay_v1",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreatePaymentAttemptDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BinancePayAttemptResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "summary": "Create a new binance pay checkout attempt",
-        "tags": [
-          "Checkouts"
-        ]
-      }
-    },
-    "/api/v1/checkouts/{id}/attempts/onchain": {
-      "post": {
-        "operationId": "CheckoutsController_createCheckoutAttemptOnchain_v1",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreatePaymentAttemptDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/OnchainAttemptResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "summary": "Create a new onchain checkout attempt",
-        "tags": [
-          "Checkouts"
-        ]
-      }
-    },
-    "/api/v1/checkouts/{id}/enabled-tokens": {
-      "get": {
-        "operationId": "CheckoutsController_getEnabledTokens_v1",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CanonicalTokensResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "summary": "Get enabled tokens for a checkout",
-        "tags": [
-          "Checkouts"
-        ]
-      }
-    },
-    "/api/v1/conversions/convert": {
-      "get": {
-        "operationId": "ConversionsController_convert_v1",
-        "parameters": [
-          {
-            "name": "from",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "to",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "amount",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "tags": [
-          "Conversions"
         ]
       }
     },
@@ -564,6 +564,286 @@
           "BINANCE_PAY"
         ]
       },
+      "CreateCheckoutDto": {
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "type": "string",
+            "maxLength": 256,
+            "example": "order-12345",
+            "description": "Unique order identifier"
+          },
+          "priceAmount": {
+            "type": "string",
+            "example": "100.12",
+            "description": "Price amount in the specified currency"
+          },
+          "priceCurrency": {
+            "type": "string",
+            "example": "USD",
+            "description": "ISO 4217 currency code"
+          },
+          "webhookUrl": {
+            "type": "string",
+            "nullable": true,
+            "default": null,
+            "maxLength": 2048,
+            "format": "uri",
+            "example": "https://example.com/webhook",
+            "description": "Webhook URL to notify checkout status changes. For example, when the checkout is paid"
+          },
+          "verificationToken": {
+            "type": "string",
+            "nullable": true,
+            "default": null,
+            "example": "123e4567-e89b-12d3-a456-426614174000",
+            "description": "Verification token signed with an secret key to ensure webhook integrity"
+          }
+        },
+        "required": [
+          "orderId",
+          "priceAmount",
+          "priceCurrency",
+          "webhookUrl",
+          "verificationToken"
+        ]
+      },
+      "CheckoutResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "ckl1234567890",
+            "description": "Checkout ID"
+          },
+          "orderId": {
+            "type": "string",
+            "example": "order-12345",
+            "description": "Unique order identifier"
+          },
+          "priceCurrency": {
+            "type": "string",
+            "example": "USD",
+            "description": "Currency code"
+          },
+          "priceAmount": {
+            "type": "string",
+            "example": "100.00",
+            "description": "Price amount"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "OPEN",
+              "COMPLETED",
+              "EXPIRED",
+              "CANCELLED"
+            ],
+            "example": "OPEN",
+            "description": "Current status of the checkout"
+          },
+          "expiresAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true,
+            "example": "2025-10-05T12:00:00Z",
+            "description": "Expiration date"
+          },
+          "checkoutUrl": {
+            "type": "string",
+            "example": "https://pay.zenobank.io/ckl1234567890",
+            "description": "URL to complete the checkout"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2025-10-04T10:00:00Z",
+            "description": "Creation date"
+          },
+          "webhookUrl": {
+            "type": "string",
+            "nullable": true,
+            "example": "https://example.com/webhook",
+            "description": "Webhook URL to notify checkout status changes. For example, when the checkout is paid"
+          },
+          "verificationToken": {
+            "type": "string",
+            "nullable": true,
+            "example": "123e4567-e89b-12d3-a456-426614174000",
+            "description": "Verification token to ensure webhook integrity"
+          }
+        },
+        "required": [
+          "id",
+          "orderId",
+          "priceCurrency",
+          "priceAmount",
+          "status",
+          "expiresAt",
+          "checkoutUrl",
+          "createdAt",
+          "webhookUrl",
+          "verificationToken"
+        ]
+      },
+      "CreateBinancePayCredentialDto": {
+        "type": "object",
+        "properties": {
+          "apiKey": {
+            "type": "string",
+            "example": "your-api-key",
+            "description": "API Key"
+          },
+          "apiSecret": {
+            "type": "string",
+            "example": "your-api-secret",
+            "description": "API Secret"
+          },
+          "accountId": {
+            "type": "string",
+            "example": "your-account-id",
+            "description": "Account ID"
+          }
+        },
+        "required": [
+          "apiKey",
+          "apiSecret",
+          "accountId"
+        ]
+      },
+      "BinancePayCredentialResponseDto": {
+        "type": "object",
+        "properties": {
+          "apiKey": {
+            "type": "string",
+            "example": "cuid_1234567890abcdef"
+          },
+          "accountId": {
+            "type": "string",
+            "example": "568321"
+          }
+        },
+        "required": [
+          "apiKey",
+          "accountId"
+        ]
+      },
+      "CreatePaymentAttemptDto": {
+        "type": "object",
+        "properties": {
+          "tokenId": {
+            "type": "string",
+            "maxLength": 256,
+            "description": "Token ID to use for this attempt",
+            "example": "USDC_ETHEREUM_MAINNET"
+          },
+          "checkoutId": {
+            "type": "string",
+            "maxLength": 256,
+            "description": "Checkout ID to use for this attempt",
+            "example": "ckl1234567890"
+          }
+        },
+        "required": [
+          "tokenId",
+          "checkoutId"
+        ]
+      },
+      "BinancePayAttemptResponseDto": {
+        "type": "object",
+        "properties": {
+          "depositAccountId": {
+            "type": "string",
+            "description": "Deposit Binance ID for the payment attempt",
+            "example": "568321"
+          },
+          "tokenPayAmount": {
+            "type": "string",
+            "description": "Token pay amount for the payment attempt",
+            "example": "100"
+          },
+          "binanceTokenId": {
+            "type": "string",
+            "description": "Binance token ID for the payment attempt",
+            "example": "USDC"
+          }
+        },
+        "required": [
+          "depositAccountId",
+          "tokenPayAmount",
+          "binanceTokenId"
+        ]
+      },
+      "WalletResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for the wallet",
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          "address": {
+            "type": "string",
+            "description": "Wallet address",
+            "example": "0xc429e068b65b3462f0e422b3ea388a7a37b23bff"
+          },
+          "network": {
+            "enum": [
+              "ETHEREUM_MAINNET",
+              "BASE_MAINNET",
+              "ARBITRUM_ONE_MAINNET",
+              "BNB_MAINNET",
+              "POLYGON_POS_MAINNET",
+              "ETHEREUM_HOLESKY",
+              "ETHEREUM_SEPOLIA"
+            ],
+            "type": "string",
+            "description": "Wallet network",
+            "example": "ETHEREUM_MAINNET"
+          },
+          "label": {
+            "type": "string",
+            "nullable": true,
+            "description": "Wallet label",
+            "example": "Main Wallet"
+          }
+        },
+        "required": [
+          "id",
+          "address",
+          "network",
+          "label"
+        ]
+      },
+      "OnchainAttemptResponseDto": {
+        "type": "object",
+        "properties": {
+          "tokenId": {
+            "type": "string",
+            "description": "Token ID for the payment attempt",
+            "example": "USDC"
+          },
+          "tokenPayAmount": {
+            "type": "string",
+            "description": "Token pay amount for the payment attempt",
+            "example": "100"
+          },
+          "networkId": {
+            "type": "string",
+            "description": "Network ID for the payment attempt",
+            "example": "ETHEREUM_MAINNET"
+          },
+          "depositWallet": {
+            "$ref": "#/components/schemas/WalletResponseDto"
+          }
+        },
+        "required": [
+          "tokenId",
+          "tokenPayAmount",
+          "networkId",
+          "depositWallet"
+        ]
+      },
       "RegisterExternalWalletDto": {
         "type": "object",
         "properties": {
@@ -631,64 +911,6 @@
           "minBlockConfirmations",
           "maxConfirmationAttempts",
           "confirmationRetryDelay"
-        ]
-      },
-      "BinancePayCredentialResponseDto": {
-        "type": "object",
-        "properties": {
-          "apiKey": {
-            "type": "string",
-            "example": "cuid_1234567890abcdef"
-          },
-          "accountId": {
-            "type": "string",
-            "example": "568321"
-          }
-        },
-        "required": [
-          "apiKey",
-          "accountId"
-        ]
-      },
-      "WalletResponseDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "Unique identifier for the wallet",
-            "example": "123e4567-e89b-12d3-a456-426614174000"
-          },
-          "address": {
-            "type": "string",
-            "description": "Wallet address",
-            "example": "0xc429e068b65b3462f0e422b3ea388a7a37b23bff"
-          },
-          "network": {
-            "enum": [
-              "ETHEREUM_MAINNET",
-              "BASE_MAINNET",
-              "ARBITRUM_ONE_MAINNET",
-              "BNB_MAINNET",
-              "POLYGON_POS_MAINNET",
-              "ETHEREUM_HOLESKY",
-              "ETHEREUM_SEPOLIA"
-            ],
-            "type": "string",
-            "description": "Wallet network",
-            "example": "ETHEREUM_MAINNET"
-          },
-          "label": {
-            "type": "string",
-            "nullable": true,
-            "description": "Wallet label",
-            "example": "Main Wallet"
-          }
-        },
-        "required": [
-          "id",
-          "address",
-          "network",
-          "label"
         ]
       },
       "StoreResponseDto": {
@@ -765,196 +987,6 @@
         },
         "required": [
           "alreadyExists"
-        ]
-      },
-      "CreateBinancePayCredentialDto": {
-        "type": "object",
-        "properties": {
-          "apiKey": {
-            "type": "string",
-            "example": "your-api-key",
-            "description": "API Key"
-          },
-          "apiSecret": {
-            "type": "string",
-            "example": "your-api-secret",
-            "description": "API Secret"
-          },
-          "accountId": {
-            "type": "string",
-            "example": "your-account-id",
-            "description": "Account ID"
-          }
-        },
-        "required": [
-          "apiKey",
-          "apiSecret",
-          "accountId"
-        ]
-      },
-      "CreateCheckoutDto": {
-        "type": "object",
-        "properties": {
-          "orderId": {
-            "type": "string",
-            "maxLength": 256,
-            "example": "order-12345",
-            "description": "Unique order identifier"
-          },
-          "priceAmount": {
-            "type": "string",
-            "example": "100.12",
-            "description": "Price amount in the specified currency"
-          },
-          "priceCurrency": {
-            "type": "string",
-            "example": "USD",
-            "description": "ISO 4217 currency code"
-          }
-        },
-        "required": [
-          "orderId",
-          "priceAmount",
-          "priceCurrency"
-        ]
-      },
-      "CheckoutResponseDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "example": "ckl1234567890",
-            "description": "Checkout ID"
-          },
-          "orderId": {
-            "type": "string",
-            "example": "order-12345",
-            "description": "Unique order identifier"
-          },
-          "priceCurrency": {
-            "type": "string",
-            "example": "USD",
-            "description": "Currency code"
-          },
-          "priceAmount": {
-            "type": "string",
-            "example": "100.00",
-            "description": "Price amount"
-          },
-          "status": {
-            "type": "string",
-            "enum": [
-              "OPEN",
-              "COMPLETED",
-              "EXPIRED",
-              "CANCELLED"
-            ],
-            "example": "OPEN",
-            "description": "Current status of the checkout"
-          },
-          "expiresAt": {
-            "format": "date-time",
-            "type": "string",
-            "nullable": true,
-            "example": "2025-10-05T12:00:00Z",
-            "description": "Expiration date"
-          },
-          "checkoutUrl": {
-            "type": "string",
-            "example": "https://pay.zenobank.io/ckl1234567890",
-            "description": "URL to complete the checkout"
-          },
-          "createdAt": {
-            "format": "date-time",
-            "type": "string",
-            "example": "2025-10-04T10:00:00Z",
-            "description": "Creation date"
-          }
-        },
-        "required": [
-          "id",
-          "orderId",
-          "priceCurrency",
-          "priceAmount",
-          "status",
-          "expiresAt",
-          "checkoutUrl",
-          "createdAt"
-        ]
-      },
-      "CreatePaymentAttemptDto": {
-        "type": "object",
-        "properties": {
-          "tokenId": {
-            "type": "string",
-            "maxLength": 256,
-            "description": "Token ID to use for this attempt",
-            "example": "USDC_ETHEREUM_MAINNET"
-          },
-          "checkoutId": {
-            "type": "string",
-            "maxLength": 256,
-            "description": "Checkout ID to use for this attempt",
-            "example": "ckl1234567890"
-          }
-        },
-        "required": [
-          "tokenId",
-          "checkoutId"
-        ]
-      },
-      "BinancePayAttemptResponseDto": {
-        "type": "object",
-        "properties": {
-          "depositAccountId": {
-            "type": "string",
-            "description": "Deposit Binance ID for the payment attempt",
-            "example": "568321"
-          },
-          "tokenPayAmount": {
-            "type": "string",
-            "description": "Token pay amount for the payment attempt",
-            "example": "100"
-          },
-          "binanceTokenId": {
-            "type": "string",
-            "description": "Binance token ID for the payment attempt",
-            "example": "USDC"
-          }
-        },
-        "required": [
-          "depositAccountId",
-          "tokenPayAmount",
-          "binanceTokenId"
-        ]
-      },
-      "OnchainAttemptResponseDto": {
-        "type": "object",
-        "properties": {
-          "tokenId": {
-            "type": "string",
-            "description": "Token ID for the payment attempt",
-            "example": "USDC"
-          },
-          "tokenPayAmount": {
-            "type": "string",
-            "description": "Token pay amount for the payment attempt",
-            "example": "100"
-          },
-          "networkId": {
-            "type": "string",
-            "description": "Network ID for the payment attempt",
-            "example": "ETHEREUM_MAINNET"
-          },
-          "depositWallet": {
-            "$ref": "#/components/schemas/WalletResponseDto"
-          }
-        },
-        "required": [
-          "tokenId",
-          "tokenPayAmount",
-          "networkId",
-          "depositWallet"
         ]
       }
     }

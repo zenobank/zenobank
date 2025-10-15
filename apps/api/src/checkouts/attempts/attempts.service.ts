@@ -9,7 +9,12 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CreatePaymentAttemptDto } from './dtos/create-payment-attempt.dto';
 import { TokensService } from 'src/tokens/tokens.service';
 
-import { AttemptStatus, CheckoutStatus, MethodType } from '@prisma/client';
+import {
+  AttemptStatus,
+  CheckoutStatus,
+  MethodType,
+  OnChainPaymentAttempt,
+} from '@prisma/client';
 import { OnchainAttemptResponseDto } from './dtos/onchain-attempt-response.dto';
 import { toDto } from 'src/lib/utils/to-dto';
 import { BinancePayAttemptResponseDto } from './dtos/binance-pay-attempt-response.dto';
@@ -19,6 +24,7 @@ import { BinancePayTokenResponseDto } from 'src/tokens/dto/binance-pay-token-res
 import { OnChainTokenResponseDto } from 'src/tokens/dto/onchain-token-response';
 import { ConversionsService } from 'src/conversions/conversions.service';
 import { toBN } from 'src/lib/utils/numbers';
+import { CheckoutsService } from '../checkouts.service';
 
 @Injectable()
 export class AttemptsService {
@@ -26,6 +32,7 @@ export class AttemptsService {
     private readonly db: PrismaService,
     private readonly tokensService: TokensService,
     private readonly conversionsService: ConversionsService,
+    private readonly checkoutsService: CheckoutsService,
   ) {}
   private async getCheckoutContextOrThrow(checkoutId: string) {
     const checkout = await this.db.checkout.findUnique({
@@ -240,5 +247,51 @@ export class AttemptsService {
       depositAccountId: store.binancePayCredential.accountId,
       binanceTokenId: binancePayPaymentAttempt.token.binanceTokenId,
     });
+  }
+  /**
+   * Confirm onchain payment success. Also mark checkout as completed
+   * @param onChainPaymentAttemptId - The ID of the onchain payment attempt to confirm
+   */
+  async confirmOnchainPaymentSuccess({
+    onChainPaymentAttemptId,
+  }: {
+    onChainPaymentAttemptId: string;
+  }) {
+    const onChainPaymentAttempt = await this.db.onChainPaymentAttempt.update({
+      where: { id: onChainPaymentAttemptId },
+      data: { status: AttemptStatus.SUCCEEDED },
+    });
+    await this.checkoutsService.completeCheckout(
+      onChainPaymentAttempt.checkoutId,
+    );
+  }
+
+  async findOnChainPaymentAttempt({
+    tokenId,
+    networkId,
+    depositWalletAddress,
+    tokenPayAmount,
+  }: {
+    tokenId: string;
+    networkId: string;
+    depositWalletAddress: string;
+    tokenPayAmount: string;
+  }): Promise<OnChainPaymentAttempt | null> {
+    const onChainPaymentAttempt = await this.db.onChainPaymentAttempt.findFirst(
+      {
+        where: {
+          status: AttemptStatus.PENDING,
+          networkId: networkId,
+          tokenPayAmount: tokenPayAmount,
+          tokenId: tokenId,
+          depositWallet: {
+            address: depositWalletAddress.toLowerCase(),
+            networkId: networkId,
+          },
+        },
+      },
+    );
+
+    return onChainPaymentAttempt || null;
   }
 }

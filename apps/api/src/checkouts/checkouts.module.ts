@@ -5,20 +5,12 @@ import { PrismaModule } from 'src/prisma/prisma.module';
 import { StoresModule } from 'src/stores/stores.module';
 import { TokensModule } from 'src/tokens/tokens.module';
 import { AttemptsModule } from './attempts/attempts.module';
-import { CheckoutCron } from './checkout.cron';
-import { WalletsModule } from 'src/wallets/wallets.module';
-import { CheckoutOnchainService } from './checkout-onchain.service';
+import { CheckoutCron } from './checkouts.cron';
 
 @Module({
-  imports: [
-    PrismaModule,
-    StoresModule,
-    TokensModule,
-    AttemptsModule,
-    WalletsModule,
-  ],
-  providers: [CheckoutsService, CheckoutCron, CheckoutOnchainService],
+  imports: [PrismaModule, StoresModule, TokensModule],
+  providers: [CheckoutsService, CheckoutCron],
   controllers: [CheckoutsController],
-  exports: [CheckoutsService, CheckoutOnchainService],
+  exports: [CheckoutsService],
 })
 export class CheckoutsModule {}

@@ -6,6 +6,7 @@
   "scripts": {
     "build": "pnpm run db:generate && nest build && pnpm sentry:sourcemaps",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "circular-deps": "pnpm dlx madge src --circular",
     "start": "db:migrate:prod && nest start",
     "tunnel": "lt -s dkfjadskfjaercl --port 3001",
     "dev": "nest start --watch",

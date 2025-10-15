@@ -27,7 +27,7 @@ import { toDto } from 'src/lib/utils/to-dto';
 import { TokensService } from 'src/tokens/tokens.service';
 import { OnChainTokenResponseDto } from 'src/tokens/dto/onchain-token-response';
 import { CheckoutsService } from 'src/checkouts/checkouts.service';
-import { CheckoutOnchainService } from 'src/checkouts/checkout-onchain.service';
+import { AttemptsService } from 'src/checkouts/attempts/attempts.service';
 
 @Injectable()
 export class AlchemyService {
@@ -37,7 +37,7 @@ export class AlchemyService {
     @Inject(ALCHEMY_SDK) private readonly alchemy: Alchemy,
     private readonly tokenService: TokensService,
     private readonly checkoutsService: CheckoutsService,
-    private readonly checkoutOnchainService: CheckoutOnchainService,
+    private readonly attemptsService: AttemptsService,
   ) {}
 
   async processAddressActivityWebhook(body: AddressActivityWebhookResponse) {
@@ -95,7 +95,7 @@ export class AlchemyService {
     }
 
     const onChainPaymentAttempt =
-      await this.checkoutOnchainService.findOnChainPaymentAttempt({
+      await this.attemptsService.findOnChainPaymentAttempt({
         tokenId,
         networkId: network,
         depositWalletAddress: depositWalletAddress,
@@ -122,7 +122,7 @@ export class AlchemyService {
       return;
     }
 
-    await this.checkoutOnchainService.confirmOnchainPaymentSuccess({
+    await this.attemptsService.confirmOnchainPaymentSuccess({
       onChainPaymentAttemptId: onChainPaymentAttempt.id,
     });
   }
