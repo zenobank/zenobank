@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
 import { IsEthereumAddress, IsString, IsEnum } from 'class-validator';
-import { SupportedNetworksId } from 'src/networks/network.interface';
+import { SupportedNetworksId } from '@repo/networks/types';
 
 export class DepositDetailsDto {
   @Expose()
@@ -28,7 +28,7 @@ export class DepositDetailsDto {
   @Expose()
   @IsEnum(SupportedNetworksId)
   @ApiProperty({
-    example: SupportedNetworksId.ARBITRUM_MAINNET,
+    example: SupportedNetworksId.ARBITRUM_ONE_MAINNET,
     enum: SupportedNetworksId,
     enumName: 'NetworkId',
   })

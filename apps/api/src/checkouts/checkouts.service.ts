@@ -7,8 +7,11 @@ import { StoresService } from 'src/stores/stores.service';
 import { TokensService } from 'src/tokens/tokens.service';
 import { getCheckoutUrl } from 'src/checkouts/lib/utils';
 import { CanonicalTokensResponseDto } from 'src/tokens/dto/canonical-tokens-response';
-import { WalletsService } from 'src/wallets/wallet.service';
-
+import { WalletsService } from 'src/wallets/wallets.service';
+import { Checkout, CheckoutStatus } from '@prisma/client';
+import axios from 'axios';
+import { CheckoutEvents } from './lib/constants';
+import { CheckoutEventDto } from './dtos/checkout-event.dto';
 @Injectable()
 export class CheckoutsService {
   private readonly logger = new Logger(CheckoutsService.name);
@@ -17,7 +20,6 @@ export class CheckoutsService {
     private readonly db: PrismaService,
     private readonly storesService: StoresService,
     private readonly tokensService: TokensService,
-    private readonly walletsService: WalletsService,
   ) {}
   async getEnabledTokens(
     checkoutId: string,
@@ -42,15 +44,22 @@ export class CheckoutsService {
     }
     if (checkout.store.wallets.length === 0) {
       canonicalTokens.ONCHAIN = [];
-      // if (!checkout.store.binancePayCredential) {
-      //   await this.walletsService.registerInternalEvmWallet({
-      //     apiKey: checkout.store.apiKey,
-      //   });
-      // } else {
-      //   canonicalTokens.ONCHAIN = [];
-      // }
     }
     return canonicalTokens;
+  }
+  async markCheckoutAsExpired(checkoutId: string) {
+    const checkout = await this.db.checkout.update({
+      where: { id: checkoutId },
+      data: { status: CheckoutStatus.EXPIRED },
+    });
+
+    if (checkout.webhookUrl) {
+      // await this.webhooksService.sendWebhook(checkout.webhookUrl, {
+      //   event: 'checkout_expired',
+      //   data: { checkoutId },
+      // });
+    }
+    this.logger.log(`Marked checkout ${checkoutId} as expired`);
   }
 
   async createCheckout(
@@ -70,6 +79,8 @@ export class CheckoutsService {
         priceAmount,
         priceCurrency,
         storeId: store.id,
+        webhookUrl: createCheckoutDto.webhookUrl,
+        verificationToken: createCheckoutDto.verificationToken,
       },
     });
 
@@ -81,6 +92,59 @@ export class CheckoutsService {
       ...checkout,
       checkoutUrl: getCheckoutUrl(checkout.id),
     });
+  }
+
+  /*
+   * Mark checkout as completed
+   */
+  async completeCheckout(checkoutId: string) {
+    const checkout = await this.db.checkout.update({
+      where: { id: checkoutId },
+      data: { status: CheckoutStatus.COMPLETED },
+    });
+    if (checkout.webhookUrl) {
+      try {
+        await axios.post(
+          checkout.webhookUrl,
+          toDto(CheckoutEventDto, {
+            event: CheckoutEvents.COMPLETED,
+            id: checkout.id,
+            eventDate: new Date(),
+            data: toDto(CheckoutResponseDto, {
+              ...checkout,
+              checkoutUrl: getCheckoutUrl(checkout.id),
+            }),
+          }),
+          {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          },
+        );
+      } catch (error) {
+        this.logger.error(
+          `Error sending checkout ${checkoutId} completed webhook to ${checkout.webhookUrl}`,
+          error,
+        );
+      }
+    }
+  }
+
+  async getCheckoutIntegrity(
+    checkoutId: string,
+  ): Promise<{ isValid: boolean; checkout: Checkout | null; reason?: string }> {
+    const checkout = await this.db.checkout.findUnique({
+      where: { id: checkoutId },
+    });
+
+    if (!checkout) {
+      return { isValid: false, checkout: null, reason: 'Checkout not found' };
+    }
+
+    if (checkout.expiresAt && checkout.expiresAt < new Date()) {
+      return { isValid: false, checkout: null, reason: 'Checkout expired' };
+    }
+    return { isValid: true, checkout: checkout };
   }
 
   async getCheckout(id: string): Promise<CheckoutResponseDto | null> {

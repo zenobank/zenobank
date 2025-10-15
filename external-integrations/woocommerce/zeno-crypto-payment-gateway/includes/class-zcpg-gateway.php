@@ -66,8 +66,6 @@ class ZCPG_Gateway extends WC_Payment_Gateway
                     )
                 ),
             ),
-            // Se elimina 'secret_live' de la UI (no editable por el usuario).
-            // Se elimina 'debug' de la UI (Enable logging).
             'title'        => array(
                 'title'       => __('Title', 'zeno-crypto-payment-gateway'),
                 'type'        => 'text',
@@ -200,7 +198,7 @@ class ZCPG_Gateway extends WC_Payment_Gateway
             'timeout' => 25,
         );
 
-        $response = wp_remote_post(trailingslashit($this->current_endpoint()) . 'api/v1/payments', $args);
+        $response = wp_remote_post(trailingslashit($this->current_endpoint()) . 'api/v1/checkouts', $args);
 
         if (is_wp_error($response)) {
             wc_add_notice(esc_html__('Error connecting with the gateway.', 'zeno-crypto-payment-gateway'), 'error');
@@ -208,7 +206,7 @@ class ZCPG_Gateway extends WC_Payment_Gateway
         }
 
         $body        = json_decode(wp_remote_retrieve_body($response), true);
-        $payment_url = isset($body['paymentUrl']) ? (string) $body['paymentUrl'] : '';
+        $payment_url = isset($body['checkoutUrl']) ? (string) $body['checkoutUrl'] : '';
 
         if (! $payment_url) {
             wc_add_notice(__('The payment URL could not be generated.', 'zeno-crypto-payment-gateway'), 'error');

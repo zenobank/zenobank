@@ -7,6 +7,7 @@ import {
   IconKey,
   IconCopy,
 } from '@tabler/icons-react'
+import copy from 'copy-to-clipboard'
 import { CheckCircleIcon } from 'lucide-react'
 import { toast } from 'sonner'
 import { useActiveStore } from '@/lib/state/store/hooks'
@@ -28,7 +29,7 @@ interface Props {
 }
 
 export function WordPressIntegrationDialog({ open, onOpenChange }: Props) {
-  const [apiKey] = useState('zeno_sk_live_1234567890abcdef')
+  const store = useActiveStore()
   const [isWalletDialogOpen, setIsWalletDialogOpen] = useState(false)
   const { activeStore } = useActiveStore()
   const paymentWallet = useMemo(() => {
@@ -36,16 +37,8 @@ export function WordPressIntegrationDialog({ open, onOpenChange }: Props) {
   }, [activeStore])
 
   const copyApiKey = () => {
-    navigator.clipboard.writeText(apiKey)
+    if (store?.activeStore?.apiKey) copy(store?.activeStore?.apiKey)
     toast.success('API key copied!')
-  }
-
-  const downloadPlugin = () => {
-    toast.success('Plugin download started!')
-  }
-
-  const addWallet = () => {
-    setIsWalletDialogOpen(true)
   }
 
   return (
@@ -75,8 +68,13 @@ export function WordPressIntegrationDialog({ open, onOpenChange }: Props) {
                 <p className='text-muted-foreground mb-3 text-sm'>
                   Download and install the WordPress plugin
                 </p>
-                <Button onClick={downloadPlugin} size='sm'>
-                  Download Plugin
+                <Button asChild size='sm'>
+                  <a
+                    target='_blank'
+                    href='https://wordpress.org/plugins/zeno-crypto-payment-gateway'
+                  >
+                    Download Plugin
+                  </a>
                 </Button>
               </CardContent>
             </Card>
@@ -94,7 +92,7 @@ export function WordPressIntegrationDialog({ open, onOpenChange }: Props) {
                 </p>
                 <div className='flex items-center gap-2'>
                   <div className='bg-muted flex-1 rounded-md border px-3 py-2 font-mono text-sm'>
-                    {apiKey}
+                    {store?.activeStore?.apiKey}
                   </div>
                   <Button variant='outline' size='sm' onClick={copyApiKey}>
                     <IconCopy className='h-4 w-4' />

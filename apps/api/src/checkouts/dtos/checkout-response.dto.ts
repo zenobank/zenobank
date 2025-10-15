@@ -65,4 +65,21 @@ export class CheckoutResponseDto {
     description: 'Creation date',
   })
   createdAt: Date;
+
+  @Expose()
+  @ApiProperty({
+    example: 'https://example.com/webhook',
+    description:
+      'Webhook URL to notify checkout status changes. For example, when the checkout is paid',
+    nullable: true,
+  })
+  webhookUrl: string | null;
+
+  @Expose()
+  @ApiProperty({
+    example: '123e4567-e89b-12d3-a456-426614174000',
+    description: 'Verification token to ensure webhook integrity',
+    nullable: true,
+  })
+  verificationToken: string | null;
 }

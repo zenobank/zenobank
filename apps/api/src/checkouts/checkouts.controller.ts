@@ -22,10 +22,7 @@ import { CanonicalTokensResponseDto } from 'src/tokens/dto/canonical-tokens-resp
 @ApiTags('Checkouts')
 @Controller('checkouts')
 export class CheckoutsController {
-  constructor(
-    private readonly checkoutsService: CheckoutsService,
-    private readonly attemptsService: AttemptsService,
-  ) {}
+  constructor(private readonly checkoutsService: CheckoutsService) {}
 
   @Post('')
   @ApiKeyAuth()
@@ -45,49 +42,6 @@ export class CheckoutsController {
       throw new NotFoundException('Checkout not found');
     }
     return checkout;
-  }
-  //   @Get(':id/attempts')
-  //   @ApiOperation({ summary: 'Get checkout attempts by ID' })
-  //   async getCheckoutAttempts(
-  //     @Param('id') id: string,
-  //   ): Promise<CheckoutAttemptResponseDto[]> {
-  //     const attempts = await this.attemptsService.getCheckoutAttempts(id);
-  //     return attempts;
-  //   }
-  // TODO: CAMBIAR EL ANY
-  // @Post(':id/attempts')
-  // @ApiOperation({ summary: 'Create a new checkout attempt' })
-  // async createCheckoutAttempt(
-  //   @Param('id') Compruebas sícheckoutId: string,
-  //   @Body() createCheckoutAttemptDto: CreatePaymentAttemptDto,
-  // ): Promise<void> {
-  //   return this.attemptsService.createCheckoutAttempt(
-  //     checkoutId,
-  //     createCheckoutAttemptDto,
-  //   );
-  // }
-  @Post(':id/attempts/binance-pay')
-  @ApiOperation({ summary: 'Create a new binance pay checkout attempt' })
-  async createCheckoutAttemptBinancePay(
-    @Param('id') checkoutId: string,
-    @Body() createCheckoutAttemptDto: CreatePaymentAttemptDto,
-  ): Promise<BinancePayAttemptResponseDto> {
-    return this.attemptsService.createBinancePayCheckoutAttempt(
-      checkoutId,
-      createCheckoutAttemptDto,
-    );
-  }
-
-  @Post(':id/attempts/onchain')
-  @ApiOperation({ summary: 'Create a new onchain checkout attempt' })
-  async createCheckoutAttemptOnchain(
-    @Param('id') checkoutId: string,
-    @Body() createCheckoutAttemptDto: CreatePaymentAttemptDto,
-  ): Promise<OnchainAttemptResponseDto> {
-    return this.attemptsService.createOnChainCheckoutAttempt(
-      checkoutId,
-      createCheckoutAttemptDto,
-    );
   }
 
   @Get(':id/enabled-tokens')

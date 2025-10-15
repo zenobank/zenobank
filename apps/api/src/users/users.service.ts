@@ -1,12 +1,13 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { toDto } from 'src/lib/utils/to-dto';
 import { toEnumValue } from 'src/lib/utils/to-enum';
-import { SupportedNetworksId } from 'src/networks/network.interface';
+import { SupportedNetworksId } from '@repo/networks/types';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 import { UserResponseDto } from './dtos/user-response.dto';
 import { generateApiKey } from 'src/lib/utils/generate-api-key';
 import { BootstrapResponseDto } from './dtos/bootstrap-response.dto';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class UsersService {
@@ -15,50 +16,52 @@ export class UsersService {
 
   async bootstrap(userId: string): Promise<BootstrapResponseDto> {
     this.logger.log('Bootstrapping user with id: ' + userId);
-    if (!userId) {
-      throw new Error('User id is required for bootstrap');
-    }
+    if (!userId) throw new Error('User id is required for bootstrap');
 
-    // First, try to find the user
-    let user = await this.db.user.findUnique({
-      where: { id: userId },
-      include: { stores: { include: { binancePayCredential: true } } },
-    });
-    let alreadyExists = true;
-    // If user doesn't exist, create them
-    if (!user) {
-      alreadyExists = false;
-      user = await this.db.user.create({
-        data: {
-          id: userId,
-          stores: {
-            create: {
-              apiKey: generateApiKey(),
-              name: 'Default Store',
-            },
+    const result = await this.db.$transaction(async (tx) => {
+      // intentar crear primero; si ya existe, leerlo
+      let user;
+      let createdUser = false;
+
+      try {
+        user = await tx.user.create({
+          data: { id: userId },
+          include: { stores: { include: { binancePayCredential: true } } },
+        });
+        createdUser = true;
+      } catch (e) {
+        if (
+          e instanceof Prisma.PrismaClientKnownRequestError &&
+          e.code === 'P2002'
+        ) {
+          user = await tx.user.findUnique({
+            where: { id: userId },
+            include: { stores: { include: { binancePayCredential: true } } },
+          });
+        } else {
+          throw e;
+        }
+      }
+
+      let createdStore = false;
+      if (user!.stores.length === 0) {
+        const store = await tx.store.create({
+          data: {
+            name: 'Default Store',
+            userId: user!.id,
+            apiKey: generateApiKey(),
           },
-        },
-        include: { stores: { include: { binancePayCredential: true } } },
-      });
-    } else if (user.stores.length === 0) {
-      // If user exists but has no stores, create a default store
-      alreadyExists = false;
-      const store = await this.db.store.create({
-        data: {
-          name: 'Default Store',
-          userId: user.id,
-          apiKey: generateApiKey(),
-        },
-        include: {
-          binancePayCredential: true,
-        },
-      });
-      user.stores.push(store);
-    }
+          include: { binancePayCredential: true },
+        });
+        user = { ...user!, stores: [store] };
+        createdStore = true;
+      }
 
-    return toDto(BootstrapResponseDto, {
-      alreadyExists: alreadyExists,
+      return { user, createdUser, createdStore };
     });
+
+    const alreadyExists = !(result.createdUser || result.createdStore);
+    return toDto(BootstrapResponseDto, { alreadyExists });
   }
 
   async getUser(userId: string): Promise<UserResponseDto | null> {

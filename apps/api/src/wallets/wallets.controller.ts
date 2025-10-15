@@ -6,7 +6,7 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { WalletsService } from './wallet.service';
+import { WalletsService } from './wallets.service';
 import { ApiHeader, ApiOperation, ApiSecurity } from '@nestjs/swagger';
 import { RegisterExternalWalletDto } from './dto/register-external-wallet-request.dto';
 import { ApiKeyGuard } from 'src/auth/api-key.guard';
@@ -15,8 +15,8 @@ import { Pay as BinancePay } from '@binance/pay';
 import { ConfigService } from '@nestjs/config';
 import { ms } from 'src/lib/utils/ms';
 
-@Controller('wallet')
-export class WalletController {
+@Controller('wallets')
+export class WalletsController {
   constructor(
     private readonly walletService: WalletsService,
     private readonly configService: ConfigService,

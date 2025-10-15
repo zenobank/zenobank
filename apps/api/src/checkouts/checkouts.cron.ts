@@ -27,25 +27,7 @@ export class CheckoutCron {
     }
 
     for (const checkout of checkouts) {
-      await this.db.checkout.update({
-        where: { id: checkout.id },
-        data: {
-          status: CheckoutStatus.EXPIRED,
-        },
-      });
-      await this.db.onChainPaymentAttempt.updateMany({
-        where: { checkoutId: checkout.id },
-        data: {
-          status: AttemptStatus.CANCELLED,
-        },
-      });
-      await this.db.binancePayPaymentAttempt.updateMany({
-        where: { checkoutId: checkout.id },
-        data: {
-          status: AttemptStatus.CANCELLED,
-        },
-      });
-      this.logger.log(`Expired checkout ${checkout.id}`);
+      await this.checkoutsService.markCheckoutAsExpired(checkout.id);
     }
   }
 }

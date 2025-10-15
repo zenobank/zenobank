@@ -1,11 +1,5 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import {
-  AttemptStatus,
-  Checkout,
-  OnChainPaymentAttempt,
-  PaymentStatus,
-} from '@prisma/client';
-import { SupportedNetworksId } from 'src/networks/network.interface';
+import { SupportedNetworksId } from '@repo/networks/types';
 import { Alchemy, WebhookType as AlchemyWebhookType } from 'alchemy-sdk';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ALCHEMY_SDK } from './lib/alchemy.constants';
@@ -16,6 +10,7 @@ import {
 } from './lib/alchemy.interface';
 import { isNumber } from 'class-validator';
 import {
+  ALCHEMY_SDK_TO_NETWORK_MAP,
   ALCHEMY_WEBHOOK_TO_NETWORK_MAP,
   NETWORK_TO_ALCHEMY_SDK,
 } from './lib/alchemy.network-map';
@@ -25,6 +20,8 @@ import { AddressActivityWebhookDto } from 'src/wallets/dto/address-activity-webh
 import { toDto } from 'src/lib/utils/to-dto';
 import { TokensService } from 'src/tokens/tokens.service';
 import { OnChainTokenResponseDto } from 'src/tokens/dto/onchain-token-response';
+import { CheckoutsService } from 'src/checkouts/checkouts.service';
+import { AttemptsService } from 'src/checkouts/attempts/attempts.service';
 
 @Injectable()
 export class AlchemyService {
@@ -33,6 +30,8 @@ export class AlchemyService {
     private readonly db: PrismaService,
     @Inject(ALCHEMY_SDK) private readonly alchemy: Alchemy,
     private readonly tokenService: TokensService,
+    private readonly checkoutsService: CheckoutsService,
+    private readonly attemptsService: AttemptsService,
   ) {}
 
   async processAddressActivityWebhook(body: AddressActivityWebhookResponse) {
@@ -64,27 +63,69 @@ export class AlchemyService {
     return { received: true };
   }
 
+  private extractDataFromActivity(
+    activity: AddressActivity,
+    supportedTokens: OnChainTokenResponseDto[],
+  ) {
+    const tokenAmount = this.extractTokenAmountFromActivity(activity);
+    const tokenId = this.extractTokenIdFromActivity(activity, supportedTokens);
+    const depositWalletAddress = activity.toAddress;
+    return { tokenAmount, tokenId, depositWalletAddress };
+  }
+
   private async processActivity(
     activity: AddressActivity,
     supportedTokens: OnChainTokenResponseDto[],
     network: SupportedNetworksId,
   ) {
-    const tokenAmount = activity.value;
-    const tokenId = this.findTokenIdFromActivity(activity, supportedTokens);
-
+    const { tokenAmount, tokenId, depositWalletAddress } =
+      this.extractDataFromActivity(activity, supportedTokens);
     if (!this.isValidActivity(activity, tokenId, tokenAmount)) {
       return;
     }
-
-    const paymentAttempt = await this.findPaymentAttempt(activity, network);
-    if (!paymentAttempt) {
+    if (!tokenId || !tokenAmount || !depositWalletAddress) {
+      this.logger.error('Missing data from activity', { activity });
       return;
     }
 
-    await this.validateAndUpdateCheckout(paymentAttempt);
+    const onChainPaymentAttempt =
+      await this.attemptsService.findOnChainPaymentAttempt({
+        tokenId,
+        networkId: network,
+        depositWalletAddress: depositWalletAddress,
+        tokenPayAmount: tokenAmount.toString(),
+      });
+    if (!onChainPaymentAttempt) {
+      this.logger.warn('Payment attempt not found', {
+        tokenId,
+        networkId: network,
+        depositWalletAddress,
+        tokenPayAmount: tokenAmount.toString(),
+      });
+      return;
+    }
+
+    const checkoutIntegrity = await this.checkoutsService.getCheckoutIntegrity(
+      onChainPaymentAttempt.checkoutId,
+    );
+    if (!checkoutIntegrity.isValid) {
+      this.logger.error('Checkout integrity not valid', {
+        checkoutId: onChainPaymentAttempt.checkoutId,
+        reason: checkoutIntegrity.reason,
+      });
+      return;
+    }
+
+    await this.attemptsService.confirmOnchainPaymentSuccess({
+      onChainPaymentAttemptId: onChainPaymentAttempt.id,
+    });
   }
 
-  private findTokenIdFromActivity(
+  private extractTokenAmountFromActivity(activity: AddressActivity) {
+    return activity.value;
+  }
+
+  private extractTokenIdFromActivity(
     activity: AddressActivity,
     supportedTokens: OnChainTokenResponseDto[],
   ) {
@@ -109,56 +150,6 @@ export class AlchemyService {
       return false;
     }
     return true;
-  }
-
-  private async findPaymentAttempt(
-    activity: AddressActivity,
-    network: SupportedNetworksId,
-  ) {
-    if (!activity.toAddress) {
-      this.logger.error('Invalid activity', { activity });
-      return null;
-    }
-    const paymentAttempt = await this.db.onChainPaymentAttempt.findFirst({
-      where: {
-        status: AttemptStatus.PENDING,
-        networkId: network,
-        depositWallet: {
-          address: activity.toAddress,
-          networkId: network,
-        },
-      },
-    });
-
-    if (!paymentAttempt) {
-      this.logger.warn(
-        `Payment attempt not found ${JSON.stringify({
-          activity,
-        })}`,
-      );
-      return null;
-    }
-
-    return paymentAttempt;
-  }
-
-  private async validateAndUpdateCheckout(
-    paymentAttempt: OnChainPaymentAttempt,
-  ) {
-    const checkout = await this.db.checkout.findUnique({
-      where: { id: paymentAttempt.checkoutId },
-    });
-
-    if (!checkout) {
-      this.logger.error(`Checkout not found ${paymentAttempt.id}`);
-      return;
-    }
-
-    if (checkout.expiresAt && checkout.expiresAt < new Date()) {
-      this.logger.error(
-        `Activity received but checkout expired ${checkout.id}`,
-      );
-    }
   }
 
   private isValidWebhookType(body: AddressActivityWebhookResponse): boolean {
@@ -204,7 +195,7 @@ export class AlchemyService {
     });
   }
 
-  async getWebhook(
+  async getOrCreateWebhook(
     network: SupportedNetworksId,
   ): Promise<AddressActivityWebhookDto> {
     const webhooksData = await this.alchemy.notify.getAllWebhooks();
@@ -228,11 +219,10 @@ export class AlchemyService {
       );
       await this.activateWebhook(webhook.id);
     }
-    const obj = toDto(AddressActivityWebhookDto, {
+    return toDto(AddressActivityWebhookDto, {
       id: webhook.id,
-      network: SupportedNetworksId.ETHEREUM_MAINNET,
+      network: ALCHEMY_SDK_TO_NETWORK_MAP[webhook.network],
     });
-    return obj;
   }
 
   async addAddressToWebhook({

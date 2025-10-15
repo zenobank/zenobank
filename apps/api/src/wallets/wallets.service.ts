@@ -5,14 +5,11 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { SupportedNetworksId } from 'src/networks/network.interface';
+import { SupportedNetworksId } from '@repo/networks/types';
 import { AlchemyService } from 'src/integrations/alchemy/alchemy.service';
 import { Wallet, NetworkType } from '@prisma/client';
 import { toEnumValue } from 'src/lib/utils/to-enum';
 import { AddressActivityWebhookDto } from './dto/address-activity-webhook.dto';
-import { generatePrivateKey, privateKeyToAddress } from 'viem/accounts';
-import { toDto } from 'src/lib/utils/to-dto';
-import { WalletResponseDto } from './dto/wallet.response.dto';
 
 @Injectable()
 export class WalletsService {
@@ -68,15 +65,18 @@ export class WalletsService {
     if (walletsWithThatAddress.length > 0) {
       throw new ConflictException(`Wallet ${address} already exists`);
     }
-    for (const network of networks) {
-      this.logger.log(
-        `Subscribing to address activity for ${address} on network ${network.id}`,
-      );
-      await this.subscribeToAddressActivity({
-        address,
-        network: toEnumValue(SupportedNetworksId, network.id),
-      });
-    }
+    await Promise.all(
+      networks.map(async (network) => {
+        this.logger.log(
+          `Subscribing to address activity for ${address} on network ${network.id}`,
+        );
+
+        await this.subscribeToAddressActivity({
+          address,
+          network: toEnumValue(SupportedNetworksId, network.id),
+        });
+      }),
+    );
     // await Promise.all(
     //   networks.map((network) =>
     //     this.subscribeToAddressActivity({
@@ -107,7 +107,7 @@ export class WalletsService {
     address: string;
     network: SupportedNetworksId;
   }): Promise<AddressActivityWebhookDto> {
-    const webhook = await this.alchemyService.getWebhook(network);
+    const webhook = await this.alchemyService.getOrCreateWebhook(network);
     if (!webhook) {
       this.logger.error(
         `!!Webhook not found for network ${network}. Address: ${address}`,
