@@ -5,7 +5,7 @@ import {
   OnChainPaymentAttempt,
   PaymentStatus,
 } from '@prisma/client';
-import { SupportedNetworksId } from 'src/networks/network.interface';
+import { SupportedNetworksId } from 'src/networks/networks.interface';
 import { Alchemy, WebhookType as AlchemyWebhookType } from 'alchemy-sdk';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ALCHEMY_SDK } from './lib/alchemy.constants';

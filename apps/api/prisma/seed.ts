@@ -1,6 +1,6 @@
 import { PrismaClient, NetworkType } from '@prisma/client';
 import { ms } from 'src/lib/utils/ms';
-import { SupportedNetworksId } from 'src/networks/network.interface';
+import { SupportedNetworksId } from 'src/networks/networks.interface';
 
 const prisma = new PrismaClient();
 

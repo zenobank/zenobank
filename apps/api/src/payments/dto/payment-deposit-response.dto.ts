@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
 import { IsEthereumAddress, IsString, IsEnum } from 'class-validator';
-import { SupportedNetworksId } from 'src/networks/network.interface';
+import { SupportedNetworksId } from 'src/networks/networks.interface';
 
 export class DepositDetailsDto {
   @Expose()

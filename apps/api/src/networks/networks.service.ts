@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { SupportedNetworksId } from 'src/networks/network.interface';
+import { SupportedNetworksId } from 'src/networks/networks.interface';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { NetworkResponseDto } from './dto/network-response.dto';
 import { toDto } from 'src/lib/utils/to-dto';

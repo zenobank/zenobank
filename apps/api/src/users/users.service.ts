@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { toDto } from 'src/lib/utils/to-dto';
 import { toEnumValue } from 'src/lib/utils/to-enum';
-import { SupportedNetworksId } from 'src/networks/network.interface';
+import { SupportedNetworksId } from 'src/networks/networks.interface';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 import { UserResponseDto } from './dtos/user-response.dto';

@@ -7,7 +7,7 @@ import { StoresService } from 'src/stores/stores.service';
 import { TokensService } from 'src/tokens/tokens.service';
 import { getCheckoutUrl } from 'src/checkouts/lib/utils';
 import { CanonicalTokensResponseDto } from 'src/tokens/dto/canonical-tokens-response';
-import { WalletsService } from 'src/wallets/wallet.service';
+import { WalletsService } from 'src/wallets/wallets.service';
 import { Checkout, CheckoutStatus } from '@prisma/client';
 import axios from 'axios';
 import { CheckoutEvents } from './lib/constants';
