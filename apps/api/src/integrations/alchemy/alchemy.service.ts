@@ -1,9 +1,9 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { SupportedNetworksId } from '@repo/networks/types';
 import { Alchemy, WebhookType as AlchemyWebhookType } from 'alchemy-sdk';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ALCHEMY_SDK } from './lib/alchemy.constants';
 import { env } from 'src/lib/utils/env';
+import { SupportedNetworksId } from '@repo/networks';
 import {
   AddressActivity,
   AddressActivityWebhookResponse,

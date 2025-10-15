@@ -19,7 +19,7 @@ const chainsById: Record<SupportedNetworksId, Chain> = {
   [SupportedNetworksId.BNB_MAINNET]: bsc,
   [SupportedNetworksId.ETHEREUM_HOLESKY]: holesky,
   [SupportedNetworksId.ETHEREUM_SEPOLIA]: sepolia,
-}
+};
 
 const enabledChains = Object.values(chainsById) as [Chain, ...Chain[]];
 
