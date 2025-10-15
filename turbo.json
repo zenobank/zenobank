@@ -37,6 +37,9 @@
     "check-types": {
       "dependsOn": ["^check-types", "format"],
       "cache": false
+    },
+    "clean": {
+      "cache": false
     }
   }
 }
