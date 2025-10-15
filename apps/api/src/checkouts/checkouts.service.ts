@@ -11,6 +11,7 @@ import { WalletsService } from 'src/wallets/wallets.service';
 import { Checkout, CheckoutStatus } from '@prisma/client';
 import axios from 'axios';
 import { CheckoutEvents } from './lib/constants';
+import { CheckoutEventDto } from './dtos/checkout-event.dto';
 @Injectable()
 export class CheckoutsService {
   private readonly logger = new Logger(CheckoutsService.name);
@@ -105,13 +106,15 @@ export class CheckoutsService {
       try {
         await axios.post(
           checkout.webhookUrl,
-          {
+          toDto(CheckoutEventDto, {
             event: CheckoutEvents.COMPLETED,
+            id: checkout.id,
+            eventDate: new Date(),
             data: toDto(CheckoutResponseDto, {
               ...checkout,
               checkoutUrl: getCheckoutUrl(checkout.id),
             }),
-          },
+          }),
           {
             headers: {
               'Content-Type': 'application/json',
