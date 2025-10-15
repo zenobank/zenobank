@@ -7,6 +7,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { UserResponseDto } from './dtos/user-response.dto';
 import { generateApiKey } from 'src/lib/utils/generate-api-key';
 import { BootstrapResponseDto } from './dtos/bootstrap-response.dto';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class UsersService {
@@ -15,41 +16,44 @@ export class UsersService {
 
   async bootstrap(userId: string): Promise<BootstrapResponseDto> {
     this.logger.log('Bootstrapping user with id: ' + userId);
-
-    if (!userId) {
-      throw new Error('User id is required for bootstrap');
-    }
+    if (!userId) throw new Error('User id is required for bootstrap');
 
     const result = await this.db.$transaction(async (tx) => {
-      const userAfterUpsert = await tx.user.upsert({
-        where: { id: userId },
-        update: {},
-        create: {
-          id: userId,
-        },
-        include: {
-          stores: { include: { binancePayCredential: true } },
-        },
-      });
-
+      // intentar crear primero; si ya existe, leerlo
+      let user;
       let createdUser = false;
-      let createdStore = false;
-      let user = userAfterUpsert;
 
-      if (user.stores.length === 0) {
+      try {
+        user = await tx.user.create({
+          data: { id: userId },
+          include: { stores: { include: { binancePayCredential: true } } },
+        });
+        createdUser = true;
+      } catch (e) {
+        if (
+          e instanceof Prisma.PrismaClientKnownRequestError &&
+          e.code === 'P2002'
+        ) {
+          user = await tx.user.findUnique({
+            where: { id: userId },
+            include: { stores: { include: { binancePayCredential: true } } },
+          });
+        } else {
+          throw e;
+        }
+      }
+
+      let createdStore = false;
+      if (user!.stores.length === 0) {
         const store = await tx.store.create({
           data: {
             name: 'Default Store',
-            userId: user.id,
+            userId: user!.id,
             apiKey: generateApiKey(),
           },
           include: { binancePayCredential: true },
         });
-
-        user = {
-          ...user,
-          stores: [store],
-        };
+        user = { ...user!, stores: [store] };
         createdStore = true;
       }
 
@@ -57,10 +61,7 @@ export class UsersService {
     });
 
     const alreadyExists = !(result.createdUser || result.createdStore);
-
-    return toDto(BootstrapResponseDto, {
-      alreadyExists,
-    });
+    return toDto(BootstrapResponseDto, { alreadyExists });
   }
 
   async getUser(userId: string): Promise<UserResponseDto | null> {

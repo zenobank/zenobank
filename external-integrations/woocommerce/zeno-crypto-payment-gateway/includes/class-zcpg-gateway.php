@@ -180,8 +180,7 @@ class ZCPG_Gateway extends WC_Payment_Gateway
         );
 
         $payload = array(
-            'version'           => ZCPG_VERSION,
-            'platform'          => 'woocommerce',
+            'version' => 'woocommerce:' . ZCPG_VERSION,
             'priceAmount'       => $amount,
             'priceCurrency'     => $currency,
             'orderId'           => (string) $order_id,

@@ -4,8 +4,10 @@ import {
   IsISO4217CurrencyCode,
   IsNotEmpty,
   IsNumberString,
+  IsOptional,
   IsPositive,
   IsString,
+  IsUrl,
   MaxLength,
 } from 'class-validator';
 import { trimTrailingDecimalZeros } from 'src/lib/utils/numbers';
@@ -38,4 +40,25 @@ export class CreateCheckoutDto {
     description: 'ISO 4217 currency code',
   })
   priceCurrency: string;
+
+  @IsOptional()
+  @IsUrl()
+  @MaxLength(2048)
+  @ApiProperty({
+    example: 'https://example.com/webhook',
+    description:
+      'Webhook URL to notify checkout status changes. For example, when the checkout is paid',
+    nullable: true,
+  })
+  webhookUrl: string | null = null;
+
+  @IsOptional()
+  @IsString()
+  @ApiProperty({
+    example: '123e4567-e89b-12d3-a456-426614174000',
+    description:
+      'Verification token signed with an secret key to ensure webhook integrity',
+    nullable: true,
+  })
+  verificationToken: string | null = null;
 }

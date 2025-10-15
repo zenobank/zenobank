@@ -97,8 +97,9 @@ model Checkout {
   onChainPaymentAttempts OnChainPaymentAttempt[]
   binancePayAttempts     BinancePayPaymentAttempt[]
 
-  // back-ref 1–1 desde Payment (relación nombrada)
-  payment Payment? @relation("CheckoutPayment")
+  webhookUrl        String?
+  verificationToken String?
+  payment           Payment? @relation("CheckoutPayment")
 
   createdAt         DateTime         @default(now())
   updatedAt         DateTime         @updatedAt
