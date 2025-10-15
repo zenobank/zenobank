@@ -10,9 +10,6 @@ import { AlchemyService } from 'src/integrations/alchemy/alchemy.service';
 import { Wallet, NetworkType } from '@prisma/client';
 import { toEnumValue } from 'src/lib/utils/to-enum';
 import { AddressActivityWebhookDto } from './dto/address-activity-webhook.dto';
-import { generatePrivateKey, privateKeyToAddress } from 'viem/accounts';
-import { toDto } from 'src/lib/utils/to-dto';
-import { WalletResponseDto } from './dto/wallet.response.dto';
 
 @Injectable()
 export class WalletsService {
