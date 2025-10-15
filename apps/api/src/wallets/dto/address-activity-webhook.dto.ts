@@ -1,4 +1,4 @@
-import { SupportedNetworksId } from '@repo/networks/types';
+import { SupportedNetworksId } from '@repo/networks';
 import { Expose, Transform } from 'class-transformer';
 import { IsBoolean, IsEnum, IsString } from 'class-validator';
 import { ALCHEMY_WEBHOOK_TO_NETWORK_MAP } from '../../integrations/alchemy/lib/alchemy.network-map';

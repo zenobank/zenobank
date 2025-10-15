@@ -9,7 +9,7 @@ import {
   rabbyWallet,
   braveWallet,
 } from '@rainbow-me/rainbowkit/wallets';
-import { SupportedNetworksId } from '@repo/networks/types';
+import { SupportedNetworksId } from '@repo/networks';
 
 const chainsById: Record<SupportedNetworksId, Chain> = {
   [SupportedNetworksId.ETHEREUM_MAINNET]: mainnet,
