@@ -17,35 +17,41 @@ export class UsersService {
   async bootstrap(userId: string): Promise<void> {
     this.logger.log('Bootstrapping user with id: ' + userId);
     if (!userId) throw new Error('User id is required for bootstrap');
-    const user = await this.db.user.upsert({
-      where: { id: userId },
-      create: {
-        id: userId,
-        stores: {
-          connectOrCreate: {
-            where: { userId_name: { userId, name: 'Default Store' } },
-            create: {
-              name: 'Default Store',
-              apiKey: generateApiKey(),
+    try {
+      const user = await this.db.user.upsert({
+        where: { id: userId },
+        create: {
+          id: userId,
+          stores: {
+            connectOrCreate: {
+              where: { userId_name: { userId, name: 'Default Store' } },
+              create: {
+                name: 'Default Store',
+                apiKey: generateApiKey(),
+              },
             },
           },
         },
-      },
-      update: {
-        stores: {
-          connectOrCreate: {
-            where: { userId_name: { userId, name: 'Default Store' } },
-            create: {
-              name: 'Default Store',
-              apiKey: generateApiKey(),
+        update: {
+          stores: {
+            connectOrCreate: {
+              where: { userId_name: { userId, name: 'Default Store' } },
+              create: {
+                name: 'Default Store',
+                apiKey: generateApiKey(),
+              },
             },
           },
         },
-      },
-      include: {
-        stores: { include: { binancePayCredential: true, wallets: true } },
-      },
-    });
+        include: {
+          stores: { include: { binancePayCredential: true, wallets: true } },
+        },
+      });
+      return;
+    } catch (error) {
+      this.logger.error('Error bootstrapping user: ' + error);
+      throw error;
+    }
   }
 
   async getUser(userId: string): Promise<UserResponseDto | null> {

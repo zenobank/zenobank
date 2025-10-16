@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { SupportedNetworksId } from '@repo/networks';
-import { Expose } from 'class-transformer';
+import { Expose, Transform } from 'class-transformer';
 import {
   IsBoolean,
   IsEnum,
@@ -34,6 +34,7 @@ export class OnChainTokenResponseDto {
   @Expose()
   @IsString()
   @ApiProperty({ example: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48' })
+  @Transform(({ value }) => value.toLowerCase())
   address: string;
 
   @Expose()

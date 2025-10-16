@@ -22,6 +22,7 @@ import { TokensService } from 'src/tokens/tokens.service';
 import { OnChainTokenResponseDto } from 'src/tokens/dto/onchain-token-response';
 import { CheckoutsService } from 'src/checkouts/checkouts.service';
 import { AttemptsService } from 'src/checkouts/attempts/attempts.service';
+import z from 'zod';
 
 @Injectable()
 export class AlchemyService {
@@ -182,9 +183,9 @@ export class AlchemyService {
       .filter((a) => a.erc721TokenId == null && a.erc1155Metadata == null)
       .filter((a) => a.category === 'token')
       .filter((a) =>
-        supportedTokensAddresses.includes(
-          a.rawContract?.address?.toLowerCase() ?? '',
-        ),
+        supportedTokensAddresses
+          .map((t) => t.toLowerCase())
+          .includes(a.rawContract?.address?.toLowerCase() ?? ''),
       )
       .filter((a) => a.log?.removed === false);
   }

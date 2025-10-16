@@ -14,13 +14,26 @@ import { API_KEY_HEADER } from 'src/auth/auth.constants';
 import { Pay as BinancePay } from '@binance/pay';
 import { ConfigService } from '@nestjs/config';
 import { ms } from 'src/lib/utils/ms';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Controller('wallets')
 export class WalletsController {
   constructor(
     private readonly walletService: WalletsService,
     private readonly configService: ConfigService,
+    private readonly db: PrismaService,
   ) {}
+
+  @Get('test')
+  async test() {
+    const allTokens = await this.db.onchainToken.findFirst({
+      where: {
+        address: '0xaf88d065e77c8cc2239327c5edb3a432268e5831',
+      },
+    });
+    console.log(allTokens);
+    return allTokens;
+  }
 
   @UseGuards(ApiKeyGuard)
   @ApiSecurity(API_KEY_HEADER)
