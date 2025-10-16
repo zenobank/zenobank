@@ -12,17 +12,17 @@ Open-source crypto payments for WooCommerce with 0% fees and instant settlement.
 
 == Description ==
 
-Stop giving away 3% in fees. No chargebacks. No disputes. No frozen funds.
+Stop giving away 3% in fees. **No chargebacks. No disputes. No frozen funds.**
 
 Accept crypto directly in WooCommerce and take full control of your money.
 
-Crypto adoption is growing fast. Accepting crypto opens your store to global customers and new revenue.
+Crypto adoption is growing fast. Accepting crypto **opens your store to global customers** and new revenue.
 
-Zeno Bank is a 100% open-source crypto payment gateway that enables your WooCommerce store to accept crypto payments.
+Zeno Bank is a **100% open-source** crypto payment gateway** that enables your WooCommerce store to accept crypto payments.
 
 Full source code available on [GitHub](https://github.com/zenobank/zenobank)
 
-Every payment goes directly to your wallet.
+Every payment **goes directly to your wallet.**
 
 We currently support EVM chains and Binance Pay, with more networks coming soon.
 
