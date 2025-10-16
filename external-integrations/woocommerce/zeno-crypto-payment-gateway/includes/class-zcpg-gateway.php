@@ -163,7 +163,6 @@ class ZCPG_Gateway extends WC_Payment_Gateway
         $success_url = add_query_arg(
             array(
                 'order_id'           => $order_id,
-                'verification_token' => $verification_token,
                 '_wpnonce'           => wp_create_nonce('zcpg_return_nonce'),
             ),
             WC()->api_request_url('zcpg_return')
@@ -172,7 +171,6 @@ class ZCPG_Gateway extends WC_Payment_Gateway
         $webhook_url = add_query_arg(
             array(
                 'order_id'           => $order_id,
-                'verification_token' => $verification_token,
             ),
             rest_url('zcpg/v1/webhook')
         );
