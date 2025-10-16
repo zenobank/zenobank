@@ -1,4 +1,7 @@
 == Changelog ==
+= 1.0.2 =
+* Updated readme.txt (improved plugin description and formatting).
+* Hid verification token in checkout success and webhook
 
 = 1.0.1 =
 * Added: Admin settings panel  
