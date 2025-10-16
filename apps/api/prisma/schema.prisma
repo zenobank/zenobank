@@ -208,7 +208,7 @@ model Network {
 model OnchainToken {
   id               String @id
   canonicalTokenId String
-  address          String
+  address          String @db.Citext
   decimals         Int
   symbol           String
 
@@ -262,7 +262,7 @@ model BinancePayToken {
 
 model Wallet {
   id        String   @id @default(uuid())
-  address   String
+  address   String   @db.Citext
   networkId String
   label     String?
   createdAt DateTime @default(now())
