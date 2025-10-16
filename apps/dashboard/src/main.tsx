@@ -140,8 +140,6 @@ if (!rootElement.innerHTML) {
       >
         <ClerkProvider
           publishableKey={PUBLISHABLE_KEY}
-          domain={'zenobank.io'}
-          isSatellite={false}
           afterSignOutUrl='/sign-in'
           signInUrl='/sign-in'
           signUpUrl='/sign-up'
