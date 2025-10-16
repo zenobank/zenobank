@@ -28,11 +28,14 @@ export class WalletsService {
     apiKey: string;
   }): Promise<void> {
     const address = _address.toLowerCase();
-
+    this.logger.log(
+      `Registering external EVm wallet ${address} for apiKey ${apiKey}`,
+    );
     const store = await this.db.store.findUnique({
       where: { apiKey },
     });
     if (!store) {
+      this.logger.error(`Store not found for apiKey ${apiKey}`);
       throw new NotFoundException('Store not found');
     }
 
@@ -59,32 +62,41 @@ export class WalletsService {
         }),
       ]);
     if (otherStoreWallets.length > 0) {
+      this.logger.error(`A wallet already exists for this store`);
       throw new ConflictException(`A wallet already exists for this store`);
     }
 
     if (walletsWithThatAddress.length > 0) {
+      this.logger.error(`Wallet ${address} already exists`);
       throw new ConflictException(`Wallet ${address} already exists`);
     }
-    await Promise.all(
-      networks.map(async (network) => {
-        this.logger.log(
-          `Subscribing to address activity for ${address} on network ${network.id}`,
-        );
-
-        await this.subscribeToAddressActivity({
-          address,
-          network: toEnumValue(SupportedNetworksId, network.id),
-        });
-      }),
+    if (!networks.length) {
+      this.logger.error(`No EVM networks found`);
+      throw new ConflictException(`No EVM networks found`);
+    }
+    this.logger.log(
+      `Subscribing to address activity for ${address} on networks ${networks.map((network) => network.id).join(', ')} for store ${store.id}`,
     );
     // await Promise.all(
-    //   networks.map((network) =>
-    //     this.subscribeToAddressActivity({
+    //   networks.map(async (network) => {
+    //     this.logger.log(
+    //       `Subscribing to address activity for ${address} on network ${network.id}`,
+    //     );
+
+    //     await this.subscribeToAddressActivity({
     //       address,
     //       network: toEnumValue(SupportedNetworksId, network.id),
-    //     }),
-    //   ),
+    //     });
+    //   }),
     // );
+    await Promise.all(
+      networks.map((network) =>
+        this.subscribeToAddressActivity({
+          address,
+          network: toEnumValue(SupportedNetworksId, network.id),
+        }),
+      ),
+    );
 
     const wallets = await this.db.$transaction(async (tx) => {
       return await Promise.all(

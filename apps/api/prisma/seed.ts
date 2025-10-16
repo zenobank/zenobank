@@ -149,7 +149,7 @@ async function seedTokensOnNetworks() {
         networkId: SupportedNetworksId.ARBITRUM_ONE_MAINNET,
         symbol: 'USDC',
         canonicalTokenId: 'USDC',
-        address: '0xaf88d065e77c8cC2239327C5EDb3A432268e5831',
+        address: '0xaf88d065e77c8cc2239327c5edb3a432268e5831',
         decimals: 6,
         logoUrl: 'https://pay.zenobank.io/images/tokens/usdc.png',
       },

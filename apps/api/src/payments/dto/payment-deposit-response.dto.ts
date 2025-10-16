@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Expose } from 'class-transformer';
+import { Expose, Transform } from 'class-transformer';
 import { IsEthereumAddress, IsString, IsEnum } from 'class-validator';
 import { SupportedNetworksId } from '@repo/networks';
 
@@ -9,6 +9,7 @@ export class DepositDetailsDto {
   @ApiProperty({
     example: '0x1234567890123456789012345678901234567890',
   })
+  @Transform(({ value }) => value.toLowerCase())
   address: string;
 
   @Expose()

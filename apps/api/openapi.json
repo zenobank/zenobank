@@ -301,6 +301,27 @@
         ]
       }
     },
+    "/api/v1/wallets/test": {
+      "get": {
+        "operationId": "WalletsController_test_v1",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Wallets"
+        ]
+      }
+    },
     "/api/v1/wallets/external": {
       "post": {
         "description": "An Externall wallet is an non-custodial wallet. Address must be an EVM address.",
@@ -412,14 +433,7 @@
         "parameters": [],
         "responses": {
           "201": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BootstrapResponseDto"
-                }
-              }
-            }
+            "description": ""
           }
         },
         "summary": "Create initial backend resources for the newly signed-up user",
@@ -968,18 +982,6 @@
         "required": [
           "id",
           "stores"
-        ]
-      },
-      "BootstrapResponseDto": {
-        "type": "object",
-        "properties": {
-          "alreadyExists": {
-            "type": "boolean",
-            "example": false
-          }
-        },
-        "required": [
-          "alreadyExists"
         ]
       }
     }
