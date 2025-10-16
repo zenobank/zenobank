@@ -73,6 +73,8 @@ model Store {
   payments             Payment[]
   checkouts            Checkout[]
   binancePayCredential BinancePayCredential?
+
+  @@unique([userId, name])
 }
 
 /**
