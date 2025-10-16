@@ -1,9 +1,11 @@
 import { AxiosError } from 'axios'
+import * as Sentry from '@sentry/react'
 import { toast } from 'sonner'
 
 export function handleServerError(error: unknown) {
   // eslint-disable-next-line no-console
   console.log(error)
+  Sentry.captureException(error)
 
   let errMsg = 'Something went wrong!'
 
@@ -19,6 +21,7 @@ export function handleServerError(error: unknown) {
   if (error instanceof AxiosError) {
     errMsg = error.response?.data.title
   }
-
-  toast.error(errMsg)
+  if (errMsg) {
+    toast.error(errMsg)
+  }
 }
