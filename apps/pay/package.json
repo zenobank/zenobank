@@ -13,6 +13,7 @@
     "api-client:generate": "dotenv -- orval"
   },
   "dependencies": {
+    "@repo/networks": "workspace:*",
     "@clerk/themes": "^2.4.10",
     "@radix-ui/react-alert-dialog": "^1.1.14",
     "@radix-ui/react-avatar": "^1.1.10",

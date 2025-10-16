@@ -5,8 +5,8 @@ import { match } from 'ts-pattern';
 import {
   useCheckoutsControllerGetCheckoutV1,
   useNetworksControllerGetNetworksV1,
-  useCheckoutsControllerCreateCheckoutAttemptBinancePayV1,
-  useCheckoutsControllerCreateCheckoutAttemptOnchainV1,
+  useAttemptsControllerCreateCheckoutAttemptBinancePayV1,
+  useAttemptsControllerCreateCheckoutAttemptOnchainV1,
   useCheckoutsControllerGetEnabledTokensV1,
 } from '@/lib/generated/api-client';
 import { CheckoutResponseDtoStatus } from '@/lib/generated/api-client/model';
@@ -40,8 +40,8 @@ export enum MethodType {
 
 export type TokenResponseDto = BinancePayTokenResponseDto | OnChainTokenResponseDto;
 export default function Payament({ id }: { id: string }) {
-  const { mutateAsync: createCheckoutAttemptBinancePay } = useCheckoutsControllerCreateCheckoutAttemptBinancePayV1();
-  const { mutateAsync: createCheckoutAttemptOnchain } = useCheckoutsControllerCreateCheckoutAttemptOnchainV1();
+  const { mutateAsync: createCheckoutAttemptBinancePay } = useAttemptsControllerCreateCheckoutAttemptBinancePayV1();
+  const { mutateAsync: createCheckoutAttemptOnchain } = useAttemptsControllerCreateCheckoutAttemptOnchainV1();
 
   const { data: { data: checkoutData } = {}, refetch: refetchPaymentData } = useCheckoutsControllerGetCheckoutV1(id, {
     query: {

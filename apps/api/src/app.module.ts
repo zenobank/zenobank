@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { WalletModule } from './wallets/wallet.module';
+import { WalletsModule } from './wallets/wallets.module';
 import { ConfigModule } from '@nestjs/config';
 import { env } from './lib/utils/env';
 import { PrismaModule } from './prisma/prisma.module';
@@ -24,7 +24,7 @@ import { APP_FILTER } from '@nestjs/core';
   imports: [
     SentryModule.forRoot(),
     AlchemyModule,
-    WalletModule,
+    WalletsModule,
     ConfigModule.forRoot({
       cache: true,
       isGlobal: true,

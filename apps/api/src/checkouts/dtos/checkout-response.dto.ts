@@ -1,18 +1,12 @@
+// checkout-response.dto.ts
 import { ApiProperty } from '@nestjs/swagger';
 import { CheckoutStatus } from '@prisma/client';
-import { Exclude, Expose, Type } from 'class-transformer';
-import { OnchainAttemptResponseDto } from '../attempts/dtos/onchain-attempt-response.dto';
-import { BinancePayAttemptResponseDto } from '../attempts/dtos/binance-pay-attempt-response.dto';
-import { BinancePayTokenResponseDto } from 'src/tokens/dto/binance-pay-token-response';
-import { OnChainTokenResponseDto } from 'src/tokens/dto/onchain-token-response';
+import { Exclude, Expose } from 'class-transformer';
 
 @Exclude()
 export class CheckoutResponseDto {
   @Expose()
-  @ApiProperty({
-    example: 'ckl1234567890',
-    description: 'Checkout ID',
-  })
+  @ApiProperty({ example: 'ckl1234567890', description: 'Checkout ID' })
   id: string;
 
   @Expose()
@@ -23,17 +17,11 @@ export class CheckoutResponseDto {
   orderId: string;
 
   @Expose()
-  @ApiProperty({
-    example: 'USD',
-    description: 'Currency code',
-  })
+  @ApiProperty({ example: 'USD', description: 'Currency code' })
   priceCurrency: string;
 
   @Expose()
-  @ApiProperty({
-    example: '100.00',
-    description: 'Price amount',
-  })
+  @ApiProperty({ example: '100.00', description: 'Price amount' })
   priceAmount: string;
 
   @Expose()
@@ -65,4 +53,24 @@ export class CheckoutResponseDto {
     description: 'Creation date',
   })
   createdAt: Date;
+
+  @Expose()
+  @ApiProperty({
+    example: 'https://example.com/webhook',
+    description:
+      'Webhook URL to notify checkout status changes. For example, when the checkout is paid',
+    nullable: true,
+  })
+  webhookUrl: string | null;
+}
+
+@Exclude()
+export class ProtectedCheckoutResponseDto extends CheckoutResponseDto {
+  @Expose()
+  @ApiProperty({
+    example: '123e4567-e89b-12d3-a456-426614174000',
+    description: 'Verification token to ensure webhook integrity',
+    nullable: true,
+  })
+  verificationToken: string | null;
 }

@@ -33,6 +33,13 @@
         "apps/api/openapi.json"
       ],
       "outputs": ["src/**", "dist/**"]
+    },
+    "check-types": {
+      "dependsOn": ["^check-types", "format"],
+      "cache": false
+    },
+    "clean": {
+      "cache": false
     }
   }
 }

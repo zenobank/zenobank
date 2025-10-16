@@ -9,16 +9,22 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CreatePaymentAttemptDto } from './dtos/create-payment-attempt.dto';
 import { TokensService } from 'src/tokens/tokens.service';
 
-import { AttemptStatus, CheckoutStatus, MethodType } from '@prisma/client';
+import {
+  AttemptStatus,
+  CheckoutStatus,
+  MethodType,
+  OnChainPaymentAttempt,
+} from '@prisma/client';
 import { OnchainAttemptResponseDto } from './dtos/onchain-attempt-response.dto';
 import { toDto } from 'src/lib/utils/to-dto';
 import { BinancePayAttemptResponseDto } from './dtos/binance-pay-attempt-response.dto';
 import { toEnumValue } from 'src/lib/utils/to-enum';
-import { SupportedNetworksId } from 'src/networks/network.interface';
+import { SupportedNetworksId } from '@repo/networks';
 import { BinancePayTokenResponseDto } from 'src/tokens/dto/binance-pay-token-response';
 import { OnChainTokenResponseDto } from 'src/tokens/dto/onchain-token-response';
 import { ConversionsService } from 'src/conversions/conversions.service';
 import { toBN } from 'src/lib/utils/numbers';
+import { CheckoutsService } from '../checkouts.service';
 
 @Injectable()
 export class AttemptsService {
@@ -26,6 +32,7 @@ export class AttemptsService {
     private readonly db: PrismaService,
     private readonly tokensService: TokensService,
     private readonly conversionsService: ConversionsService,
+    private readonly checkoutsService: CheckoutsService,
   ) {}
   private async getCheckoutContextOrThrow(checkoutId: string) {
     const checkout = await this.db.checkout.findUnique({
@@ -39,10 +46,11 @@ export class AttemptsService {
     const store = checkout.store;
     if (!store) throw new NotFoundException('Store not found');
 
-    const wallet = store.wallets[0];
-    if (!wallet) throw new UnprocessableEntityException('Wallet not found');
+    const wallets = store.wallets;
+    if (!wallets || wallets.length === 0)
+      throw new UnprocessableEntityException('Wallets not found');
 
-    return { checkout, store, wallet };
+    return { checkout, store, wallets };
   }
   private async getTokenOrThrow(
     method: typeof MethodType.ONCHAIN,
@@ -139,7 +147,7 @@ export class AttemptsService {
     checkoutId: string,
     createCheckoutAttemptDto: CreatePaymentAttemptDto,
   ): Promise<OnchainAttemptResponseDto> {
-    const { checkout, wallet } =
+    const { checkout, wallets } =
       await this.getCheckoutContextOrThrow(checkoutId);
 
     if (checkout.status !== CheckoutStatus.OPEN) {
@@ -160,6 +168,14 @@ export class AttemptsService {
       convertedAmount.amount,
       token.id,
     );
+    const walletId = wallets.find(
+      (wallet) => wallet.networkId === token.networkId,
+    )?.id;
+    if (!walletId) {
+      throw new UnprocessableEntityException(
+        'No wallet found for token network!!!',
+      );
+    }
 
     const onChainPaymentAttempt = await this.db.onChainPaymentAttempt.upsert({
       where: {
@@ -170,7 +186,7 @@ export class AttemptsService {
         checkoutId,
         tokenId: token.id,
         tokenPayAmount: tokenPayAmount,
-        depositWalletId: wallet.id,
+        depositWalletId: walletId,
         networkId: token.networkId,
       },
       include: {
@@ -240,5 +256,51 @@ export class AttemptsService {
       depositAccountId: store.binancePayCredential.accountId,
       binanceTokenId: binancePayPaymentAttempt.token.binanceTokenId,
     });
+  }
+  /**
+   * Confirm onchain payment success. Also mark checkout as completed
+   * @param onChainPaymentAttemptId - The ID of the onchain payment attempt to confirm
+   */
+  async confirmOnchainPaymentSuccess({
+    onChainPaymentAttemptId,
+  }: {
+    onChainPaymentAttemptId: string;
+  }) {
+    const onChainPaymentAttempt = await this.db.onChainPaymentAttempt.update({
+      where: { id: onChainPaymentAttemptId },
+      data: { status: AttemptStatus.SUCCEEDED },
+    });
+    await this.checkoutsService.completeCheckout(
+      onChainPaymentAttempt.checkoutId,
+    );
+  }
+
+  async findOnChainPaymentAttempt({
+    tokenId,
+    networkId,
+    depositWalletAddress,
+    tokenPayAmount,
+  }: {
+    tokenId: string;
+    networkId: string;
+    depositWalletAddress: string;
+    tokenPayAmount: string;
+  }): Promise<OnChainPaymentAttempt | null> {
+    const onChainPaymentAttempt = await this.db.onChainPaymentAttempt.findFirst(
+      {
+        where: {
+          status: AttemptStatus.PENDING,
+          networkId: networkId,
+          tokenPayAmount: tokenPayAmount,
+          tokenId: tokenId,
+          depositWallet: {
+            address: depositWalletAddress.toLowerCase(),
+            networkId: networkId,
+          },
+        },
+      },
+    );
+
+    return onChainPaymentAttempt || null;
   }
 }

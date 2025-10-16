@@ -17,14 +17,12 @@ class ZCPG_Webhook
 
     public function handle(WP_REST_Request $request)
     {
-        $data      = $request->get_json_params() ?: [];
-        $order_id  = intval($data['order_id'] ?? $request->get_param('order_id') ?? 0);
-        $status    = sanitize_text_field($data['status'] ?? $request->get_param('status') ?? '');
+        $body      = $request->get_json_params() ?: [];
+        $order_id  = intval($body['data']['orderId'] ?? $request->get_param('order_id') ?? 0);
+        $received_token = sanitize_text_field($body['data']['verificationToken'] ?? $request->get_param('verification_token') ?? '');
+        $status    = sanitize_text_field($body['data']['status'] ?? $request->get_param('status') ?? '');
 
-        // Read the verification_token from request (body or query)
-        $received_token = sanitize_text_field(
-            $data['verification_token'] ?? $request->get_param('verification_token') ?? ''
-        );
+
         $gateways = WC()->payment_gateways()->payment_gateways();
         $gw = $gateways['zcpg_gateway'] ?? null;
 
@@ -44,7 +42,7 @@ class ZCPG_Webhook
         // Token is valid: process the order status update
         if ($order_id && ($order = wc_get_order($order_id))) {
             if ($status === 'COMPLETED') {
-                $order->payment_complete($data['transaction_id'] ?? '');
+                $order->payment_complete($order_id);
                 $order->add_order_note(__('Payment confirmed via webhook.', 'zeno-crypto-payment-gateway'));
             } else {
                 $order->update_status('failed', __('Payment failed via webhook.', 'zeno-crypto-payment-gateway'));
@@ -56,7 +54,6 @@ class ZCPG_Webhook
             'order_id' => $order_id,
             'status' => $status,
             'received_token' => $received_token,
-            'expected_token' => $expected_token,
             'order' => $order,
         ];
     }

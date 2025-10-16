@@ -1,15 +1,24 @@
-// src/lib/axios-instance.ts  (o la ruta que pusiste en orval.config.ts)
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios'
 
-// puedes conservar una instancia interna si quieres interceptores, baseURL, etc.
+interface ClerkWindow {
+  Clerk?: {
+    session?: {
+      getToken: (options?: unknown) => Promise<string | null>
+    }
+  }
+}
+
 const instance = axios.create({
   withCredentials: true,
-  // baseURL: process.env.NEXT_PUBLIC_API_BASE_URL, // si te sirve
 })
 
-// interceptores opcionales
-instance.interceptors.request.use((config) => {
-  // ej: añadir api-key, logs, etc.
+instance.interceptors.request.use(async (config) => {
+  const token = await (window as ClerkWindow).Clerk?.session?.getToken()
+
+  if (token) {
+    config.headers?.set?.('Authorization', `Bearer ${token}`)
+  }
+
   return config
 })
 

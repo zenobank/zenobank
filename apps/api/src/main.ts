@@ -50,7 +50,6 @@ async function bootstrap() {
     ],
     credentials: true,
   });
-
   app.setGlobalPrefix('api');
   app.enableVersioning({
     type: VersioningType.URI,
@@ -91,4 +90,5 @@ async function bootstrap() {
 
   await app.listen(3001);
 }
+
 bootstrap();

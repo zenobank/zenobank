@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { SupportedNetworksId } from 'src/networks/network.interface';
+import { SupportedNetworksId } from '@repo/networks';
 import { Expose } from 'class-transformer';
 import {
   IsBoolean,
