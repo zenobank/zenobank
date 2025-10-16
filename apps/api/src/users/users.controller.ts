@@ -37,7 +37,9 @@ export class UsersController {
   })
   @UseGuards(AuthGuard)
   @Post('me/bootstrap')
-  async bootstrap(@Req() req: AuthenticatedRequest): Promise<void> {
-    return this.usersService.bootstrap(req.userId);
+  async bootstrap(
+    @Req() req: AuthenticatedRequest,
+  ): Promise<BootstrapResponseDto> {
+    return await this.usersService.bootstrap(req.userId);
   }
 }
