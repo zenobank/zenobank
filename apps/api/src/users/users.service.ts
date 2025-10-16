@@ -14,54 +14,38 @@ export class UsersService {
   private readonly logger = new Logger(UsersService.name);
   constructor(private readonly db: PrismaService) {}
 
-  async bootstrap(userId: string): Promise<BootstrapResponseDto> {
+  async bootstrap(userId: string): Promise<void> {
     this.logger.log('Bootstrapping user with id: ' + userId);
     if (!userId) throw new Error('User id is required for bootstrap');
-
-    const result = await this.db.$transaction(async (tx) => {
-      // intentar crear primero; si ya existe, leerlo
-      let user;
-      let createdUser = false;
-
-      try {
-        user = await tx.user.create({
-          data: { id: userId },
-          include: { stores: { include: { binancePayCredential: true } } },
-        });
-        createdUser = true;
-      } catch (e) {
-        if (
-          e instanceof Prisma.PrismaClientKnownRequestError &&
-          e.code === 'P2002'
-        ) {
-          user = await tx.user.findUnique({
-            where: { id: userId },
-            include: { stores: { include: { binancePayCredential: true } } },
-          });
-        } else {
-          throw e;
-        }
-      }
-
-      let createdStore = false;
-      if (user!.stores.length === 0) {
-        const store = await tx.store.create({
-          data: {
-            name: 'Default Store',
-            userId: user!.id,
-            apiKey: generateApiKey(),
+    const user = await this.db.user.upsert({
+      where: { id: userId },
+      create: {
+        id: userId,
+        stores: {
+          connectOrCreate: {
+            where: { userId_name: { userId, name: 'Default Store' } },
+            create: {
+              name: 'Default Store',
+              apiKey: generateApiKey(),
+            },
           },
-          include: { binancePayCredential: true },
-        });
-        user = { ...user!, stores: [store] };
-        createdStore = true;
-      }
-
-      return { user, createdUser, createdStore };
+        },
+      },
+      update: {
+        stores: {
+          connectOrCreate: {
+            where: { userId_name: { userId, name: 'Default Store' } },
+            create: {
+              name: 'Default Store',
+              apiKey: generateApiKey(),
+            },
+          },
+        },
+      },
+      include: {
+        stores: { include: { binancePayCredential: true, wallets: true } },
+      },
     });
-
-    const alreadyExists = !(result.createdUser || result.createdStore);
-    return toDto(BootstrapResponseDto, { alreadyExists });
   }
 
   async getUser(userId: string): Promise<UserResponseDto | null> {

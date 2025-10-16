@@ -412,14 +412,7 @@
         "parameters": [],
         "responses": {
           "201": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BootstrapResponseDto"
-                }
-              }
-            }
+            "description": ""
           }
         },
         "summary": "Create initial backend resources for the newly signed-up user",
@@ -968,18 +961,6 @@
         "required": [
           "id",
           "stores"
-        ]
-      },
-      "BootstrapResponseDto": {
-        "type": "object",
-        "properties": {
-          "alreadyExists": {
-            "type": "boolean",
-            "example": false
-          }
-        },
-        "required": [
-          "alreadyExists"
         ]
       }
     }
