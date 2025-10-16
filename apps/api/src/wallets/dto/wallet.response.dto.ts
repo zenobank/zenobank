@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Expose } from 'class-transformer';
+import { Expose, Transform } from 'class-transformer';
 import { SupportedNetworksId } from '@repo/networks';
 
 export class WalletResponseDto {
@@ -15,6 +15,7 @@ export class WalletResponseDto {
     description: 'Wallet address',
     example: '0xc429e068b65b3462f0e422b3ea388a7a37b23bff',
   })
+  @Transform(({ value }) => value.toLowerCase())
   address: string;
 
   @Expose()
