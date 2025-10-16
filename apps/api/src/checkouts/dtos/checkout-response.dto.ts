@@ -74,12 +74,4 @@ export class CheckoutResponseDto {
     nullable: true,
   })
   webhookUrl: string | null;
-
-  @Expose()
-  @ApiProperty({
-    example: '123e4567-e89b-12d3-a456-426614174000',
-    description: 'Verification token to ensure webhook integrity',
-    nullable: true,
-  })
-  verificationToken: string | null;
 }
