@@ -7,7 +7,7 @@ import {
   IsString,
 } from 'class-validator';
 import { CheckoutEvents, type CheckoutEvent } from '../lib/constants';
-import { CheckoutResponseDto } from './checkout-response.dto';
+import { ProtectedCheckoutResponseDto } from './checkout-response.dto';
 import { Expose, Type } from 'class-transformer';
 
 export class CheckoutEventDto {
@@ -39,8 +39,8 @@ export class CheckoutEventDto {
   @IsNotEmpty()
   @IsObject()
   @ApiProperty({
-    type: CheckoutResponseDto,
+    type: ProtectedCheckoutResponseDto,
   })
-  @Type(() => CheckoutResponseDto)
-  data: CheckoutResponseDto;
+  @Type(() => ProtectedCheckoutResponseDto)
+  data: ProtectedCheckoutResponseDto;
 }

@@ -1,7 +1,10 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateCheckoutDto } from './dtos/create-checkout.dto';
-import { CheckoutResponseDto } from './dtos/checkout-response.dto';
+import {
+  CheckoutResponseDto,
+  ProtectedCheckoutResponseDto,
+} from './dtos/checkout-response.dto';
 import { toDto } from 'src/lib/utils/to-dto';
 import { StoresService } from 'src/stores/stores.service';
 import { TokensService } from 'src/tokens/tokens.service';
@@ -110,7 +113,7 @@ export class CheckoutsService {
             event: CheckoutEvents.COMPLETED,
             id: checkout.id,
             eventDate: new Date(),
-            data: toDto(CheckoutResponseDto, {
+            data: toDto(ProtectedCheckoutResponseDto, {
               ...checkout,
               checkoutUrl: getCheckoutUrl(checkout.id),
             }),
