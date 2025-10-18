@@ -301,27 +301,6 @@
         ]
       }
     },
-    "/api/v1/wallets/test": {
-      "get": {
-        "operationId": "WalletsController_test_v1",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Wallets"
-        ]
-      }
-    },
     "/api/v1/wallets/external": {
       "post": {
         "description": "An Externall wallet is an non-custodial wallet. Address must be an EVM address.",
