@@ -27,10 +27,10 @@ export class AlchemySignatureGuard implements CanActivate {
       '54.236.136.17', // alchemy server 1
       '34.237.24.169', // alchemy server 2
     ];
-    if (!ALLOWED_IPS.includes(ip)) {
-      this.logger.error(`IP ${ip} is not allowed`);
-      throw new UnauthorizedException('IP not allowed');
-    }
+    // if (!ALLOWED_IPS.includes(ip)) {
+    //   this.logger.error(`IP ${ip} is not allowed`);
+    //   throw new UnauthorizedException('IP not allowed');
+    // }
     const sig = req.headers['x-alchemy-signature'] as string;
     const signingKey = env.ALCHEMY_AUTH_TOKEN;
     return true;
